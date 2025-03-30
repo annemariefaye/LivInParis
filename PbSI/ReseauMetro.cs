@@ -39,27 +39,6 @@ namespace PbSI
             return stations;
         }
 
-        private int CompterLiensUniques(List<List<string>> donneesArcs)
-        {
-            HashSet<(int, int)> liensUniques = new HashSet<(int, int)>();
-
-            foreach (var dataStation in donneesArcs)
-            {
-                if (dataStation[0] != "-1" && dataStation[2] != "-1")
-                {
-                    int idStation = int.Parse(dataStation[0]);
-                    int idStationPrecedente = int.Parse(dataStation[2]);
-                    int idStationSuivante = int.Parse(dataStation[3]);
-
-                    // Ajouter les liens
-                    liensUniques.Add((idStationPrecedente, idStation));
-                    liensUniques.Add((idStation, idStationPrecedente)); // Pour le lien inverse
-                }
-            }
-
-            return liensUniques.Count; 
-        }
-
 
 
         private void CreerRelations(List<Noeud<StationMetro>> stations, List<List<string>> donneesArcs)

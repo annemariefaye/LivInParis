@@ -307,6 +307,121 @@
             return min_index;
         }
 
+        ///<summary>
+        ///Algorithme de Bellman-Ford pour trouver le chemin le plus court
+
+        public static void BellmanFord(Graphe<T> graphe, int departIndex, int arriveeIndex)
+        {
+            int nbNodes = graphe.Noeuds.Count;
+            double[] distances = new double[nbNodes];
+            int[] parents = new int[nbNodes];
+            // initialisation
+            for (int i = 0; i < nbNodes; i++)
+            {
+                distances[i] = double.PositiveInfinity;
+                parents[i] = -1;
+            }
+            distances[departIndex] = 0;
+
+            for (int i = 0; i < nbNodes - 1; i++)
+            {
+                foreach (var lien in graphe.Liens)
+                {
+                    int u = lien.Source.Id;
+                    int v = lien.Destination.Id;
+                    double poids = lien.Poids;
+
+                    if (distances[u] + poids < distances[v])
+                    {
+                        distances[v] = distances[u] + poids;
+                        parents[v] = u;
+                    }
+                }
+            }
+
+            /// verification de la presence de cycle negatif
+            foreach (var lien in graphe.Liens)
+            {
+                int u = lien.Source.Id;
+                int v = lien.Destination.Id;
+                double poids = lien.Poids;
+
+                if (distances[u] + poids < distances[v])
+                {
+                    Console.WriteLine("Cycle de poids negatif detecte");
+                    return;
+                }
+            }
+
+        }
+
+        ///<summary>
+        ///algorithme de Floyd Warshall
+        ///</summary>
+        
+        public static void FloydWarshall (Graphe<T> graphe)
+        {
+            int n = graphe.Noeuds.Count;
+
+            double[,] distances = new double[n, n];
+            int?[,] predecesseurs = new int?[n, n];
+
+            for (int i=0; i<n; i++)
+            {
+                for (int j=0;i<n;j++)
+                {
+                    if (i == j)
+                    {
+                        distances[i, j] = 0;
+                    }
+                    else if (graphe.MatriceAdjacence[i, j] != 0)
+                    {
+                        distances[i, j] = graphe.MatriceAdjacence[i, j];
+                        predecesseurs[i, j] = i;
+                    }
+
+                    else
+                    {
+                        distances[i, j] = double.PositiveInfinity;
+                        predecesseurs[i, j] = null;
+                    }
+
+                }
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                        for (int k = 0; k < n; k++)
+                    {
+                        if (distances[j,i]+ distances[i,k]< distances[j, k])
+                        {
+                            distances[j, k] = distances[j, i] + distances[i, k];
+                            predecesseurs[j, k] = predecesseurs[i, k];
+                        }
+                    }
+
+                }
+            }
+            
+            for (int i = 0; i < n; i++)
+            {
+                for (int j=0;j<n;j++)
+                {
+                    if (i!=j && distances[i,j]!= double.PositiveInfinity)
+                    {
+                        Console.WriteLine($"\n Chemin le plus court de  {i} a {j} :");
+                        Console.WriteLine("je sais pas comment le faire aahh ");
+                        Console.WriteLine($"Distance totale : {distances[i, j]}");
+                    }
+                }
+            }
+        }
+
+
+
+
         #endregion
 
         #region Cycle
