@@ -1,0 +1,27 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="export" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="export">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="IdCuisinier" type="xs:int" minOccurs="0" />
+                <xs:element name="MotDePasse" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <export>
+    <IdCuisinier>1</IdCuisinier>
+    <MotDePasse>cuisine123</MotDePasse>
+  </export>
+  <export>
+    <IdCuisinier>2</IdCuisinier>
+    <MotDePasse>chef789</MotDePasse>
+  </export>
+</NewDataSet>
