@@ -54,6 +54,7 @@ namespace PbSI
                 }
                 Console.WriteLine();
             }
+            this.reader.Close();
         }
 
         public void exporterResultatRequete(string nomFichier="export")
