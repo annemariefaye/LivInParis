@@ -14,8 +14,8 @@ public class Visualisation : Form
         ligneColors = new Dictionary<string, Color>();
         this.Text = "Graphe du Métro de Paris";
         this.Size = new Size(1500, 1000);
+        this.BackColor = Color.White; // Ajout d'un fond blanc
 
-        // Ajout d'un bouton pour enregistrer l'image
         Button saveButton = new Button
         {
             Text = "Enregistrer en tant qu'image",
@@ -38,15 +38,15 @@ public class Visualisation : Form
 
     private PointF ConvertToScreenCoordinates(float lon, float lat)
     {
-        float margin = 0; // Réduire la marge pour utiliser tout l'espace
+        float margin = 0;
         float scaleX = (this.ClientSize.Width - margin) / (maxX - minX);
         float scaleY = (this.ClientSize.Height - margin) / (maxY - minY);
-        float scale = Math.Min(scaleX, scaleY) * 0.95f; // Réduire légèrement le scale pour éviter le débordement
+        float scale = Math.Min(scaleX, scaleY) * 0.95f;
 
-        float screenX = (lon - minX) * scale + margin / 2;
-
-        float upperMargin = 30; // Ajustez cette valeur pour abaisser le haut du graphe
-        float screenY = (maxY - lat) * scale + margin / 2 + upperMargin; // Ajout de la marge supérieure
+        float offsetX = 50; 
+        float screenX = (lon - minX) * scale + margin / 2 + offsetX;
+        float upperMargin = 30;
+        float screenY = (maxY - lat) * scale + margin / 2 + upperMargin;
 
         return new PointF(screenX, screenY);
     }
@@ -55,7 +55,7 @@ public class Visualisation : Form
     {
         g.DrawLine(pen, start, end);
 
-        float arrowSize = 10;
+        float arrowSize = 4;
         double angle = Math.Atan2(end.Y - start.Y, end.X - start.X);
         PointF arrow1 = new PointF(
             end.X - (float)(arrowSize * Math.Cos(angle - Math.PI / 6)),
@@ -73,17 +73,14 @@ public class Visualisation : Form
     {
         Graphics g = e.Graphics;
         g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        g.Clear(Color.White); // S'assurer que le fond est blanc
         Dictionary<Noeud<StationMetro>, PointF> positions = new Dictionary<Noeud<StationMetro>, PointF>();
-        Dictionary<Noeud<StationMetro>, RectangleF> labelBounds = new Dictionary<Noeud<StationMetro>, RectangleF>();
 
-        // Calcul des positions des nœuds
         foreach (var noeud in graphe.Noeuds)
         {
-            StationMetro station = noeud.Contenu;
-            positions[noeud] = ConvertToScreenCoordinates((float)station.Longitude, (float)station.Latitude);
+            positions[noeud] = ConvertToScreenCoordinates((float)noeud.Contenu.Longitude, (float)noeud.Contenu.Latitude);
         }
 
-        // Dessiner les liens entre les nœuds
         foreach (var lien in graphe.Liens)
         {
             Noeud<StationMetro> source = lien.Source;
@@ -98,59 +95,45 @@ public class Visualisation : Form
             DrawArrow(g, pen, start, direction);
         }
 
-        // Créer un dictionnaire pour suivre les coordonnées déjà affichées
-        HashSet<PointF> displayedLabels = new HashSet<PointF>();
-
-        // Dessiner les nœuds et les étiquettes
         foreach (var noeud in graphe.Noeuds)
         {
             PointF position = positions[noeud];
-            g.FillEllipse(Brushes.Black, position.X - 5, position.Y - 5, 10, 10);
+            g.FillEllipse(Brushes.Black, position.X - 5, position.Y - 5, 5, 5);
 
-            // Vérifier si cette position a déjà été utilisée pour une étiquette
-            if (!displayedLabels.Contains(position))
-            {
-                // Ajouter la position au set pour éviter de réécrire le même label
-                displayedLabels.Add(position);
+            string label = noeud.Contenu.Libelle;
+            Font labelFont = new Font("Arial", 3);
+            SizeF labelSize = g.MeasureString(label, labelFont);
+            PointF labelPosition = new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8); // Positionner le texte au-dessus du nœud
 
-                // Créer la chaîne pour l'étiquette
-                string label = noeud.Contenu.Libelle;
-                Font labelFont = new Font("Arial", 3);
-                SizeF labelSize = g.MeasureString(label, labelFont);
+            // Dessiner le fond blanc pour le libellé
+            RectangleF backgroundRect = new RectangleF(labelPosition.X - 2, labelPosition.Y - 2, labelSize.Width + 4, labelSize.Height + 4);
+            g.FillRectangle(Brushes.White, backgroundRect);
+            g.DrawRectangle(Pens.Black, backgroundRect.X, backgroundRect.Y, backgroundRect.Width, backgroundRect.Height); // Bordure noire
 
-                // Déterminer la position de l'étiquette
-                PointF labelPosition = new PointF(position.X + 12, position.Y - 12);
-
-                // Dessiner l'étiquette
-                g.DrawString(label, labelFont, Brushes.Black, labelPosition);
-            }
+            // Dessiner le texte
+            g.DrawString(label, labelFont, Brushes.Black, labelPosition);
         }
     }
 
     private void SaveButton_Click(object sender, EventArgs e)
     {
-        // Facteur d'échelle pour augmenter la qualité
         float scaleFactor = 3.0f;
-
-        // Créer un bitmap de la taille de la fenêtre multipliée par le facteur d'échelle
         using (Bitmap bitmap = new Bitmap((int)(this.ClientSize.Width * scaleFactor), (int)(this.ClientSize.Height * scaleFactor)))
         {
-            // Dessiner le contenu de la fenêtre sur le bitmap
             using (Graphics g = Graphics.FromImage(bitmap))
             {
-                g.Clear(this.BackColor);
-                g.ScaleTransform(scaleFactor, scaleFactor); // Appliquer l'échelle
+                g.Clear(Color.White);
+                g.ScaleTransform(scaleFactor, scaleFactor);
                 DrawGraph(this, new PaintEventArgs(g, this.ClientRectangle));
             }
 
-            // Enregistrer l'image dans un fichier
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
                 saveFileDialog.Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp";
                 saveFileDialog.Title = "Enregistrer l'image";
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    bitmap.Save(saveFileDialog.FileName, ImageFormat.Png); // Changez le format si nécessaire
+                    bitmap.Save(saveFileDialog.FileName, ImageFormat.Png);
                 }
             }
         }
