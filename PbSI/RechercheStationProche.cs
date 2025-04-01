@@ -10,7 +10,7 @@ namespace PbSI
     {
         private readonly string adresse;
         private readonly Graphe<StationMetro> graphe;
-        private int idStationProche = -1;
+        private List<int> idStationsProches = new List<int> { -1};
         private const double RayonTerre = 6371000.0;
 
         public RechercheStationProche(string adresse, Graphe<StationMetro> graphe)
@@ -22,15 +22,15 @@ namespace PbSI
         public async Task InitialiserAsync()
         {
             (double lon, double lat)? coordonnees = await ConvertirAdresseEnCoordonnees(adresse);
-            RechercherStationProche(coordonnees);
+            RechercherStationsProches(coordonnees);
         }
 
-        public int IdStationProche
+        public List<int> IdStationsProches
         {
             get
             {
-                if (this.idStationProche != -1)
-                    return this.idStationProche;
+                if (this.idStationsProches[0] != -1)
+                    return this.idStationsProches;
                 else
                     throw new Exception("Aucune station trouvée.");
             }
@@ -68,36 +68,41 @@ namespace PbSI
             return null;
         }
 
-        public void RechercherStationProche((double lon, double lat)? coordonneesOriginelles)
+        public void RechercherStationsProches((double lon, double lat)? coordonneesOriginelles)
         {
-            if (coordonneesOriginelles == null) {return;}
+            if (coordonneesOriginelles == null) return;
 
-            Console.WriteLine("Recherche de la station la plus proche..."); 
+            Console.WriteLine("Recherche des stations les plus proches...");
 
             double distanceMin = double.MaxValue;
+            List<int> stationsProches = new List<int>();
 
             foreach (var noeud in this.graphe.Noeuds)
             {
-                Console.WriteLine(noeud.ToString());
-                if (noeud is Noeud<StationMetro> station)
+                if (noeud is Noeud<StationMetro> station && station.Contenu != null)
                 {
-                    if(station.Contenu != null)
+                    (double lon, double lat) coordonneesStation = (station.Contenu.Longitude, station.Contenu.Latitude);
+                    double distance = CalculerDistance(coordonneesOriginelles.Value, coordonneesStation);
+
+                    //Console.WriteLine("La distance est : " + distance);
+
+                    if (distance < distanceMin)
                     {
-                        (double lon, double lat) coordonneesStation = (station.Contenu.Longitude, station.Contenu.Latitude);
-                        double distance = CalculerDistance(coordonneesOriginelles.Value, coordonneesStation);
-
-                        Console.WriteLine("la distance est : " + distance);
-
-                        if (distance < distanceMin)
-                        {
-                            distanceMin = distance;
-                            this.idStationProche = station.Id;
-                        }
+                        distanceMin = distance;
+                        stationsProches.Clear(); // On enlève les anciennes stations si on trouve plus proche
+                        stationsProches.Add(station.Id);
+                    }
+                    else if (Math.Abs(distance - distanceMin) < 1e-6) // Tolérance pour éviter erreurs de précision
+                    {
+                        stationsProches.Add(station.Id);
                     }
                 }
             }
 
-            Console.WriteLine(this.idStationProche);
+            // Stocke la liste des stations proches
+            this.idStationsProches = stationsProches;
+
+            Console.WriteLine("Stations les plus proches : " + string.Join(", ", stationsProches));
         }
 
         public double CalculerDistance((double lon, double lat) origine, (double lon, double lat) destination)

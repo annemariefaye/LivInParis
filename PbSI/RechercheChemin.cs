@@ -1,4 +1,8 @@
-﻿namespace PbSI
+﻿using Mysqlx.Crud;
+using MySqlX.XDevAPI.CRUD;
+using System.Diagnostics;
+
+namespace PbSI
 {
     public static class RechercheChemin<T> where T : notnull
     {
@@ -235,8 +239,9 @@
         /// </summary>
         /// <param name="graph">Graphe sous forme de matrice d'adjacence</param>
         /// <param name="depart">Noeud de départ</param>
-        public static void Dijkstra(double[,] matriceAdjacence, int depart, int arrivee)
+        public static (double, List<int>) Dijkstra(Graphe<StationMetro> graphe, int depart, int arrivee)
         {
+            double[,] matriceAdjacence = graphe.MatriceAdjacence;
             int nbNodes = matriceAdjacence.GetLength(0);
 
             double[] distances = new double[nbNodes];
@@ -260,8 +265,6 @@
                 int indexMinDistance = minimum_distance(distances, dejaExplore, nbNodes);
                 dejaExplore[indexMinDistance] = true;
 
-                //Console.WriteLine($"On visite à partir du noeud {mapIdIndex.FirstOrDefault(x => x.Value == indexMinDistance).Key} : ");
-
                 for (int n = 0; n < nbNodes; n++)
                 {
                     if (!dejaExplore[n] && matriceAdjacence[indexMinDistance, n] != 0)
@@ -272,15 +275,38 @@
                         {
                             distances[n] = newDist;
                             parents[n] = indexMinDistance;
-                            Console.WriteLine($"Node : {n}, Poids : {matriceAdjacence[indexMinDistance, n]}, Distance totale : {distances[n]}");
                         }
                     }
                 }
-                //Console.WriteLine();
             }
 
-            AfficherChemin(parents, departIndex, arriveeIndex);
-            Console.WriteLine($"Poids total du chemin de {depart} à {arrivee} : {distances[arriveeIndex]}");
+            List<int> chemin = ObtenirChemin(parents, departIndex, arriveeIndex);
+            //AfficherChemin(chemin, graphe);
+
+            return (distances[arriveeIndex], chemin);
+        }
+
+        public static void DijkstraListe(Graphe<StationMetro> graphe, List<int> depart, List<int> arrivee)
+        {
+            double distanceMin = double.MaxValue;
+            List<int> cheminMin = new List<int>();
+
+            foreach (int id in depart)
+            {
+                foreach (int id2 in arrivee)
+                {
+                    (double distanceCurrent, List<int> cheminCurrent) = RechercheChemin<StationMetro>.Dijkstra(graphe, id, id2);
+                    if (distanceCurrent < distanceMin)
+                    {
+                        distanceMin = distanceCurrent;
+                        cheminMin = cheminCurrent;
+                    }
+                }
+
+            }
+
+            AfficherChemin(cheminMin, graphe);
+            Console.WriteLine($"Poids total du chemin est de : " + distanceMin);
         }
 
         /// <summary>
@@ -406,25 +432,30 @@
             }
         }
 
-
-        private static void AfficherChemin(int[] parents, int departIndex, int arriveeIndex)
+        private static List<int> ObtenirChemin(int[] parents, int departIndex, int arriveeIndex)
         {
-            Stack<int> chemin = new Stack<int>();
+            List<int> chemin = new List<int>();
             for (int courant = arriveeIndex; courant != -1; courant = parents[courant])
             {
-                chemin.Push(courant);
+                chemin.Add(courant);
+            }
+            chemin.Reverse();
+            return chemin;
+        }
+
+
+        private static void AfficherChemin(List<int> chemin, Graphe<StationMetro> graphe)
+        {
+            
+            Console.WriteLine("Le chemin à prendre est :");
+            List<string> libelleChemin = new List<string>();
+
+            foreach (int id in chemin)
+            {
+                libelleChemin.Add(graphe.TrouverNoeudParId(id).Contenu.Libelle);
             }
 
-            Console.Write("Chemin de " + departIndex + " à " + arriveeIndex + ": ");
-            while (chemin.Count > 0)
-            {
-                Console.Write(chemin.Pop());
-                if (chemin.Count > 0)
-                {
-                    Console.Write(" -> ");
-                }
-            }
-            Console.WriteLine();
+            Console.WriteLine(string.Join(" -> ", libelleChemin));
         }
 
 

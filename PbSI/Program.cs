@@ -17,17 +17,19 @@ namespace PbSI
 
 
             RechercheStationProche recherche = new RechercheStationProche("55 Rue du Faubourg Saint-Honoré, 75008 Paris, France", graphe);
-            RechercheStationProche recherche2 = new RechercheStationProche("22 rue du sergent bauchat, 75012", graphe);
-            await recherche.InitialiserAsync(); // On attend la fin de l'initialisation
-            await recherche2.InitialiserAsync(); // On attend la fin de l'initialisation
+            RechercheStationProche recherche2 = new RechercheStationProche("Place Charles de Gaulle, 75017 Paris", graphe);
+            await recherche.InitialiserAsync(); 
+            await recherche2.InitialiserAsync();
 
-            int depart;
-            int arrivee;
+            List<int> depart;
+            List<int> arrivee;
+            double distanceMin = double.MaxValue;
             try
             {
-                depart = recherche.IdStationProche;
-                arrivee = recherche2.IdStationProche;
-                RechercheChemin<StationMetro>.Dijkstra(graphe.MatriceAdjacence, depart, arrivee);
+                depart = recherche.IdStationsProches;
+                arrivee = recherche2.IdStationsProches;
+
+                RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
             }
             catch (Exception e)
             {
