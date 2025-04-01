@@ -13,8 +13,8 @@ public class Visualisation : Form
         graphe = reseau.Graphe;
         ligneColors = new Dictionary<string, Color>();
         this.Text = "Graphe du Métro de Paris";
-        this.Size = new Size(1500, 1000);
-        this.BackColor = Color.White; // Ajout d'un fond blanc
+        this.Size = new Size(6000, 000);
+        this.BackColor = Color.White;
 
         Button saveButton = new Button
         {
@@ -41,7 +41,7 @@ public class Visualisation : Form
         float margin = 0;
         float scaleX = (this.ClientSize.Width - margin) / (maxX - minX);
         float scaleY = (this.ClientSize.Height - margin) / (maxY - minY);
-        float scale = Math.Min(scaleX, scaleY) * 0.95f;
+        float scale = Math.Min(scaleX, scaleY)*0.9f;
 
         float offsetX = 50; 
         float screenX = (lon - minX) * scale + margin / 2 + offsetX;
@@ -55,7 +55,7 @@ public class Visualisation : Form
     {
         g.DrawLine(pen, start, end);
 
-        float arrowSize = 4;
+        float arrowSize = 6;
         double angle = Math.Atan2(end.Y - start.Y, end.X - start.X);
         PointF arrow1 = new PointF(
             end.X - (float)(arrowSize * Math.Cos(angle - Math.PI / 6)),
@@ -73,7 +73,7 @@ public class Visualisation : Form
     {
         Graphics g = e.Graphics;
         g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-        g.Clear(Color.White); // S'assurer que le fond est blanc
+        g.Clear(Color.White); 
         Dictionary<Noeud<StationMetro>, PointF> positions = new Dictionary<Noeud<StationMetro>, PointF>();
 
         foreach (var noeud in graphe.Noeuds)
@@ -86,33 +86,110 @@ public class Visualisation : Form
             Noeud<StationMetro> source = lien.Source;
             Noeud<StationMetro> destination = lien.Destination;
             Color color = GetLigneColor(source.Contenu.Ligne);
-            Pen pen = new Pen(color, 2);
+            Pen pen = new Pen(color, 1);
 
             PointF start = positions[source];
             PointF end = positions[destination];
-            PointF direction = new PointF((end.X - start.X) * 0.85f + start.X, (end.Y - start.Y) * 0.85f + start.Y);
+            PointF direction = new PointF((end.X - start.X)*0.98f + start.X, (end.Y - start.Y)*0.98f + start.Y);
 
             DrawArrow(g, pen, start, direction);
         }
 
+        List<RectangleF> placedElements = new List<RectangleF>(); // Stocke les labels ET les ellipses
+        HashSet<string> displayedLabels = new HashSet<string>(); // Évite les doublons de labels
+
         foreach (var noeud in graphe.Noeuds)
         {
+            int tailleNoeud = 5;
             PointF position = positions[noeud];
-            g.FillEllipse(Brushes.Black, position.X - 5, position.Y - 5, 5, 5);
+
+            // Dessiner le nœud (ellipse)
+            RectangleF nodeRect = new RectangleF(position.X - 0.5f * tailleNoeud, position.Y - 0.5f * tailleNoeud, tailleNoeud, tailleNoeud);
+            g.FillEllipse(Brushes.Black, nodeRect);
+
+            placedElements.Add(nodeRect); // Ajouter l'ellipse aux éléments placés
 
             string label = noeud.Contenu.Libelle;
+
+            // Vérifier si ce label a déjà été affiché
+            if (displayedLabels.Contains(label))
+                continue;
+
+            displayedLabels.Add(label); // Marquer ce label comme affiché
+
+            // Récupérer les lignes associées pour la couleur du contour
+            var lignes = graphe.Liens
+                .Where(lien => lien.Source.Contenu.Libelle == label || lien.Destination.Contenu.Libelle == label)
+                .Select(lien => lien.Source.Contenu.Ligne)
+                .Distinct()
+                .ToList();
+
+            Color contourColor = (lignes.Count == 1) ? GetLigneColor(lignes.First()) : Color.Black;
+            Pen contourPen = new Pen(contourColor, 1);
+
+            // Position du label
             Font labelFont = new Font("Arial", 3);
             SizeF labelSize = g.MeasureString(label, labelFont);
-            PointF labelPosition = new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8); // Positionner le texte au-dessus du nœud
 
-            // Dessiner le fond blanc pour le libellé
-            RectangleF backgroundRect = new RectangleF(labelPosition.X - 2, labelPosition.Y - 2, labelSize.Width + 4, labelSize.Height + 4);
-            g.FillRectangle(Brushes.White, backgroundRect);
-            g.DrawRectangle(Pens.Black, backgroundRect.X, backgroundRect.Y, backgroundRect.Width, backgroundRect.Height); // Bordure noire
+            // Liste des positions possibles (au-dessus et en dessous)
+            List<PointF> potentialPositions = new List<PointF>
+    {
+        new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8), // Au-dessus
+        new PointF(position.X - labelSize.Width / 2, position.Y + 8), // En dessous
+    };
 
-            // Dessiner le texte
-            g.DrawString(label, labelFont, Brushes.Black, labelPosition);
+            // Tester des positions avec des décalages supplémentaires
+            for (int offset = 15; offset <= 60; offset += 5) // Ajustements pour un espacement plus grand
+            {
+                potentialPositions.Add(new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - offset)); // Plus haut
+                potentialPositions.Add(new PointF(position.X - labelSize.Width / 2, position.Y + offset)); // Plus bas
+            }
+
+            // Variable pour la meilleure position
+            PointF chosenLabelPosition = PointF.Empty;
+            float closestDistance = float.MaxValue; // Initialiser à une grande valeur
+
+            // Vérifier les positions et choisir la plus proche qui ne chevauche pas
+            foreach (var potentialPosition in potentialPositions)
+            {
+                RectangleF backgroundRect = new RectangleF(potentialPosition.X - 2, potentialPosition.Y - 2, labelSize.Width + 4, labelSize.Height + 4);
+
+                // Vérifie les chevauchements avec d'autres labels et le nœud
+                bool intersects = placedElements.Any(rect => rect.IntersectsWith(backgroundRect));
+
+                if (!intersects) // Si aucune intersection
+                {
+                    // Calculer la distance absolue au nœud
+                    float distance = Math.Abs(potentialPosition.Y - position.Y);
+
+                    // Vérifier si cette position est plus proche que la précédente
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance; // Met à jour la distance la plus proche
+                        chosenLabelPosition = potentialPosition; // Met à jour la position choisie
+                    }
+                }
+            }
+
+            // Si aucune position valide n'a été trouvée, utiliser la position par défaut au-dessus
+            if (chosenLabelPosition.IsEmpty)
+            {
+                chosenLabelPosition = new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8);
+            }
+
+            // Créer le rectangle de fond pour le label
+            RectangleF chosenBackgroundRect = new RectangleF(chosenLabelPosition.X - 2, chosenLabelPosition.Y - 2, labelSize.Width + 4, labelSize.Height + 4);
+
+            // Ajouter la position validée
+            placedElements.Add(chosenBackgroundRect);
+
+            // Dessiner le label
+            g.FillRectangle(Brushes.White, chosenBackgroundRect);
+            g.DrawRectangle(contourPen, chosenBackgroundRect.X, chosenBackgroundRect.Y, chosenBackgroundRect.Width, chosenBackgroundRect.Height);
+            g.DrawString(label, labelFont, Brushes.Black, chosenLabelPosition);
         }
+
+
     }
 
     private void SaveButton_Click(object sender, EventArgs e)
