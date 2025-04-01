@@ -281,7 +281,7 @@ namespace PbSI
             }
 
             List<int> chemin = ObtenirChemin(parents, departIndex, arriveeIndex);
-            //AfficherChemin(chemin, graphe);
+            // AfficherChemin(chemin, graphe);
 
             return (distances[arriveeIndex], chemin);
         }
