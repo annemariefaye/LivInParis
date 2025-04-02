@@ -39,10 +39,8 @@ namespace PbSI
         {
             try
             {
-
                 this.requete = this.maConnexion.CreateCommand();
                 this.requete.CommandText = stringRequete;
-                Console.WriteLine("Requete exécutée\n");
             }
             catch (MySqlException e) {
                 Console.WriteLine("erreur:" + e.ToString());

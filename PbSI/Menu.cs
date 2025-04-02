@@ -11,7 +11,7 @@ namespace PbSI
     {
 
         private string pageChoisie;
-        private Connexion bdd;
+        private Connexion connexion;
         public Menu()
         {
             this.bdd = new Connexion();
@@ -34,21 +34,21 @@ namespace PbSI
                 Console.ResetColor();
                 Console.Write(" Sélectionnez une option : ");
 
-                string choix = Console.ReadLine();
+                char choix = (char)Console.ReadKey(false).Key;
 
                 switch (choix)
                 {
-                    case "1":
+                    case '1':
                         Console.Clear();
                         MenuSQL();
                         this.pageChoisie = "Menu SQL";
                         break;
-                    case "2":
+                    case '2':
                         Console.Clear();
-                        MenuSQL();
+                        MenuSimplifie();
                         this.pageChoisie = "Menu simplifié";
                         break;
-                    case "3":
+                    case '3':
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Merci d'avoir utilisé LivInParis ! À bientôt !");
                         Console.ResetColor();
@@ -127,9 +127,124 @@ namespace PbSI
 
         public void MenuSimplifie()
         {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Bienvenue dans le mode simplifié de l'interface !\n");
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("  1.  Gestion des clients");
+                Console.WriteLine("  2.  Gestion des cuisines");
+                Console.WriteLine("  3.  Gestion des commandes");
+                Console.WriteLine("  4.  Statistiques");
+                Console.WriteLine("  5.  Autre...");
+                Console.WriteLine("  6.  Retour");
+                Console.WriteLine("----------------------------------------------------\n\n");
+                Console.WriteLine("Menu choisi:");
+                Console.ResetColor();
+                char menu_choisi = (char)Console.ReadKey(false).Key;
 
+                switch (menu_choisi)
+                {
+                    case ('1'):
+                        Console.Clear();
+                        ModuleClient();
+                        break;
+                    case ('2'):
+                        Console.Clear();
+                        break;
+                    case ('3'):
+                        Console.Clear();
+                        break;
+                    case ('4'):
+                        Console.Clear();
+                        break;
+                    case ('5'):
+                        Console.Clear();
+                        break;
+                    case ('6'):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        break;
+                }
+            }
         }
 
-        
+        public void ModuleClient()
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Module Client !\n");
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("  1.  Afficher les clients");
+                Console.WriteLine("  2.  Ajouter un client");
+                Console.WriteLine("  3.  Supprimer un client");
+                Console.WriteLine("  4.  Modifier un client");
+                Console.WriteLine("  5.  Retour");
+                Console.WriteLine("----------------------------------------------------\n\n");
+                Console.WriteLine("Menu choisi:");
+                Console.ResetColor();
+                char menu_choisi = (char)Console.ReadKey(false).Key;
+
+                switch (menu_choisi)
+                {
+                    case ('1'):
+                        Console.Clear();
+                        this.afficherClients();
+                        break;
+                    case ('2'):
+                        Console.Clear();
+                        break;
+                    case ('3'):
+                        Console.Clear();
+                        break;
+                    case ('4'):
+                        Console.Clear();
+                        break;
+                    case ('5'):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        break;
+                }
+            }
+        }
+
+        public void afficherClients()
+        {
+            while (true)
+            {
+                Console.WriteLine("Liste des clients:\n");
+                Console.WriteLine("Tri possible: A: Ordre Alphabétique; R: Rue; M: Montant des achats cumulés; C: combinaisons de plusieurs tris");
+                Console.WriteLine("X: Retour");
+                char choix = (char)Console.ReadKey(false).Key;
+                switch (choix)
+                {
+                    case 'A':
+                        this.connexion.executerRequete("SELECT * FROM Utilisateur ORDER BY nom ASC;");
+                        break;
+                    case 'R':
+                        break;
+                    case 'M':
+                        break;
+                    case 'C':
+                        break;
+                    case 'X':
+                        Console.Clear();
+                        return;
+                }
+            }
+        }
+
+
     }
 }
