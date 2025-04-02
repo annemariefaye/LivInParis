@@ -28,7 +28,7 @@ namespace PbSI
                 Console.WriteLine(" Bienvenue sur l'interface de LivInParis ");
                 Console.WriteLine("----------------------------------------------------");
                 Console.WriteLine("  1.  Interface SQL");
-                Console.WriteLine("  2.  A définir");
+                Console.WriteLine("  2.  Menu simplifié");
                 Console.WriteLine("  3.  Quitter");
                 Console.WriteLine("----------------------------------------------------");
                 Console.ResetColor();
@@ -44,7 +44,9 @@ namespace PbSI
                         this.pageChoisie = "Menu SQL";
                         break;
                     case "2":
-                        //ExporterRequeteSQL();
+                        Console.Clear();
+                        MenuSQL();
+                        this.pageChoisie = "Menu simplifié";
                         break;
                     case "3":
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -121,6 +123,11 @@ namespace PbSI
                 }
             }    
             Console.ReadKey();
+        }
+
+        public void MenuSimplifie()
+        {
+
         }
 
         
