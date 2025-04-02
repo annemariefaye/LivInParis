@@ -17,7 +17,7 @@ namespace PbSI
 
 
             RechercheStationProche recherche = new RechercheStationProche("55 Rue du Faubourg Saint-Honoré, 75008 Paris, France", graphe);
-            RechercheStationProche recherche2 = new RechercheStationProche("Place Charles de Gaulle, 75017 Paris", graphe);
+            RechercheStationProche recherche2 = new RechercheStationProche("8 rue Sainte-Anne, 75001 Paris", graphe);
             await recherche.InitialiserAsync(); 
             await recherche2.InitialiserAsync();
 

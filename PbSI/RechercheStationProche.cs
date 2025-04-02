@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PbSI
 {
-    class RechercheStationProche
+    public class RechercheStationProche
     {
         private readonly string adresse;
         private readonly Graphe<StationMetro> graphe;

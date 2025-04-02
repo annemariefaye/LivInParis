@@ -286,7 +286,7 @@ namespace PbSI
             return (distances[arriveeIndex], chemin);
         }
 
-        public static void DijkstraListe(Graphe<StationMetro> graphe, List<int> depart, List<int> arrivee)
+        public static List<int> DijkstraListe(Graphe<StationMetro> graphe, List<int> depart, List<int> arrivee)
         {
             double distanceMin = double.MaxValue;
             List<int> cheminMin = new List<int>();
@@ -307,6 +307,7 @@ namespace PbSI
 
             AfficherChemin(cheminMin, graphe);
             Console.WriteLine($"Poids total du chemin est de : " + distanceMin);
+            return cheminMin;
         }
 
         /// <summary>
