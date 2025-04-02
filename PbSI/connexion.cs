@@ -37,8 +37,16 @@ namespace PbSI
 
         public void executerRequete(string stringRequete)
         {
-            this.requete = this.maConnexion.CreateCommand();
-            this. requete.CommandText = stringRequete;
+            try
+            {
+
+                this.requete = this.maConnexion.CreateCommand();
+                this.requete.CommandText = stringRequete;
+                Console.WriteLine("Requete exécutée\n");
+            }
+            catch (MySqlException e) {
+                Console.WriteLine("erreur:" + e.ToString());
+            }
         }
 
         public void afficherResultatRequete()
@@ -54,6 +62,7 @@ namespace PbSI
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine();
             this.reader.Close();
         }
 

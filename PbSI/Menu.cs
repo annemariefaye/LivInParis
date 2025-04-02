@@ -24,12 +24,14 @@ namespace PbSI
                 Console.WriteLine("                       LIVINPARIS");
                 Console.WriteLine("====================================================\n\n");
                 Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(" Bienvenue sur l'interface de LivInParis ");
                 Console.WriteLine("----------------------------------------------------");
                 Console.WriteLine("  1.  Interface SQL");
-                Console.WriteLine("  2.  Exporter une requête SQL");
+                Console.WriteLine("  2.  A définir");
                 Console.WriteLine("  3.  Quitter");
                 Console.WriteLine("----------------------------------------------------");
+                Console.ResetColor();
                 Console.Write(" Sélectionnez une option : ");
 
                 string choix = Console.ReadLine();
@@ -38,10 +40,6 @@ namespace PbSI
                 {
                     case "1":
                         Console.Clear();
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Chargement de l'exécution SQL...");
-                        Console.ResetColor();
-                        Thread.Sleep(1000);
                         MenuSQL();
                         this.pageChoisie = "Menu SQL";
                         break;
@@ -65,14 +63,17 @@ namespace PbSI
         }
         public void MenuSQL()
         {
-                
-            Console.WriteLine("Bienvenue dans l'espace SQL !");    
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Bienvenue dans l'espace SQL !");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
             Console.WriteLine("Ecrire une commande SQL l'éxecutera");
             Console.WriteLine("\n\nDes mots clefs à rajouter avant la commande permettent différentes fonctionnalités:");            
             Console.WriteLine("AFFICHER: Executera le code SQL et affiche le résultat");             
             Console.WriteLine("EXPORTER: Executera le code SQL et exportera le résultat dans un fichier XML");                
             Console.Write("Entrez votre commande : \n");
-                
+            Console.ResetColor();
+
             string mot_clef;
 
                 
@@ -100,9 +101,16 @@ namespace PbSI
                         
                     if(mot_clef == "EXPORTER")   
                     {
-                        Console.WriteLine("Nom du fichier d'export:\n");
-                        string nom_fichier = Console.ReadLine();
-                        bdd.exporterResultatRequete(nom_fichier);
+                        if(requete.Substring(9).Substring(0,6)!="SELECT")
+                        {
+                            Console.WriteLine("erreur: la commande n'est pas une requête de de retrait de données (SELECT)");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Nom du fichier d'export:\n");
+                            string nom_fichier = Console.ReadLine();
+                            bdd.exporterResultatRequete(nom_fichier);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -110,7 +118,6 @@ namespace PbSI
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Erreur : " + ex.Message);
                     Console.ResetColor();    
-                    break;    
                 }
             }    
             Console.ReadKey();
