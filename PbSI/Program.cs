@@ -42,12 +42,13 @@ namespace PbSI
             
 
 
-            Connexion bdd = new Connexion();
+            /*Connexion bdd = new Connexion();
             bdd.executerRequete("SELECT * FROM Cuisinier");
             bdd.afficherResultatRequete();
             bdd.exporterResultatRequete();
             bdd.fermerConnexion();
-
+            */
+            Menu menu = new Menu();
 
         }
         
