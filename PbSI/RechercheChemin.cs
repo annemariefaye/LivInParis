@@ -543,6 +543,34 @@
         }
 
 
+        private static List<int> ObtenirChemin(int[] parents, int departIndex, int arriveeIndex)
+        {
+            List<int> chemin = new List<int>();
+            for (int courant = arriveeIndex; courant != -1; courant = parents[courant])
+            {
+                chemin.Add(courant);
+            }
+            chemin.Reverse();
+            return chemin;
+        }
+
+
+        private static void AfficherChemin(List<int> chemin, Graphe<StationMetro> graphe)
+        {
+
+            Console.WriteLine("Le chemin à prendre est :");
+            List<string> libelleChemin = new List<string>();
+
+            foreach (int id in chemin)
+            {
+                libelleChemin.Add(graphe.TrouverNoeudParId(id).Contenu.Libelle);
+            }
+
+            Console.WriteLine(string.Join(" -> ", libelleChemin));
+        }
+
         #endregion
+
+
     }
 }
