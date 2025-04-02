@@ -221,6 +221,8 @@ namespace PbSI
 
         public void afficherClients()
         {
+            string base_requete = "SELECT * FROM Utilisateurs";
+            
             while (true)
             {
                 Console.WriteLine("Liste des clients:\n");
@@ -254,6 +256,8 @@ namespace PbSI
                             }
                         }
                         break;
+                    case '+':
+
                     case 'X':
                         Console.Clear();
                         return;
