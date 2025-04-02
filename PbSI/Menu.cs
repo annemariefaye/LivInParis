@@ -14,7 +14,7 @@ namespace PbSI
         private Connexion connexion;
         public Menu()
         {
-            this.bdd = new Connexion();
+            this.connexion = new Connexion();
 
             while (true)
             {
@@ -85,7 +85,7 @@ namespace PbSI
  
                 try
                 {
-                    this.bdd.executerRequete(requete.Substring(9));   
+                    this.connexion.executerRequete(requete.Substring(9));   
 
                     mot_clef = "";                        
                     if (requete.Length < 8) break;
@@ -98,7 +98,7 @@ namespace PbSI
                     if(mot_clef == "AFFICHER")   
                     {       
                         Console.WriteLine("Résultat de la commande:\n");
-                        bdd.afficherResultatRequete();
+                        connexion.afficherResultatRequete();
                     }
                         
                     if(mot_clef == "EXPORTER")   
@@ -111,7 +111,7 @@ namespace PbSI
                         {
                             Console.WriteLine("Nom du fichier d'export:\n");
                             string nom_fichier = Console.ReadLine();
-                            bdd.exporterResultatRequete(nom_fichier);
+                            connexion.exporterResultatRequete(nom_fichier);
                         }
                     }
                 }
@@ -225,6 +225,7 @@ namespace PbSI
             {
                 Console.WriteLine("Liste des clients:\n");
                 Console.WriteLine("Tri possible: A: Ordre Alphabétique; R: Rue; M: Montant des achats cumulés; C: combinaisons de plusieurs tris");
+                Console.WriteLine("Ordre de tri: +: du plus petit au plus grand; -:du plus grand au plus petit (défaut: + )");
                 Console.WriteLine("X: Retour");
                 char choix = (char)Console.ReadKey(false).Key;
                 switch (choix)
@@ -237,6 +238,21 @@ namespace PbSI
                     case 'M':
                         break;
                     case 'C':
+                        Console.WriteLine("\nTri multiple par ordre du plus important au moins important (e.g. A+C-):");
+                        string tri_multiple = Console.ReadLine();
+                        for(int i=0; i < tri_multiple.Length; i++)
+                        {
+                            switch (tri_multiple[i])
+                            {
+                                case 'A':
+                                    this.connexion.executerRequete("SELECT * FROM Utilisateur ORDER BY nom ASC;");
+                                    break;
+                                case 'R':
+                                    break;
+                                case 'M':
+                                    break;
+                            }
+                        }
                         break;
                     case 'X':
                         Console.Clear();
