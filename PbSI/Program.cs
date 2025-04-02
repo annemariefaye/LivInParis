@@ -28,7 +28,11 @@ namespace PbSI
             catch (Exception e)
             {
                 Console.WriteLine($"Erreur : {e.Message}");
-            }
+            }*/
+            
+            /*RechercheChemin<StationMetro>.DFS_Liste(graphe, 1);
+            RechercheChemin<StationMetro>.DFS_Matrice(graphe, 1);
+            RechercheChemin<StationMetro>.Dijkstra(graphe.MatriceAdjacence, 1, 300);*/
             
             /*RechercheChemin<StationMetro>.DFS_Liste(graphe, 1);
             RechercheChemin<StationMetro>.DFS_Matrice(graphe, 1);
