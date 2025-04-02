@@ -22,8 +22,8 @@ namespace PbSI
             try
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
-                                        "DATABASE=LivInParis;" +
-                                        "UID=root;PASSWORD=admin";
+                                        "DATABASE=livinparis;" +
+                                        "UID=root;PASSWORD=root";
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
                 this.maConnexion = maConnexion;
