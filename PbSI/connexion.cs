@@ -38,7 +38,7 @@ namespace PbSI
         public void executerRequete(string stringRequete)
         {
             this.requete = this.maConnexion.CreateCommand();
-            this. requete.CommandText = stringRequete;
+            this.requete.CommandText = stringRequete;
         }
 
         public void afficherResultatRequete()
