@@ -1,17 +1,14 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace PbSI
 {
     internal class Menu
     {
-
         private string pageChoisie;
         private Connexion bdd;
+
         public Menu()
         {
             this.bdd = new Connexion();
@@ -45,15 +42,18 @@ namespace PbSI
                         MenuSQL();
                         this.pageChoisie = "Menu SQL";
                         break;
+
                     case "2":
-                        //ExporterRequeteSQL();
+                        Console.WriteLine("Fonctionnalité d'exportation à implémenter.");
                         break;
+
                     case "3":
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Merci d'avoir utilisé LivInParis ! À bientôt !");
                         Console.ResetColor();
                         Thread.Sleep(1500);
                         return;
+
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
@@ -63,59 +63,60 @@ namespace PbSI
                 }
             }
         }
+
         public void MenuSQL()
         {
-                
-            Console.WriteLine("Bienvenue dans l'espace SQL !");    
+            Console.WriteLine("Bienvenue dans l'espace SQL !");
             Console.WriteLine("Ecrire une commande SQL l'éxecutera");
-            Console.WriteLine("\n\nDes mots clefs à rajouter avant la commande permettent différentes fonctionnalités:");            
-            Console.WriteLine("AFFICHER: Executera le code SQL et affiche le résultat");             
-            Console.WriteLine("EXPORTER: Executera le code SQL et exportera le résultat dans un fichier XML");                
+            Console.WriteLine("\n\nDes mots clefs à rajouter avant la commande permettent différentes fonctionnalités:");
+            Console.WriteLine("AFFICHER: Executera le code SQL et affiche le résultat");
+            Console.WriteLine("EXPORTER: Executera le code SQL et exportera le résultat dans un fichier XML");
             Console.Write("Entrez votre commande : \n");
-                
-            string mot_clef;
 
-                
             while (true)
-            {    
+            {
                 string requete = Console.ReadLine();
- 
-                try
-                {
-                    this.bdd.executerRequete(requete.Substring(9));   
 
-                    mot_clef = "";                        
-                    if (requete.Length < 8) break;
-                        
-                    for(int i = 0; i < 8; i++) 
-                    {     
-                        mot_clef += requete[i];  
-                    }
-                        
-                    if(mot_clef == "AFFICHER")   
-                    {       
-                        Console.WriteLine("Résultat de la commande:\n");
+                if (string.IsNullOrWhiteSpace(requete))
+                {
+                    Console.WriteLine("Veuillez entrer une commande.");
+                    continue;
+                }
+
+                if (requete.StartsWith("AFFICHER", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Résultat de la commande:\n");
+                    string sqlCommand = requete.Length > 9 ? requete.Substring(9).Trim() : string.Empty;
+                    if (!string.IsNullOrWhiteSpace(sqlCommand))
+                    {
+                        bdd.executerRequete(sqlCommand);
                         bdd.afficherResultatRequete();
                     }
-                        
-                    if(mot_clef == "EXPORTER")   
+                    else
                     {
-                        Console.WriteLine("Nom du fichier d'export:\n");
-                        string nom_fichier = Console.ReadLine();
-                        bdd.exporterResultatRequete(nom_fichier);
+                        Console.WriteLine("Aucune commande SQL fournie après 'AFFICHER'.");
                     }
                 }
-                catch (Exception ex)
-                {     
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Erreur : " + ex.Message);
-                    Console.ResetColor();    
-                    break;    
+                else if (requete.StartsWith("EXPORTER", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Nom du fichier d'export:\n");
+                    string nom_fichier = Console.ReadLine();
+                    string sqlCommand = requete.Length > 9 ? requete.Substring(9).Trim() : string.Empty;
+                    if (!string.IsNullOrWhiteSpace(sqlCommand))
+                    {
+                        bdd.executerRequete(sqlCommand);
+                        bdd.exporterResultatRequete(nom_fichier);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Aucune commande SQL fournie après 'EXPORTER'.");
+                    }
                 }
-            }    
-            Console.ReadKey();
+                else
+                {
+                    Console.WriteLine("Commande non reconnue.");
+                }
+            }
         }
-
-        
     }
 }
