@@ -18,8 +18,11 @@ namespace PbSI
 
             RechercheStationProche recherche = new RechercheStationProche("55 Rue du Faubourg Saint-Honoré, 75008 Paris, France", graphe);
             RechercheStationProche recherche2 = new RechercheStationProche("8 rue Sainte-Anne, 75001 Paris", graphe);
-            await recherche.InitialiserAsync(); 
+            await recherche.InitialiserAsync();
+            Console.WriteLine();
             await recherche2.InitialiserAsync();
+            Console.WriteLine();
+
 
             List<int> depart;
             List<int> arrivee;
@@ -34,15 +37,22 @@ namespace PbSI
                 tempsDeplacementDepart = recherche.TempsDeplacement;
                 tempsDeplacementArrivee = recherche2.TempsDeplacement;
 
-                RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
+                var resultat = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
+
+                if (resultat != null)
+                {
+                    double tempsTotal = tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
+                    Console.WriteLine("Temps total de déplacement : " + (int)tempsTotal);
+                }
+                else
+                {
+                    Console.WriteLine("Aucun chemin trouvé.");
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Erreur : {e.Message}");
             }
-
-            Console.WriteLine("Temps total de déplacement : " + tempsDeplacementArrivee+tempsDeplacementDepart);
-
 
             Console.WriteLine("Appuyez sur une touche pour continuer...");
 

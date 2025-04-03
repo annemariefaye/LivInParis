@@ -7,14 +7,20 @@ namespace PbSI
 
     public class ResultatChemin
     {
-        public double PoidsTotal { get; set; }
-        public List<int> Chemin { get; set; }
+
+        private readonly double poidsTotal;
+        private readonly List<int> chemin;
+
+        
 
         public ResultatChemin(double poidsTotal, List<int> chemin)
         {
-            PoidsTotal = poidsTotal;
-            Chemin = chemin;
+            this.poidsTotal = poidsTotal;
+            this.chemin = chemin;
         }
+
+        public double PoidsTotal { get { return this.poidsTotal; } }
+        public List<int> Chemin { get { return this.chemin; } }
     }
 
 
