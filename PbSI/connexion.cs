@@ -17,8 +17,6 @@ namespace PbSI
         {
             try
             {
-                InstallerMySQL();
-                DemarrerMySQL();
 
                 string connexionString = "SERVER=localhost;PORT=3306;UID=root;PASSWORD=root;";
                 maConnexion = new MySqlConnection(connexionString);
@@ -31,7 +29,7 @@ namespace PbSI
 
                 Console.WriteLine("Connexion à MySQL réussie !");
                 CreerBaseSiNonExiste();
-                maConnexion.ChangeDatabase("livinparis");
+                maConnexion.ChangeDatabase("livinparics");
 
                 Console.WriteLine("Base de données prête !");
                 ExecuterFichiersSQL(new string[] { "01_create_tables.sql", "02_insert_date.sql", "03_select.sql" });
@@ -46,68 +44,6 @@ namespace PbSI
             }
         }
 
-        private void InstallerMySQL()
-        {
-            try
-            {
-                Process process = new Process();
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.Arguments = "/c sc query MySQL80";
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.Start();
-                process.WaitForExit();
-
-                string output = process.StandardOutput.ReadToEnd();
-                if (!output.Contains("RUNNING") && !output.Contains("STOPPED"))
-                {
-                    Console.WriteLine("MySQL n'est pas installé. Installation en cours...");
-                    Console.WriteLine("Veuillez installer MySQL manuellement.");
-                }
-                else
-                {
-                    Console.WriteLine("MySQL est déjà installé.");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Erreur lors de la vérification de l'installation de MySQL: " + e.Message);
-            }
-        }
-
-        private void DemarrerMySQL()
-        {
-            try
-            {
-                string nomService = "MySQL80";
-
-                Console.WriteLine("Vérification du service MySQL...");
-                Process process = new Process();
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.Arguments = $"/c sc query {nomService} | find \"RUNNING\"";
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.Start();
-                process.WaitForExit();
-
-                if (process.StandardOutput.ReadToEnd().Contains("RUNNING"))
-                {
-                    Console.WriteLine("MySQL est déjà en cours d'exécution.");
-                    return;
-                }
-
-                Console.WriteLine($"Démarrage du service {nomService}...");
-                Process.Start("net", $"start {nomService}").WaitForExit();
-                Thread.Sleep(5000);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Impossible de démarrer MySQL: " + e.Message);
-            }
-        }
-
         private void CreerBaseSiNonExiste()
         {
             if (maConnexion == null || maConnexion.State != ConnectionState.Open)
@@ -118,7 +54,7 @@ namespace PbSI
 
             try
             {
-                using (MySqlCommand cmd = new MySqlCommand("CREATE DATABASE IF NOT EXISTS livinparis;", maConnexion))
+                using (MySqlCommand cmd = new MySqlCommand("CREATE DATABASE IF NOT EXISTS livinparics;", maConnexion))
                 {
                     cmd.ExecuteNonQuery();
                     Console.WriteLine("Base de données vérifiée/créée.");
@@ -174,7 +110,7 @@ namespace PbSI
                 requete = maConnexion.CreateCommand();
                 requete.CommandText = stringRequete;
                 requete.ExecuteNonQuery();
-                Console.WriteLine("Requête exécutée avec succès !");
+                //Console.WriteLine("Requête exécutée avec succès !");
             }
             catch (Exception e)
             {
@@ -193,6 +129,14 @@ namespace PbSI
             try
             {
                 reader = requete.ExecuteReader();
+
+                if (!reader.HasRows)
+                {
+                    Console.WriteLine("Pas de résultats pour cette requête.");
+                    reader.Close();
+                    return;
+                }
+
                 while (reader.Read())
                 {
                     for (int i = 0; i < reader.FieldCount; i++)
@@ -208,6 +152,7 @@ namespace PbSI
                 Console.WriteLine("Erreur lors de l'affichage des résultats: " + e.Message);
             }
         }
+
 
         public void exporterResultatRequete(string nomFichier = "export")
         {
