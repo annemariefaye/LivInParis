@@ -65,6 +65,7 @@ Classe qui contient des algorithmes pour la recherche de chemins dans le graphe.
   - `Dijkstra`: Trouve le plus court chemin entre un nœud de départ et tous les autres nœuds.
   - `BellmanFord`: Trouve le chemin le plus court tout en gérant les poids négatifs.
   - `FloydWarshall`: Calcule le plus court chemin entre tous les nœuds.
+  - `A*`: Trouve le plus court chemin en utilisant une heuristique pour guider la recherche.
 
 ### 7. `Chronometreur`
 
@@ -78,6 +79,7 @@ Ce projet explore et compare trois algorithmes classiques de recherche du plus c
 - **Dijkstra**
 - **Bellman-Ford**
 - **Floyd-Warshall**
+- **A***
 
 ### Résultats des Tests
 
@@ -88,10 +90,21 @@ Les tests ont été réalisés sur un réseau de métro simulé, et les temps d'
 | Dijkstra         | 3 ms             |
 | Bellman-Ford     | 5 ms             |
 | Floyd-Warshall   | 30753 ms         |
+| A*               | 8 ms             |
+
+### Analyse de la complexité
+
+| Algorithme       | Complexité temporelle | Avantages | Inconvénients |
+|------------------|----------------------|-----------|---------------|
+| **Dijkstra**    | `O((V + E) log V)` avec un tas de Fibonacci | Optimal pour les graphes pondérés positifs, rapide avec une bonne implémentation | Inefficace pour les très grands graphes avec de nombreux nœuds |
+| **Bellman-Ford**| `O(VE)` | Gère les poids négatifs | Plus lent que Dijkstra |
+| **Floyd-Warshall** | `O(V³)` | Calcule toutes les distances entre chaque paire de nœuds | Trop inefficace pour les grands graphes |
+| **A***          | `O((V + E) log V)` (similaire à Dijkstra) mais souvent plus rapide avec une bonne heuristique | Plus rapide que Dijkstra lorsque l'heuristique est bien choisie | Nécessite une heuristique adaptée pour de bonnes performances |
+
 
 ### Conclusion
 
-Pour notre solution, **l'algorithme de Dijkstra est le meilleur choix** car il offre un compromis optimal entre rapidité et efficacité. Bellman-Ford peut être utile dans certains cas si des retards doivent être gérés, mais son exécution est plus lente. Floyd-Warshall, bien que complet, est trop inefficace pour un grand réseau.
+Pour notre solution, l'algorithme de Dijkstra est le meilleur choix car il offre un compromis optimal entre rapidité et efficacité. L'algorithme A* est également très performant, surtout lorsqu'il est associé à une heuristique appropriée, permettant des recherches plus ciblées et souvent plus rapides dans des graphes complexes. Bellman-Ford peut être utile dans certains cas si des retards doivent être gérés, mais son exécution est plus lente. Floyd-Warshall, bien que complet, est trop inefficace pour un grand réseau.
 
 ## Installation
 
@@ -107,4 +120,5 @@ Pour exécuter les algorithmes sur le réseau de métro, utilisez le fichier `Ch
 Chronometreur.ChronometreDijkstra(graphe, depart, arrivee);
 Chronometreur.ChronometreBellmanFord(graphe, depart, arrivee);
 Chronometreur.ChronometreFloydWarshall(graphe, depart, arrivee);
+Chronometreur.ChronometreAStar(graphe, depart, arrivee);
 ```
