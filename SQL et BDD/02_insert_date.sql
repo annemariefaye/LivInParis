@@ -3,8 +3,7 @@ USE LivInParis;
 INSERT INTO Client (NomEntreprise, MotDePasse) VALUES
 ('Boulangerie Dupont', 'mdp123'),
 ('Entreprise XYZ', 'xyz789'),
-(null, 'boul2025'),
-(null, 'gerard10');
+(null, 'boul2025');
 
 INSERT INTO Cuisinier (MotDePasse) VALUES
 ('cuisine123'),

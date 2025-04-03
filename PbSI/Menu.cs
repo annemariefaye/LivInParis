@@ -207,6 +207,7 @@ namespace PbSI
                         break;
                     case ('3'):
                         Console.Clear();
+                        supprimerClient();
                         break;
                     case ('4'):
                         Console.Clear();
@@ -395,6 +396,47 @@ namespace PbSI
 
                         break;
                     case ('3'):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        break;
+                }
+            }
+        }
+
+        public void supprimerClient()
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Moyen d'identification du client à supprimer: \n");
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("  1.  Identifiant client");
+                Console.WriteLine("  2.  Retour");
+                Console.WriteLine("----------------------------------------------------\n\n");
+                Console.WriteLine("Menu choisi:");
+                Console.ResetColor();
+                char menu_choisi = (char)Console.ReadKey(false).Key;
+
+                string requete_client = "DELETE FROM Client WHERE";//pour pouvoir par la suite rajouter d'autres moyens de suppression de clients
+                switch (menu_choisi)
+                {
+                    case ('1'):
+                        Console.Clear();
+                        //la suppression en cascade est activée, la suppressions dans la table client engendre la suppression dans les autres tables
+                        Console.WriteLine("Identifiant client:");
+                        string idClient = Console.ReadLine();
+                        requete_client += " idClient = "+idClient;
+                        this.connexion.executerRequete(requete_client);
+                        Console.Clear();
+                        Console.WriteLine(requete_client);
+                        Console.WriteLine("Client supprimé !\n");
+                        break;
+                    case ('2'):
                         Console.Clear();
                         return;
                     default:
