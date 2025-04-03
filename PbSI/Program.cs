@@ -9,7 +9,7 @@ namespace PbSI
         static async Task Main(string[] args)
         {
             
-            ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
+            /*ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
             Graphe<StationMetro> graphe = reseau.Graphe;
 
             double[,] m = graphe.MatriceAdjacence;
@@ -17,94 +17,49 @@ namespace PbSI
 
 
             RechercheStationProche recherche = new RechercheStationProche("55 Rue du Faubourg Saint-Honoré, 75008 Paris, France", graphe);
-            await recherche.InitialiserAsync(); // On attend la fin de l'initialisation
+            RechercheStationProche recherche2 = new RechercheStationProche("8 rue Sainte-Anne, 75001 Paris", graphe);
+            await recherche.InitialiserAsync();
+            Console.WriteLine();
+            await recherche2.InitialiserAsync();
+            Console.WriteLine();
 
-            int depart;
+
+            List<int> depart;
+            List<int> arrivee;
+            float tempsDeplacementDepart = 0;
+            float tempsDeplacementArrivee = 0;
             try
             {
-                depart = recherche.IdStationProche;
-                RechercheChemin<StationMetro>.FloydWarshall(graphe, depart, 1);
-                
+                depart = recherche.IdStationsProches;
+                arrivee = recherche2.IdStationsProches;
 
+                tempsDeplacementDepart = recherche.TempsDeplacement;
+                tempsDeplacementArrivee = recherche2.TempsDeplacement;
+
+                var resultat = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
+
+                if (resultat != null)
+                {
+                    double tempsTotal = tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
+                    Console.WriteLine("Temps total de déplacement : " + (int)tempsTotal + "");
+                }
+                else
+                {
+                    Console.WriteLine("Aucun chemin trouvé.");
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Erreur : {e.Message}");
             }
-            
-            /*RechercheChemin<StationMetro>.DFS_Liste(graphe, 1);
-            RechercheChemin<StationMetro>.DFS_Matrice(graphe, 1);
-            RechercheChemin<StationMetro>.Dijkstra(graphe.MatriceAdjacence, 1, 300);*/
-            
-            /*RechercheChemin<StationMetro>.DFS_Liste(graphe, 1);
-            RechercheChemin<StationMetro>.DFS_Matrice(graphe, 1);
-            RechercheChemin<StationMetro>.Dijkstra(graphe.MatriceAdjacence, 1, 300);*/
-            
-            /*
 
-            Connexion bdd = new Connexion();
-            bdd.executerRequete("SELECT * FROM Cuisinier");
-            bdd.afficherResultatRequete();
-            bdd.exporterResultatRequete();
-            bdd.fermerConnexion();
-            */
+            Console.WriteLine("Appuyez sur une touche pour continuer...");
+
+            Console.ReadKey();*/
+
+            Menu menu = new Menu();
 
         }
         
-
-        /*#region Méthodes d'instanciation
-
-        /// <summary>
-        /// Instancie un graphe à partir d'une liste de membres
-        /// </summary>
-        /// <param name="tableauMembres">Liste de membres</param>
-        /// <returns>Un graphe</returns>
-        static Graphe InstantiationMatrice(List<int[]> tableauMembres)
-        {
-            HashSet<int> hashSet = new HashSet<int>(tableauMembres.SelectMany(x => x));
-
-            int taille = hashSet.Count;
-            int[,] matrice = new int[taille, taille];
-
-            foreach (int[] mini_tab in tableauMembres)
-            {
-                matrice[mini_tab[0] - 1, mini_tab[1] - 1] = 1;
-                matrice[mini_tab[1] - 1, mini_tab[0] - 1] = 1;
-            }
-
-            return new Graphe(matrice);
-        }
-
-        /// <summary>
-        /// Instancie un graphe à partir d'une liste de membres
-        /// </summary>
-        /// <param name="tableauMembres">Liste de membres</param>
-        /// <returns>Un graphe</returns>
-        static Graphe InstantiationListe(List<int[]> tableauMembres)
-        {
-            Dictionary<int, List<int>> listeAdj = new Dictionary<int, List<int>>();
-            foreach (int[] mini_tab in tableauMembres)
-            {
-                int key = mini_tab[0];
-                int value = mini_tab[1];
-
-                if (!listeAdj.ContainsKey(key))
-                {
-                    listeAdj[key] = new List<int>();
-                }
-
-                if (!listeAdj.ContainsKey(value))
-                {
-                    listeAdj[value] = new List<int>();
-                }
-
-                listeAdj[key].Add(value);
-                listeAdj[value].Add(key);
-            }
-
-            return new Graphe(listeAdj);
-        }
-
-        #endregion*/
     }
 }

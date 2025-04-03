@@ -1,7 +1,33 @@
-﻿namespace PbSI
+﻿using Mysqlx.Crud;
+using MySqlX.XDevAPI.CRUD;
+using System.Diagnostics;
+
+namespace PbSI
 {
+
+    public class ResultatChemin
+    {
+
+        private readonly double poidsTotal;
+        private readonly List<int> chemin;
+
+        
+
+        public ResultatChemin(double poidsTotal, List<int> chemin)
+        {
+            this.poidsTotal = poidsTotal;
+            this.chemin = chemin;
+        }
+
+        public double PoidsTotal { get { return this.poidsTotal; } }
+        public List<int> Chemin { get { return this.chemin; } }
+    }
+
+
     public static class RechercheChemin<T> where T : notnull
     {
+
+
         #region Parcours
 
         /// <summary>
@@ -54,7 +80,7 @@
             AfficherSolutionMatrice(distances);
 
             bool connexe = dejaExplore.All(x => x);
-            Console.WriteLine($"Le graphe est connexe ? : {connexe}");
+            Console.WriteLine($"Le graphe est fortement connexe ? : {connexe}");
         }
 
 
@@ -109,7 +135,7 @@
             AfficherSolutionListe(distances, graphe.ListeAdjacence);
 
             bool connexe = dejaExplore.All(x => x);
-            Console.WriteLine($"Le graphe est connexe ? : {connexe}");
+            Console.WriteLine($"Le graphe est fortement connexe ? : {connexe}");
         }
 
         /// <summary>
@@ -161,7 +187,7 @@
             Console.WriteLine();
 
             bool connexe = dejaExplore.All(x => x);
-            Console.WriteLine($"Le graphe est connexe ? : {connexe}");
+            Console.WriteLine($"Le graphe est fortement connexe ? : {connexe}");
 
             AfficherSolutionMatrice(distances);
         }
@@ -220,7 +246,7 @@
             Console.WriteLine();
 
             bool connexe = dejaExplore.All(x => x);
-            Console.WriteLine($"Le graphe est connexe ? : {connexe}");
+            Console.WriteLine($"Le graphe est fortement connexe ? : {connexe}");
 
             AfficherSolutionListe(distances, graphe.ListeAdjacence);
         }
@@ -235,8 +261,9 @@
         /// </summary>
         /// <param name="graph">Graphe sous forme de matrice d'adjacence</param>
         /// <param name="depart">Noeud de départ</param>
-        public static void Dijkstra(double[,] matriceAdjacence, int depart, int arrivee)
+        public static ResultatChemin Dijkstra(Graphe<StationMetro> graphe, int depart, int arrivee)
         {
+            double[,] matriceAdjacence = graphe.MatriceAdjacence;
             int nbNodes = matriceAdjacence.GetLength(0);
 
             double[] distances = new double[nbNodes];
@@ -260,8 +287,6 @@
                 int indexMinDistance = minimum_distance(distances, dejaExplore, nbNodes);
                 dejaExplore[indexMinDistance] = true;
 
-                //Console.WriteLine($"On visite à partir du noeud {mapIdIndex.FirstOrDefault(x => x.Value == indexMinDistance).Key} : ");
-
                 for (int n = 0; n < nbNodes; n++)
                 {
                     if (!dejaExplore[n] && matriceAdjacence[indexMinDistance, n] != 0)
@@ -272,15 +297,40 @@
                         {
                             distances[n] = newDist;
                             parents[n] = indexMinDistance;
-                            Console.WriteLine($"Node : {n}, Poids : {matriceAdjacence[indexMinDistance, n]}, Distance totale : {distances[n]}");
                         }
                     }
                 }
-                //Console.WriteLine();
             }
 
-            AfficherChemin(parents, departIndex, arriveeIndex);
-            Console.WriteLine($"Poids total du chemin de {depart} à {arrivee} : {distances[arriveeIndex]}");
+            List<int> chemin = ObtenirChemin(parents, departIndex, arriveeIndex);
+            // AfficherChemin(chemin, graphe);
+
+            return new ResultatChemin(distances[arrivee], chemin);
+        }
+
+        public static ResultatChemin DijkstraListe(Graphe<StationMetro> graphe, List<int> depart, List<int> arrivee)
+        {
+            double distanceMin = double.MaxValue;
+            List<int> cheminMin = new List<int>();
+
+            foreach (int id in depart)
+            {
+                foreach (int id2 in arrivee)
+                {
+                    ResultatChemin resultat = RechercheChemin<StationMetro>.Dijkstra(graphe, id, id2);
+                    if (resultat.PoidsTotal < distanceMin)
+                    {
+                        distanceMin = resultat.PoidsTotal;
+                        cheminMin = resultat.Chemin;
+                    }
+                }
+
+            }
+
+            AfficherChemin(cheminMin, graphe);
+            Console.WriteLine($"Poids total du chemin est de : " + distanceMin);
+            return new ResultatChemin(distanceMin, cheminMin);
+
         }
 
         /// <summary>
@@ -557,25 +607,34 @@
             }
         }
 
-
-        private static void AfficherChemin(int[] parents, int departIndex, int arriveeIndex)
+        private static List<int> ObtenirChemin(int[] parents, int departIndex, int arriveeIndex)
         {
-            Stack<int> chemin = new Stack<int>();
+            List<int> chemin = new List<int>();
             for (int courant = arriveeIndex; courant != -1; courant = parents[courant])
             {
-                chemin.Push(courant);
+                chemin.Add(courant);
             }
+            chemin.Reverse();
+            return chemin;
+        }
 
-            Console.Write("Chemin de " + departIndex + " à " + arriveeIndex + ": ");
-            while (chemin.Count > 0)
+
+        private static void AfficherChemin(List<int> chemin, Graphe<StationMetro> graphe)
+        {
+            
+            Console.WriteLine("Le chemin à prendre est :");
+            List<string> libelleChemin = new List<string>();
+
+            foreach (int id in chemin)
             {
-                Console.Write(chemin.Pop());
-                if (chemin.Count > 0)
+                var contenu = graphe.TrouverNoeudParId(id).Contenu;
+                if(contenu != null)
                 {
-                    Console.Write(" -> ");
+                    libelleChemin.Add(contenu.Libelle + " (Ligne " + contenu.Ligne + ")");
                 }
             }
-            Console.WriteLine();
+
+            Console.WriteLine(string.Join(" -> ", libelleChemin));
         }
 
 
