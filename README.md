@@ -1,6 +1,4 @@
-# Projet de Réseau de Métro de Paris
-
-## Problème scientifique et informatique
+# Problème scientifique et informatique
 
 ### Description
 
