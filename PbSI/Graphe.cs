@@ -10,7 +10,8 @@ namespace PbSI
         /// <summary>
         /// Liste des noeuds du graphe
         /// </summary>
-        private readonly List<Noeud<T>> noeuds;      
+        private readonly List<Noeud<T>> noeuds;
+        private readonly Dictionary<int, Noeud<T>> noeudsDict; // Dictionnaire pour accès par ID
 
         /// <summary>
         /// Liste des liens du graphe
@@ -67,7 +68,8 @@ namespace PbSI
         public Graphe()
         {
             noeuds = new List<Noeud<T>>();
-            liens = new HashSet<Lien<T>>();  
+            liens = new HashSet<Lien<T>>();
+            noeudsDict = new Dictionary<int, Noeud<T>>();
         }
 
         /// <summary>
@@ -84,13 +86,20 @@ namespace PbSI
 
             noeuds = new List<Noeud<T>>();
             liens = new HashSet<Lien<T>>();
+            noeudsDict = new Dictionary<int, Noeud<T>>();
+
             this.matriceAdjacence = matriceAdjacence;
 
 
             for (int i = 0; i < matriceAdjacence.GetLength(0); i++)
             {
-                noeuds.Add(new Noeud<T>(i, contenus[i]));
+                Noeud<T> n = new Noeud<T>(i, contenus[i]);
+                noeuds.Add(n);
+                noeudsDict[i] = n;
+            }
 
+            for (int i = 0; i < matriceAdjacence.GetLength(0); i++)
+            {
                 for (int j = 0; j < matriceAdjacence.GetLength(1); j++)
                 {
                     if (this.matriceAdjacence[i, j] != 0)
@@ -109,13 +118,19 @@ namespace PbSI
 
             noeuds = new List<Noeud<T>>();
             liens = new HashSet<Lien<T>>();
+            noeudsDict = new Dictionary<int, Noeud<T>>();
             this.matriceAdjacence = matriceAdjacence;
 
 
             for (int i = 0; i < matriceAdjacence.GetLength(0); i++)
             {
-                noeuds.Add(new Noeud<T>(i));
+                Noeud<T> n = new Noeud<T>(i);
+                noeuds.Add(n);
+                noeudsDict[i] = n;
+            }
 
+            for (int i = 0; i < matriceAdjacence.GetLength(0); i++)
+            {
                 for (int j = 0; j < matriceAdjacence.GetLength(1); j++)
                 {
                     if (this.matriceAdjacence[i, j] != 0)
@@ -142,6 +157,7 @@ namespace PbSI
 
             noeuds = new List<Noeud<T>>();
             liens = new HashSet<Lien<T>>();
+            noeudsDict = new Dictionary<int, Noeud<T>>();
 
             this.listeAdjacence = listeAdjacence;
 
@@ -151,6 +167,7 @@ namespace PbSI
             {
                 Noeud<T> source = new Noeud<T>(index, contenus[index]);
                 noeuds.Add(source);
+                noeudsDict[index] = source;
 
                 foreach (var voisin in noeud.Value)
                 {
@@ -171,6 +188,7 @@ namespace PbSI
         {
 
             noeuds = new List<Noeud<T>>();
+            noeudsDict = new Dictionary<int, Noeud<T>>();
             liens = new HashSet<Lien<T>>();
 
             this.listeAdjacence = listeAdjacence;
@@ -181,6 +199,7 @@ namespace PbSI
             {
                 Noeud<T> source = new Noeud<T>(index);
                 noeuds.Add(source);
+                noeudsDict[index] = source;
 
                 foreach (var voisin in noeud.Value)
                 {
@@ -330,21 +349,11 @@ namespace PbSI
 
         public Noeud<T>? TrouverNoeudParId(int id)
         {
-            return this.noeuds.FirstOrDefault(n => n.Id == id);
+            Noeud<T>? noeud;
+            bool existe = noeudsDict.TryGetValue(id, out noeud);
+            return existe ? noeud : null;
         }
 
-        public int TrouverIdParLibelle(string libelle)
-        {
-            foreach (var noeud in noeuds)
-            {
-                // Supposons que votre Noeud<T> contient une propriété pour accéder à son contenu
-                if (noeud.Contenu is StationMetro station && station.Libelle == libelle)
-                {
-                    return noeud.Id; // Retourne l'identifiant du nœud
-                }
-            }
-            throw new Exception($"Aucune station trouvée avec le libellé : {libelle}");
-        }
 
         /// <summary>
         /// Ajoute un noeud au graphe
@@ -355,6 +364,7 @@ namespace PbSI
             if (!noeuds.Contains(noeud))
             {
                 noeuds.Add(noeud);
+                noeudsDict[noeud.Id] = noeud;
                 this.proprietesCalculees = false;
             }
 

@@ -9,7 +9,7 @@ namespace PbSI
         static async Task Main(string[] args)
         {
             
-            /*ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
+            ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
             Graphe<StationMetro> graphe = reseau.Graphe;
 
             double[,] m = graphe.MatriceAdjacence;
@@ -34,20 +34,10 @@ namespace PbSI
             catch (Exception e)
             {
                 Console.WriteLine($"Erreur : {e.Message}");
-            }*/
-            
-            /*RechercheChemin<StationMetro>.DFS_Liste(graphe, 1);
-            RechercheChemin<StationMetro>.DFS_Matrice(graphe, 1);
-            RechercheChemin<StationMetro>.Dijkstra(graphe.MatriceAdjacence, 1, 300);*/
-            
+            }
 
+            Console.ReadKey();
 
-            /*Connexion bdd = new Connexion();
-            bdd.executerRequete("SELECT * FROM Cuisinier");
-            bdd.afficherResultatRequete();
-            bdd.exporterResultatRequete();
-            bdd.fermerConnexion();
-            */
             Menu menu = new Menu();
 
         }

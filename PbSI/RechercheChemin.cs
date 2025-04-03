@@ -1,5 +1,4 @@
 ﻿using Mysqlx.Crud;
-using Mysqlx.Crud;
 using MySqlX.XDevAPI.CRUD;
 using System.Diagnostics;
 
@@ -59,7 +58,7 @@ namespace PbSI
             AfficherSolutionMatrice(distances);
 
             bool connexe = dejaExplore.All(x => x);
-            Console.WriteLine($"Le graphe est connexe ? : {connexe}");
+            Console.WriteLine($"Le graphe est fortement connexe ? : {connexe}");
         }
 
 
@@ -114,7 +113,7 @@ namespace PbSI
             AfficherSolutionListe(distances, graphe.ListeAdjacence);
 
             bool connexe = dejaExplore.All(x => x);
-            Console.WriteLine($"Le graphe est connexe ? : {connexe}");
+            Console.WriteLine($"Le graphe est fortement connexe ? : {connexe}");
         }
 
         /// <summary>
@@ -166,7 +165,7 @@ namespace PbSI
             Console.WriteLine();
 
             bool connexe = dejaExplore.All(x => x);
-            Console.WriteLine($"Le graphe est connexe ? : {connexe}");
+            Console.WriteLine($"Le graphe est fortement connexe ? : {connexe}");
 
             AfficherSolutionMatrice(distances);
         }
@@ -225,7 +224,7 @@ namespace PbSI
             Console.WriteLine();
 
             bool connexe = dejaExplore.All(x => x);
-            Console.WriteLine($"Le graphe est connexe ? : {connexe}");
+            Console.WriteLine($"Le graphe est fortement connexe ? : {connexe}");
 
             AfficherSolutionListe(distances, graphe.ListeAdjacence);
         }
@@ -454,7 +453,11 @@ namespace PbSI
 
             foreach (int id in chemin)
             {
-                libelleChemin.Add(graphe.TrouverNoeudParId(id).Contenu.Libelle);
+                var contenu = graphe.TrouverNoeudParId(id).Contenu;
+                if(contenu != null)
+                {
+                    libelleChemin.Add(contenu.Libelle);
+                }
             }
 
             Console.WriteLine(string.Join(" -> ", libelleChemin));
