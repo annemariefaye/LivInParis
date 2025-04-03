@@ -374,7 +374,24 @@ namespace PbSI
 
         }
 
-        
+        public Noeud<T>? TrouverNoeudParId(int id)
+        {
+            return this.noeuds.FirstOrDefault(n => n.Id == id);
+        }
+
+        public int TrouverIdParLibelle(string libelle)
+        {
+            foreach (var noeud in noeuds)
+            {
+                // Supposons que votre Noeud<T> contient une propriété pour accéder à son contenu
+                if (noeud.Contenu is StationMetro station && station.Libelle == libelle)
+                {
+                    return noeud.Id; // Retourne l'identifiant du nœud
+                }
+            }
+            throw new Exception($"Aucune station trouvée avec le libellé : {libelle}");
+        }
+
 
 
         /// <summary>
