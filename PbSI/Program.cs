@@ -23,12 +23,14 @@ namespace PbSI
             try
             {
                 depart = recherche.IdStationProche;
-                RechercheChemin<StationMetro>.FloydWarshall(graphe);
+                RechercheChemin<StationMetro>.FloydWarshall(graphe, depart, 1);
+                
+
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Erreur : {e.Message}");
-            }*/
+            }
             
             /*RechercheChemin<StationMetro>.DFS_Liste(graphe, 1);
             RechercheChemin<StationMetro>.DFS_Matrice(graphe, 1);

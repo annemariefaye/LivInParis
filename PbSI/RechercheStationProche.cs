@@ -86,7 +86,7 @@ namespace PbSI
                         (double lon, double lat) coordonneesStation = (station.Contenu.Longitude, station.Contenu.Latitude);
                         double distance = CalculerDistance(coordonneesOriginelles.Value, coordonneesStation);
 
-                        Console.WriteLine("la distance est : " + distance);
+                        //Console.WriteLine("la distance est : " + distance);
 
                         if (distance < distanceMin)
                         {

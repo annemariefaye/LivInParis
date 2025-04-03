@@ -318,13 +318,15 @@
             // initialisation
             for (int i = 0; i < nbNodes; i++)
             {
-                distances[i] = double.PositiveInfinity;
+                distances[i] = double.MaxValue;
                 parents[i] = -1;
             }
             distances[departIndex] = 0;
 
+            
             for (int i = 0; i < nbNodes - 1; i++)
             {
+              
                 foreach (var lien in graphe.Liens)
                 {
                     int u = lien.Source.Id;
@@ -338,10 +340,11 @@
                     }
                 }
             }
-
+            
             /// verification de la presence de cycle negatif
             foreach (var lien in graphe.Liens)
             {
+
                 int u = lien.Source.Id;
                 int v = lien.Destination.Id;
                 double poids = lien.Poids;
@@ -353,71 +356,104 @@
                 }
             }
 
+            Console.WriteLine($"Distance minimale entre {departIndex} et {arriveeIndex} : {distances[arriveeIndex]}");
+            
+            
+            if (distances[arriveeIndex] == double.MaxValue)
+            {
+                Console.WriteLine($"Aucun chemin trouvé entre {departIndex} et {arriveeIndex}.");
+                return;
+            }
+
+            Console.WriteLine($"Distance minimale entre {departIndex} et {arriveeIndex} : {distances[arriveeIndex]}");
+            List<int> chemin = new List<int>();
+            for (int v = arriveeIndex; v != -1; v = parents[v])
+            {
+                chemin.Add(v);
+            }
+            chemin.Reverse();
+            Console.WriteLine("Chemin le plus court : " + string.Join("->", chemin));
+
+
+
         }
 
         ///<summary>
         ///algorithme de Floyd Warshall
         ///</summary>
-        
-        public static void FloydWarshall (Graphe<T> graphe)
+
+        public static void FloydWarshall(Graphe<T> graphe, int departIndex, int arriveeIndex)
         {
             int n = graphe.Noeuds.Count;
 
             double[,] distances = new double[n, n];
             int?[,] predecesseurs = new int?[n, n];
 
-            for (int i=0; i<n; i++)
+            // Initialisation
+            for (int i = 0; i < n; i++)
             {
-                for (int j=0;i<n;j++)
+                for (int j = 0; j < n; j++)
                 {
                     if (i == j)
                     {
                         distances[i, j] = 0;
                     }
-                    else if (graphe.MatriceAdjacence[i, j] != 0)
+                    else if (graphe.MatriceAdjacence[i, j] > 0)
                     {
                         distances[i, j] = graphe.MatriceAdjacence[i, j];
                         predecesseurs[i, j] = i;
                     }
-
                     else
                     {
-                        distances[i, j] = double.PositiveInfinity;
+                        distances[i, j] = double.MaxValue;
                         predecesseurs[i, j] = null;
                     }
-
                 }
             }
 
-            for (int i = 0; i < n; i++)
+            // Floyd-Warshall
+            for (int k = 0; k < n; k++)
             {
-                for (int j = 0; j < n; j++)
+                for (int i = 0; i < n; i++)
                 {
-                        for (int k = 0; k < n; k++)
+                    for (int j = 0; j < n; j++)
                     {
-                        if (distances[j,i]+ distances[i,k]< distances[j, k])
+                        if (distances[i, k] != double.MaxValue &&
+                            distances[k, j] != double.MaxValue &&
+                            distances[i, k] + distances[k, j] < distances[i, j])
                         {
-                            distances[j, k] = distances[j, i] + distances[i, k];
-                            predecesseurs[j, k] = predecesseurs[i, k];
+                            distances[i, j] = distances[i, k] + distances[k, j];
+                            predecesseurs[i, j] = predecesseurs[k, j];
                         }
                     }
+                }
+            }
 
-                }
-            }
-            
-            for (int i = 0; i < n; i++)
+            // Affichage
+            if (distances[departIndex, arriveeIndex] == double.MaxValue)
             {
-                for (int j=0;j<n;j++)
-                {
-                    if (i!=j && distances[i,j]!= double.PositiveInfinity)
-                    {
-                        Console.WriteLine($"\n Chemin le plus court de  {i} a {j} :");
-                        Console.WriteLine("je sais pas comment le faire aahh ");
-                        Console.WriteLine($"Distance totale : {distances[i, j]}");
-                    }
-                }
+                Console.WriteLine($"Aucun chemin trouvé entre {departIndex} et {arriveeIndex}.");
+                return;
             }
+
+            Console.WriteLine($"Distance minimale entre {departIndex} et {arriveeIndex} : {distances[departIndex, arriveeIndex]}");
+
+            // Reconstruction du chemin
+            List<int> chemin = new List<int>();
+            int? courant = arriveeIndex;
+            while (courant != null)
+            {
+                chemin.Add(courant.Value);
+                if (courant == departIndex)
+                    break;
+                courant = predecesseurs[departIndex, courant.Value];
+            }
+
+            chemin.Reverse();
+
+            Console.WriteLine("Chemin le plus court : " + string.Join(" -> ", chemin));
         }
+
 
 
 
