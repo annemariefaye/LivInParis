@@ -55,7 +55,7 @@ CREATE TABLE Plat (
     CheminAccesPhoto VARCHAR(255) NULL,
     Nationalite VARCHAR (255) NOT NULL,
     FOREIGN KEY (IdRecette) REFERENCES Recette(IdRecette),
-    FOREIGN KEY (IdCuisinier) REFERENCES Utilisateur(Id)
+    FOREIGN KEY (IdCuisinier) REFERENCES Utilisateur(Id) ON DELETE CASCADE
 );
 CREATE TABLE Ingredient(
 	IdIngredient INT AUTO_INCREMENT PRIMARY KEY,

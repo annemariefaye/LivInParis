@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -211,6 +212,7 @@ namespace PbSI
                         break;
                     case ('4'):
                         Console.Clear();
+                        modifierClient();
                         break;
                     case ('5'):
                         Console.Clear();
@@ -433,7 +435,6 @@ namespace PbSI
                         requete_client += " idClient = "+idClient;
                         this.connexion.executerRequete(requete_client);
                         Console.Clear();
-                        Console.WriteLine(requete_client);
                         Console.WriteLine("Client supprimé !\n");
                         break;
                     case ('2'):
@@ -444,6 +445,42 @@ namespace PbSI
                         Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
                         Console.ResetColor();
                         Console.ReadKey();
+                        break;
+                }
+            }
+        }
+
+
+        public void modifierClient()
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Interface de modification des clients\n");
+                Console.WriteLine("Tapez 'X' pour revenir au menu précédent\n\n");
+                Console.WriteLine("Identifiant du client à modifier: \n");
+                Console.ResetColor();
+                string identifiant_client = Console.ReadLine();
+
+                switch (identifiant_client)
+                {
+                    case ("X"):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.WriteLine("informations du client:");
+                        string requete = "SELECT * FROM Utilisateur JOIN Client ON Client.IdClient = Utilisateur.IdClient WHERE Utilisateur.IdClient ="+identifiant_client;
+                        this.connexion.executerRequete(requete);
+                        this.connexion.afficherResultatRequete();
+                        Console.WriteLine("Quelle colonne souhaitez-vous modifier:");
+                        string colonne = Console.ReadLine();
+                        string table = (colonne == "NomEntreprise" || colonne == "MotDePasse") ? "Client" : "Utilisateur";
+                        Console.WriteLine("Quelle est la nouvelle valeur de la colonne " + colonne);
+                        string nouvelleValeur=Console.ReadLine();
+                        requete = "UPDATE "+table+" SET "+colonne+" = '"+nouvelleValeur+"' WHERE idClient = "+identifiant_client;
+                        this.connexion.executerRequete(requete);
+                        Console.Clear();
+                        Console.WriteLine("La requete a été modifiée avec succès");
                         break;
                 }
             }
