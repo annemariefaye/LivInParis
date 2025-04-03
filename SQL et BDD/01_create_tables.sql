@@ -33,7 +33,7 @@ CREATE TABLE Utilisateur (
     IdStationProche INT,
     EstBanni BOOL DEFAULT FALSE,
     FOREIGN KEY (IdCuisinier) REFERENCES Cuisinier (IdCuisinier),
-    FOREIGN KEY (IdClient) REFERENCES Client(IdClient),
+    FOREIGN KEY (IdClient) REFERENCES Client(IdClient) ON DELETE CASCADE,
     FOREIGN KEY (IdStationProche) REFERENCES Station(IdStation) 
 );
 CREATE TABLE Recette(
@@ -55,7 +55,7 @@ CREATE TABLE Plat (
     CheminAccesPhoto VARCHAR(255) NULL,
     Nationalite VARCHAR (255) NOT NULL,
     FOREIGN KEY (IdRecette) REFERENCES Recette(IdRecette),
-    FOREIGN KEY (IdCuisinier) REFERENCES Utilisateur(Id)
+    FOREIGN KEY (IdCuisinier) REFERENCES Utilisateur(Id) ON DELETE CASCADE
 );
 CREATE TABLE Ingredient(
 	IdIngredient INT AUTO_INCREMENT PRIMARY KEY,
@@ -76,7 +76,7 @@ CREATE TABLE Commande (
     IdClient INT NOT NULL,
     DateCommande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     Statut ENUM('En attente', 'Validée', 'Livrée', 'Annulée') NOT NULL,
-    FOREIGN KEY (IdClient) REFERENCES Utilisateur(Id)
+    FOREIGN KEY (IdClient) REFERENCES Utilisateur(Id) ON DELETE CASCADE
 );
 
 CREATE TABLE LigneDeCommande (
@@ -86,9 +86,10 @@ CREATE TABLE LigneDeCommande (
     Quantite INT NOT NULL,
     DateLivraison DATE NOT NULL,
     LieuLivraison VARCHAR(255) NOT NULL,
-    FOREIGN KEY (IdCommande) REFERENCES Commande(IdCommande) ,
+    FOREIGN KEY (IdCommande) REFERENCES Commande(IdCommande) ON DELETE CASCADE,
     FOREIGN KEY (IdPlat) REFERENCES Plat(IdPlat) 
 );
+
 
 CREATE TABLE Livraison (
     IdLivraison INT AUTO_INCREMENT PRIMARY KEY,
@@ -97,11 +98,12 @@ CREATE TABLE Livraison (
     IdStationDepart INT NULL,
     IdStationArrivee INT NULL,
     Statut ENUM('En attente', 'En cours', 'Livrée') DEFAULT 'En attente',
-    FOREIGN KEY (IdLigneCommande) REFERENCES LigneDeCommande(IdLigneCommande) ,
+    FOREIGN KEY (IdLigneCommande) REFERENCES LigneDeCommande(IdLigneCommande) ON DELETE CASCADE,
     FOREIGN KEY (IdLivreur) REFERENCES Utilisateur(Id) ,
     FOREIGN KEY (IdStationDepart) REFERENCES Station(IdStation),
     FOREIGN KEY (IdStationArrivee) REFERENCES Station(IdStation)
 );
+
 
 
 
@@ -124,6 +126,6 @@ CREATE TABLE Transaction (
     Montant DECIMAL(10,2) NOT NULL,
     Reussie BOOL DEFAULT FALSE,
     DateTransaction DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (IdCommande) REFERENCES Commande(IdCommande) 
+    FOREIGN KEY (IdCommande) REFERENCES Commande(IdCommande) ON DELETE CASCADE
 );
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="export_client_1" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="export_client_1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Id" type="xs:int" minOccurs="0" />
+                <xs:element name="Nom" type="xs:string" minOccurs="0" />
+                <xs:element name="Prenom" type="xs:string" minOccurs="0" />
+                <xs:element name="Adresse" type="xs:string" minOccurs="0" />
+                <xs:element name="Telephone" type="xs:string" minOccurs="0" />
+                <xs:element name="Email" type="xs:string" minOccurs="0" />
+                <xs:element name="IdCuisinier" type="xs:int" minOccurs="0" />
+                <xs:element name="IdClient" type="xs:int" minOccurs="0" />
+                <xs:element name="IdStationProche" type="xs:int" minOccurs="0" />
+                <xs:element name="EstBanni" type="xs:boolean" minOccurs="0" />
+                <xs:element name="IdClient1" type="xs:int" minOccurs="0" />
+                <xs:element name="NomEntreprise" type="xs:string" minOccurs="0" />
+                <xs:element name="MotDePasse" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <export_client_1>
+    <Id>1</Id>
+    <Nom>Duclos</Nom>
+    <Prenom>Pierre</Prenom>
+    <Adresse>3 rue du Mans</Adresse>
+    <Telephone>0123374839</Telephone>
+    <Email>p.Duclos@email.com</Email>
+    <IdClient>1</IdClient>
+    <IdStationProche>1</IdStationProche>
+    <EstBanni>false</EstBanni>
+    <IdClient1>1</IdClient1>
+    <NomEntreprise></NomEntreprise>
+    <MotDePasse>piDuclos</MotDePasse>
+  </export_client_1>
+</NewDataSet>

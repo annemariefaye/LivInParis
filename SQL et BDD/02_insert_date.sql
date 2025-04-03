@@ -2,7 +2,8 @@ USE LivInParis;
 
 INSERT INTO Client (NomEntreprise, MotDePasse) VALUES
 ('Boulangerie Dupont', 'mdp123'),
-('Entreprise XYZ', 'xyz789');
+('Entreprise XYZ', 'xyz789'),
+(null, 'boul2025');
 
 INSERT INTO Cuisinier (MotDePasse) VALUES
 ('cuisine123'),
@@ -14,6 +15,8 @@ INSERT INTO Station (Nom, Latitude, Longitude) VALUES
 
 INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdClient, IdStationProche, EstBanni) VALUES
 ('Dupond', 'Jean', '10 rue de Paris', '0123456789', 'jean.dupond@email.com', NULL, 1, 1, FALSE),
+('Marie', 'Tom', '11 rue de la Paix', '0123486489', 'tom.marie@email.com', NULL, 2, 1, FALSE),
+('Jarrar', 'Cédric', '11 rue des Lampes', '012343030', 'cedric.jarrar@email.com', NULL, 3, 1, FALSE),
 ('Martin', 'Sofie', '15 avenue de Lyon', '0987654321', 'sofie.martin@email.com', 1, NULL, 2, FALSE);
 
 INSERT INTO Recette (Nom) VALUES
@@ -34,7 +37,10 @@ INSERT INTO ListeIngredients (IdIngredient, IdRecette, Quantite) VALUES
 
 INSERT INTO Commande (IdClient, DateCommande, Statut) VALUES
 (1, NOW(), 'En attente'),
-(2, NOW(), 'Validée');
+(2, NOW(), 'Validée'),
+(3, NOW(), 'Validée'),
+(2, NOW(), 'Validée'),
+(1, NOW(), 'Validée');
 
 INSERT INTO LigneDeCommande (IdCommande, IdPlat, Quantite, DateLivraison, LieuLivraison) VALUES
 (1, 1, 2, '2025-03-02', '10 rue de Paris'),
@@ -53,6 +59,10 @@ INSERT INTO Correspondance (IdStation, IdLigne) VALUES
 (2, 2);
 
 INSERT INTO Transaction (IdCommande, Montant, Reussie, DateTransaction) VALUES
-(1, 25.00, TRUE, NOW()),
-(2, 15.00, TRUE, NOW());
+(1, 25.00, FALSE, NOW()),
+(2, 15.00, TRUE, NOW()),
+(3, 12.00, TRUE, NOW()),
+(4, 13.00, TRUE, NOW()),
+(5, 18.00, TRUE, NOW());
+
 
