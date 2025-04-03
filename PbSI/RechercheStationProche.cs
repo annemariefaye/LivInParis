@@ -11,6 +11,7 @@ namespace PbSI
         private readonly string adresse;
         private readonly Graphe<StationMetro> graphe;
         private List<int> idStationsProches = new List<int> { -1};
+        private float tempsDeplacement = 0.0f; //en minutes
         private const double RayonTerre = 6371000.0;
 
         public RechercheStationProche(string adresse, Graphe<StationMetro> graphe)
@@ -33,6 +34,17 @@ namespace PbSI
                     return this.idStationsProches;
                 else
                     throw new Exception("Aucune station trouvée.");
+            }
+        }
+
+        public float TempsDeplacement
+        {
+            get
+            {
+                if (this.tempsDeplacement != 0.0f)
+                    return this.tempsDeplacement;
+                else
+                    throw new Exception("Aucune temps de déplacement calculé");
             }
         }
 
@@ -89,6 +101,7 @@ namespace PbSI
                     if (distance < distanceMin)
                     {
                         distanceMin = distance;
+                        this.tempsDeplacement = (float)distance / 83.3f; // Vitesse moyenne de marche en m/min
                         stationsProches.Clear(); // On enlève les anciennes stations si on trouve plus proche
                         stationsProches.Add(station.Id);
                     }

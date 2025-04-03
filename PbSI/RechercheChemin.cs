@@ -4,8 +4,24 @@ using System.Diagnostics;
 
 namespace PbSI
 {
+
+    public class ResultatChemin
+    {
+        public double PoidsTotal { get; set; }
+        public List<int> Chemin { get; set; }
+
+        public ResultatChemin(double poidsTotal, List<int> chemin)
+        {
+            PoidsTotal = poidsTotal;
+            Chemin = chemin;
+        }
+    }
+
+
     public static class RechercheChemin<T> where T : notnull
     {
+
+
         #region Parcours
 
         /// <summary>
@@ -239,7 +255,7 @@ namespace PbSI
         /// </summary>
         /// <param name="graph">Graphe sous forme de matrice d'adjacence</param>
         /// <param name="depart">Noeud de départ</param>
-        public static (double, List<int>) Dijkstra(Graphe<StationMetro> graphe, int depart, int arrivee)
+        public static ResultatChemin Dijkstra(Graphe<StationMetro> graphe, int depart, int arrivee)
         {
             double[,] matriceAdjacence = graphe.MatriceAdjacence;
             int nbNodes = matriceAdjacence.GetLength(0);
@@ -283,10 +299,10 @@ namespace PbSI
             List<int> chemin = ObtenirChemin(parents, departIndex, arriveeIndex);
             // AfficherChemin(chemin, graphe);
 
-            return (distances[arriveeIndex], chemin);
+            return new ResultatChemin(distances[arrivee], chemin);
         }
 
-        public static List<int> DijkstraListe(Graphe<StationMetro> graphe, List<int> depart, List<int> arrivee)
+        public static ResultatChemin DijkstraListe(Graphe<StationMetro> graphe, List<int> depart, List<int> arrivee)
         {
             double distanceMin = double.MaxValue;
             List<int> cheminMin = new List<int>();
@@ -295,11 +311,11 @@ namespace PbSI
             {
                 foreach (int id2 in arrivee)
                 {
-                    (double distanceCurrent, List<int> cheminCurrent) = RechercheChemin<StationMetro>.Dijkstra(graphe, id, id2);
-                    if (distanceCurrent < distanceMin)
+                    ResultatChemin resultat = RechercheChemin<StationMetro>.Dijkstra(graphe, id, id2);
+                    if (resultat.PoidsTotal < distanceMin)
                     {
-                        distanceMin = distanceCurrent;
-                        cheminMin = cheminCurrent;
+                        distanceMin = resultat.PoidsTotal;
+                        cheminMin = resultat.Chemin;
                     }
                 }
 
@@ -307,7 +323,8 @@ namespace PbSI
 
             AfficherChemin(cheminMin, graphe);
             Console.WriteLine($"Poids total du chemin est de : " + distanceMin);
-            return cheminMin;
+            return new ResultatChemin(distanceMin, cheminMin);
+
         }
 
         /// <summary>

@@ -103,8 +103,9 @@ public class Visualisation : Form
         try
         {
             // Utiliser Dijkstra pour obtenir les nœuds du sous-graphe
-            List<int> nodesSousGrapheIds = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
-            nodesSousGraphe = nodesSousGrapheIds.Select(id => graphe.Noeuds.FirstOrDefault(n => n.Id == id)).ToList();
+            ResultatChemin sousGrapheSolution = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
+            List<int> nodesSousGrapheIds = sousGrapheSolution.Chemin;
+            nodesSousGraphe = nodesSousGrapheIds.Select(id => graphe.TrouverNoeudParId(id)).ToList();
         }
         catch (Exception e)
         {

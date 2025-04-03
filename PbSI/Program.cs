@@ -23,11 +23,16 @@ namespace PbSI
 
             List<int> depart;
             List<int> arrivee;
+            float tempsDeplacementDepart = 0;
+            float tempsDeplacementArrivee = 0;
             double distanceMin = double.MaxValue;
             try
             {
                 depart = recherche.IdStationsProches;
                 arrivee = recherche2.IdStationsProches;
+
+                tempsDeplacementDepart = recherche.TempsDeplacement;
+                tempsDeplacementArrivee = recherche2.TempsDeplacement;
 
                 RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
             }
@@ -35,6 +40,11 @@ namespace PbSI
             {
                 Console.WriteLine($"Erreur : {e.Message}");
             }
+
+            Console.WriteLine("Temps total de déplacement : " + tempsDeplacementArrivee+tempsDeplacementDepart);
+
+
+            Console.WriteLine("Appuyez sur une touche pour continuer...");
 
             Console.ReadKey();
 
