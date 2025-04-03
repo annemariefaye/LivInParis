@@ -140,3 +140,64 @@ Ce fichier contient des tests unitaires pour la classe `Noeud`. Les tests inclue
 1. **TestConstructor** : Vérifie que le constructeur initialise correctement l'identifiant et la liste des voisins.
 2. **TestAjouterVoisin** : Vérifie l'ajout d'un voisin dans la liste des voisins.
 3. **TestToString** : Vérifie la méthode `ToString` pour s'assurer qu'elle retourne la chaîne attendue.
+
+
+# Comparaison des algorithmes de plus court chemin
+
+## Introduction
+Ce projet explore et compare trois algorithmes classiques de recherche du plus court chemin :
+- **Dijkstra**
+- **Bellman-Ford**
+- **Floyd-Warshall**
+
+L'objectif est d'évaluer leurs performances en termes de complexité algorithmique, rapidité d'exécution et pertinence dans différents contextes d'application.
+
+## Algorithmes
+
+### Dijkstra
+- **Principe** : Algorithme glouton qui trouve le plus court chemin d'un nœud source vers tous les autres sommets d'un graphe pondéré à poids positifs.
+- **Complexité** :
+  - \( O(V^2) \) avec une matrice d'adjacence.
+  - \( O((V+E) \log V) \) avec une file de priorité.
+- **Utilisation** : Adapté aux systèmes de navigation et aux graphes sans poids négatifs.
+
+### Bellman-Ford
+- **Principe** : Utilise la relaxation des arêtes et peut gérer des poids négatifs.
+- **Complexité** : \( O(VE) \), ce qui le rend plus lent que Dijkstra.
+- **Utilisation** : Utile pour les graphes avec poids négatifs et détection de cycles négatifs.
+
+### Floyd-Warshall
+- **Principe** : Algorithme basé sur la programmation dynamique qui trouve le plus court chemin entre tous les couples de sommets.
+- **Complexité** : \( O(V^3) \), ce qui est inefficace pour les grands graphes.
+- **Utilisation** : Convient aux graphes denses avec un nombre réduit de sommets.
+
+## Résultats des tests
+
+Les tests ont été réalisés sur un graphe donné, et les temps d'exécution ont été mesurés :
+
+| Algorithme       | Temps d'exécution |
+|------------------|------------------|
+| Dijkstra        | 3 ms              |
+| Bellman-Ford    | 5 ms              |
+| Floyd-Warshall  | 30753 ms          |
+
+### Analyse
+- **Dijkstra est le plus rapide** et efficace pour les graphes sans poids négatifs.
+- **Bellman-Ford est légèrement plus lent**, mais reste robuste face aux poids négatifs.
+- **Floyd-Warshall est très lent**, ce qui correspond à sa complexité algorithmique élevée.
+
+## Conclusion
+- **Dijkstra** est recommandé pour les graphes classiques avec poids positifs.
+- **Bellman-Ford** est utile si des poids négatifs existent.
+- **Floyd-Warshall** est inadapté aux grands graphes.
+
+### Déploiement et exécution
+Pour exécuter les algorithmes, utilisez le fichier `Chronometreur.cs` pour mesurer leurs performances. Vous pouvez lancer les tests en exécutant :
+```csharp
+Chronometreur.ChronometreDijkstra(graphe, depart, arrivee);
+Chronometreur.ChronometreBellmanFord(graphe, depart, arrivee);
+Chronometreur.ChronometreFloydWarshall(graphe);
+```
+
+## Licence
+Ce projet est sous licence MIT. Vous êtes libre de l'utiliser et de le modifier selon vos besoins.
