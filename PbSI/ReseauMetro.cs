@@ -30,6 +30,7 @@ namespace PbSI
             foreach (var data in donneesNoeuds)
             {
                 var station = new Noeud<StationMetro>(int.Parse(data[0]), StationMetro.Parse(data));
+                graphe.AjouterMembre(station);
                 stations.Add(station);
             }
         }
@@ -46,8 +47,8 @@ namespace PbSI
                     int idStationPrecedente = int.Parse(dataStation[2]);
                     double temps = int.Parse(dataStation[4]);
 
-                    var stationCurrent = TrouverNoeudParId(idStation);
-                    var stationPrecedente = TrouverNoeudParId(idStationPrecedente);
+                    var stationCurrent = graphe.TrouverNoeudParId(idStation);
+                    var stationPrecedente = graphe.TrouverNoeudParId(idStationPrecedente);
 
                     if (stationCurrent != null && stationPrecedente != null)
                     {
@@ -65,8 +66,8 @@ namespace PbSI
                 if (dataStation[0] == "44" || dataStation[0] == "69")
                 {
                     int idStation = int.Parse(dataStation[0]);
-                    var stationCurrent = TrouverNoeudParId(idStation);
-                    var stationSuivante = TrouverNoeudParId(int.Parse(dataStation[3]));
+                    var stationCurrent = graphe.TrouverNoeudParId(idStation);
+                    var stationSuivante = graphe.TrouverNoeudParId(int.Parse(dataStation[3]));
 
                     if (stationCurrent != null && stationSuivante != null)
                     {
@@ -116,8 +117,8 @@ namespace PbSI
                         {
                             if (idCorrespondance != idStation)
                             {
-                                var stationCurrent = TrouverNoeudParId(idStation);
-                                var stationCorrespondance = TrouverNoeudParId(idCorrespondance);
+                                var stationCurrent = graphe.TrouverNoeudParId(idStation);
+                                var stationCorrespondance = graphe.TrouverNoeudParId(idCorrespondance);
 
                                 if (stationCurrent != null && stationCorrespondance != null)
                                 {
@@ -128,12 +129,6 @@ namespace PbSI
                     }
                 }
             }
-        }
-
-        private Noeud<StationMetro> TrouverNoeudParId(int id)
-        {
-            return stations.FirstOrDefault(station => station.Id == id)
-                   ?? throw new KeyNotFoundException($"Aucun noeud trouvé avec l'ID {id}");
         }
 
         private List<List<string>> LireFeuilleNoeud()

@@ -101,7 +101,6 @@ namespace PbSI
 
             // Stocke la liste des stations proches
             this.idStationsProches = stationsProches;
-
             Console.WriteLine("Stations les plus proches : " + string.Join(", ", stationsProches));
         }
 

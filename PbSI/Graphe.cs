@@ -347,11 +347,14 @@ namespace PbSI
         #region Méthodes
 
 
-        public Noeud<T>? TrouverNoeudParId(int id)
+        public Noeud<T> TrouverNoeudParId(int id)
         {
-            Noeud<T>? noeud;
-            bool existe = noeudsDict.TryGetValue(id, out noeud);
-            return existe ? noeud : null;
+            if (noeudsDict.TryGetValue(id, out Noeud<T>? noeud))
+            {
+                return noeud;
+            }
+
+            throw new KeyNotFoundException($"Aucun nœud trouvé avec l'ID {id}");
         }
 
 
@@ -366,6 +369,7 @@ namespace PbSI
                 noeuds.Add(noeud);
                 noeudsDict[noeud.Id] = noeud;
                 this.proprietesCalculees = false;
+
             }
 
         }
