@@ -12,8 +12,8 @@ public class Visualisation : Form
     private Graphe<StationMetro> graphe;
     private Dictionary<string, Color> ligneColors;
     private float minX, maxX, minY, maxY;
-    private List<Noeud<StationMetro>> nodesSousGraphe; // Liste pour le sous-graphe
-    private bool afficherSousGraphe = false; // État de l'affichage
+    private List<Noeud<StationMetro>> nodesSousGraphe = new List<Noeud<StationMetro>>();
+    private bool afficherSousGraphe = false;
 
     public Visualisation()
     {
@@ -24,69 +24,61 @@ public class Visualisation : Form
         this.Size = new Size(6000, 4000);
         this.BackColor = Color.White;
 
-        // Créer un FlowLayoutPanel pour contenir les boutons
         FlowLayoutPanel buttonPanel = new FlowLayoutPanel
         {
             Dock = DockStyle.Top,
-            AutoSize = true, // Ajuster la taille automatiquement
-            FlowDirection = FlowDirection.LeftToRight, // Disposer les boutons horizontalement
-            WrapContents = false, // Ne pas permettre le passage à la ligne
-            Padding = new Padding(10), // Ajouter un peu d'espace autour
-            Margin = new Padding(10) // Ajouter un peu de marge
+            AutoSize = true,
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = false,
+            Padding = new Padding(10),
+            Margin = new Padding(10)
         };
 
-        // Bouton pour enregistrer
         Button saveButton = new Button
         {
             Text = "Enregistrer en tant qu'image",
-            Width = 200, // Largeur personnalisée
-            Height = 30, // Hauteur personnalisée
-            BackColor = Color.LightBlue, // Couleur de fond
-            FlatStyle = FlatStyle.Flat // Style plat
+            Width = 200,
+            Height = 30,
+            BackColor = Color.LightBlue,
+            FlatStyle = FlatStyle.Flat
         };
         saveButton.Click += SaveButton_Click;
-        buttonPanel.Controls.Add(saveButton); // Ajouter au FlowLayoutPanel
+        buttonPanel.Controls.Add(saveButton);
 
-        // Bouton pour afficher tout le graphe
         Button allGraphButton = new Button
         {
             Text = "Afficher tout le graphe",
-            Width = 200, // Largeur personnalisée
-            Height = 30, // Hauteur personnalisée
-            BackColor = Color.LightGreen, // Couleur de fond
-            FlatStyle = FlatStyle.Flat // Style plat
+            Width = 200,
+            Height = 30,
+            BackColor = Color.LightGreen,
+            FlatStyle = FlatStyle.Flat
         };
         allGraphButton.Click += (sender, e) =>
         {
-            afficherSousGraphe = false; // Afficher tout le graphe
-            this.Invalidate(); // Rafraîchir l'affichage
+            afficherSousGraphe = false;
+            this.Invalidate();
         };
-        buttonPanel.Controls.Add(allGraphButton); // Ajouter au FlowLayoutPanel
+        buttonPanel.Controls.Add(allGraphButton);
 
-        // Bouton pour afficher le sous-graphe
         Button subGraphButton = new Button
         {
             Text = "Afficher sous-graphe",
-            Width = 200, // Largeur personnalisée
-            Height = 30, // Hauteur personnalisée
-            BackColor = Color.LightCoral, // Couleur de fond
-            FlatStyle = FlatStyle.Flat // Style plat
+            Width = 200,
+            Height = 30,
+            BackColor = Color.LightCoral,
+            FlatStyle = FlatStyle.Flat
         };
         subGraphButton.Click += async (sender, e) =>
         {
-            await ChargerSousGrapheAsync(); // Appel d'une méthode asynchrone pour définir le sous-graphe
-            afficherSousGraphe = true; // Activer l'affichage du sous-graphe
-            this.Invalidate(); // Rafraîchir l'affichage
+            await ChargerSousGrapheAsync();
+            afficherSousGraphe = true;
+            this.Invalidate();
         };
-        buttonPanel.Controls.Add(subGraphButton); // Ajouter au FlowLayoutPanel
+        buttonPanel.Controls.Add(subGraphButton);
 
-        // Ajouter le FlowLayoutPanel au formulaire
         this.Controls.Add(buttonPanel);
-
         this.Paint += new PaintEventHandler(DrawGraph);
         NormalizeCoordinates();
-
-        // Charger les données de manière asynchrone lors du chargement du formulaire
         this.Load += async (sender, e) => await ChargerDonneesAsync();
     }
 
@@ -102,7 +94,6 @@ public class Visualisation : Form
 
         try
         {
-            // Utiliser Dijkstra pour obtenir les nœuds du sous-graphe
             ResultatChemin sousGrapheSolution = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
             List<int> nodesSousGrapheIds = sousGrapheSolution.Chemin;
             nodesSousGraphe = nodesSousGrapheIds.Select(id => graphe.TrouverNoeudParId(id)).ToList();
@@ -113,11 +104,9 @@ public class Visualisation : Form
         }
     }
 
-
     private async Task ChargerDonneesAsync()
     {
-        // Cette méthode peut rester vide ou être utilisée pour d'autres chargements de données.
-        await Task.CompletedTask; // Placeholder pour une logique future si nécessaire
+        await Task.CompletedTask;
     }
 
     private void NormalizeCoordinates()
@@ -168,21 +157,17 @@ public class Visualisation : Form
         g.Clear(Color.White);
         Dictionary<Noeud<StationMetro>, PointF> positions = new Dictionary<Noeud<StationMetro>, PointF>();
 
-        // Calcul des positions écran pour chaque nœud
         foreach (var noeud in graphe.Noeuds)
         {
             positions[noeud] = ConvertToScreenCoordinates((float)noeud.Contenu.Longitude, (float)noeud.Contenu.Latitude);
         }
 
-        // Vérifier si nous devons dessiner le sous-graphe
         if (afficherSousGraphe && nodesSousGraphe != null && nodesSousGraphe.Count > 0)
         {
-            DrawSousGraphe(g, positions); // Appel à la nouvelle fonction
+            DrawSousGraphe(g, positions);
         }
         else
         {
-
-            // Séparer les liens en deux listes : ceux à dessiner en ligne droite et ceux en courbe
             List<Lien<StationMetro>> linksStraight = new List<Lien<StationMetro>>();
             List<Lien<StationMetro>> linksCurved = new List<Lien<StationMetro>>();
 
@@ -194,7 +179,6 @@ public class Visualisation : Form
                     if (straight.Source.Contenu.Libelle == lien.Source.Contenu.Libelle &&
                         straight.Destination.Contenu.Libelle == lien.Destination.Contenu.Libelle)
                     {
-                        // Si la ligne est différente, on considère le lien comme doublon
                         if (straight.Source.Contenu.Ligne != lien.Source.Contenu.Ligne)
                         {
                             duplicateFound = true;
@@ -212,7 +196,6 @@ public class Visualisation : Form
                 }
             }
 
-            // Phase 1 : Dessin des liens en ligne droite
             foreach (var lien in linksStraight)
             {
                 Noeud<StationMetro> source = lien.Source;
@@ -222,13 +205,11 @@ public class Visualisation : Form
 
                 PointF start = positions[source];
                 PointF end = positions[destination];
-                // On se rapproche du destinataire pour le dessin de la flèche
                 PointF direction = new PointF((end.X - start.X) * 0.98f + start.X, (end.Y - start.Y) * 0.98f + start.Y);
 
                 DrawArrow(g, pen, start, direction);
             }
 
-            // Phase 2 : Dessin des liens courbés pour les doublons
             foreach (var lien in linksCurved)
             {
                 Noeud<StationMetro> source = lien.Source;
@@ -236,9 +217,8 @@ public class Visualisation : Form
                 Color color = GetLigneColor(source.Contenu.Ligne);
                 Pen pen = new Pen(color, 1);
 
-                // Déterminer le point de départ et d'arrivée en fonction de leurs positions
                 PointF start, end;
-                bool switched = false; // Variable pour indiquer si les points ont été inversés
+                bool switched = false;
                 if (positions[source].X < positions[destination].X ||
                    (positions[source].X == positions[destination].X && positions[source].Y < positions[destination].Y))
                 {
@@ -249,29 +229,25 @@ public class Visualisation : Form
                 {
                     start = positions[destination];
                     end = positions[source];
-                    switched = true; // Indiquer que nous avons inversé les points
+                    switched = true;
                 }
 
-                // Calculer un décalage perpendiculaire pour créer une légère courbe
                 float dx = end.X - start.X;
                 float dy = end.Y - start.Y;
                 float length = (float)Math.Sqrt(dx * dx + dy * dy);
                 if (length == 0)
                     length = 1;
 
-                float offsetFactor = 20; // Ajuster la force de la courbe
-                float offsetX = -dy / length * offsetFactor; // Décalage horizontal
-                float offsetY = -dx / length * offsetFactor;  // Décalage vertical (négatif, vers le bas)
+                float offsetFactor = 20;
+                float offsetX = -dy / length * offsetFactor;
+                float offsetY = -dx / length * offsetFactor;
 
-                // Points de contrôle pour la courbe de Bézier
                 PointF controlPoint1 = new PointF(start.X + offsetX, start.Y + offsetY);
                 PointF controlPoint2 = new PointF(end.X + offsetX, end.Y + offsetY);
 
-                // Dessiner la courbe de Bézier
                 g.DrawBezier(pen, start, controlPoint1, controlPoint2, end);
 
-                // Calculer un point proche de 'start' pour dessiner la flèche
-                float tStart = 0.05f; // T pour le point proche de 'start'
+                float tStart = 0.05f;
                 float bezierXStart = (float)(Math.Pow(1 - tStart, 3) * start.X +
                     3 * Math.Pow(1 - tStart, 2) * tStart * controlPoint1.X +
                     3 * (1 - tStart) * Math.Pow(tStart, 2) * controlPoint2.X +
@@ -280,61 +256,53 @@ public class Visualisation : Form
                     3 * Math.Pow(1 - tStart, 2) * tStart * controlPoint1.Y +
                     3 * (1 - tStart) * Math.Pow(tStart, 2) * controlPoint2.Y +
                     Math.Pow(tStart, 3) * end.Y);
-                PointF arrowStartEnd = new PointF(bezierXStart, bezierYStart); // Point proche de 'start'
+                PointF arrowStartEnd = new PointF(bezierXStart, bezierYStart);
 
-                // Calculer un point proche de 'end' pour dessiner la flèche
-                float tEnd = 0.95f; // T pour le point proche de 'end'
+                float tEnd = 0.95f;
                 float bezierXEnd = (float)(Math.Pow(1 - tEnd, 3) * start.X +
-                    3 * Math.Pow(1 - tEnd, 2) * tEnd * controlPoint1.X +
-                    3 * (1 - tEnd) * Math.Pow(tEnd, 2) * controlPoint2.X +
-                    Math.Pow(tEnd, 3) * end.X);
+    3 * Math.Pow(1 - tEnd, 2) * tEnd * controlPoint1.X +
+    3 * (1 - tEnd) * Math.Pow(tEnd, 2) * controlPoint2.X +
+    Math.Pow(tEnd, 3) * end.X);
                 float bezierYEnd = (float)(Math.Pow(1 - tEnd, 3) * start.Y +
                     3 * Math.Pow(1 - tEnd, 2) * tEnd * controlPoint1.Y +
                     3 * (1 - tEnd) * Math.Pow(tEnd, 2) * controlPoint2.Y +
                     Math.Pow(tEnd, 3) * end.Y);
-                PointF arrowEnd = new PointF(bezierXEnd, bezierYEnd); // Point proche de 'end'
+                PointF arrowEnd = new PointF(bezierXEnd, bezierYEnd);
 
-                // Dessiner les têtes de flèche si les libellés sont différents
                 if (source.Contenu.Libelle != destination.Contenu.Libelle)
                 {
                     switch (switched)
                     {
                         case true:
-                            // Si les points ont été inversés, dessiner la flèche près de start
                             DrawArrowHead(g, pen, arrowStartEnd, start);
                             break;
                         case false:
-                            // Si les points sont dans l'ordre normal, dessiner la flèche près de end
                             DrawArrowHead(g, pen, arrowEnd, end);
                             break;
                     }
                 }
             }
 
-            // Dessin des nœuds et labels (inchangé)
-            List<RectangleF> placedElements = new List<RectangleF>(); // Stocke les labels ET les ellipses
-            HashSet<string> displayedLabels = new HashSet<string>(); // Évite les doublons de labels
+            List<RectangleF> placedElements = new List<RectangleF>();
+            HashSet<string> displayedLabels = new HashSet<string>();
 
             foreach (var noeud in graphe.Noeuds)
             {
                 int tailleNoeud = 5;
                 PointF position = positions[noeud];
 
-                // Dessiner le nœud (ellipse)
                 RectangleF nodeRect = new RectangleF(position.X - 0.5f * tailleNoeud, position.Y - 0.5f * tailleNoeud, tailleNoeud, tailleNoeud);
                 g.FillEllipse(Brushes.Black, nodeRect);
 
-                placedElements.Add(nodeRect); // Ajouter l'ellipse aux éléments placés
+                placedElements.Add(nodeRect);
 
                 string label = noeud.Contenu.Libelle;
 
-                // Vérifier si ce label a déjà été affiché
                 if (displayedLabels.Contains(label))
                     continue;
 
-                displayedLabels.Add(label); // Marquer ce label comme affiché
+                displayedLabels.Add(label);
 
-                // Récupérer les lignes associées pour la couleur du contour
                 var lignes = graphe.Liens
                     .Where(lien => lien.Source.Contenu.Libelle == label || lien.Destination.Contenu.Libelle == label)
                     .Select(lien => lien.Source.Contenu.Ligne)
@@ -344,25 +312,21 @@ public class Visualisation : Form
                 Color contourColor = (lignes.Count == 1) ? GetLigneColor(lignes.First()) : Color.Black;
                 Pen contourPen = new Pen(contourColor, 1);
 
-                // Position du label
                 Font labelFont = new Font("Arial", 3);
                 SizeF labelSize = g.MeasureString(label, labelFont);
 
-                // Liste des positions possibles (au-dessus et en dessous)
                 List<PointF> potentialPositions = new List<PointF>
-            {
-                new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8), // Au-dessus
-                new PointF(position.X - labelSize.Width / 2, position.Y + 8), // En dessous
-            };
+                {
+                    new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8),
+                    new PointF(position.X - labelSize.Width / 2, position.Y + 8),
+                };
 
-                // Tester des positions avec des décalages supplémentaires
                 for (int offset = 15; offset <= 60; offset += 5)
                 {
                     potentialPositions.Add(new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - offset));
                     potentialPositions.Add(new PointF(position.X - labelSize.Width / 2, position.Y + offset));
                 }
 
-                // Choisir la meilleure position
                 PointF chosenLabelPosition = PointF.Empty;
                 float closestDistance = float.MaxValue;
 
@@ -399,12 +363,10 @@ public class Visualisation : Form
 
     private void DrawSousGraphe(Graphics g, Dictionary<Noeud<StationMetro>, PointF> positions)
     {
-        // Dessin des liens pour le sous-graphe
         List<Lien<StationMetro>> linksToDraw = graphe.Liens
             .Where(lien => nodesSousGraphe.Contains(lien.Source) && nodesSousGraphe.Contains(lien.Destination))
             .ToList();
 
-        // Phase 1 : Dessin des liens en ligne droite
         foreach (var lien in linksToDraw)
         {
             Noeud<StationMetro> source = lien.Source;
@@ -412,35 +374,29 @@ public class Visualisation : Form
             Color color = GetLigneColor(source.Contenu.Ligne);
             Pen pen = new Pen(color, 1);
 
-            // Utiliser uniquement les positions des nœuds du sous-graphe
             PointF start = ConvertToScreenCoordinates((float)source.Contenu.Longitude, (float)source.Contenu.Latitude);
             PointF end = ConvertToScreenCoordinates((float)destination.Contenu.Longitude, (float)destination.Contenu.Latitude);
 
-            // On se rapproche du destinataire pour le dessin de la flèche
             PointF direction = new PointF((end.X - start.X) * 0.98f + start.X, (end.Y - start.Y) * 0.98f + start.Y);
 
             DrawArrow(g, pen, start, direction);
         }
 
-        // Dessin des nœuds du sous-graphe
         foreach (var noeud in nodesSousGraphe)
         {
             int tailleNoeud = 5;
             PointF position = ConvertToScreenCoordinates((float)noeud.Contenu.Longitude, (float)noeud.Contenu.Latitude);
 
-            // Dessiner le nœud (ellipse)
             RectangleF nodeRect = new RectangleF(position.X - 0.5f * tailleNoeud, position.Y - 0.5f * tailleNoeud, tailleNoeud, tailleNoeud);
             g.FillEllipse(Brushes.Black, nodeRect);
 
             string label = noeud.Contenu.Libelle;
 
-            // Position du label
             Font labelFont = new Font("Arial", 3);
             SizeF labelSize = g.MeasureString(label, labelFont);
             PointF labelPosition = new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8);
             g.DrawString(label, labelFont, Brushes.Black, labelPosition);
 
-            // Déterminer la couleur de l'encadrement
             Color borderColor;
             var lignes = linksToDraw
                 .Where(l => l.Source == noeud || l.Destination == noeud)
@@ -448,10 +404,8 @@ public class Visualisation : Form
                 .Distinct()
                 .ToList();
 
-            // Si le nœud a plusieurs lignes, utiliser noir
             borderColor = lignes.Count > 1 ? Color.Black : GetLigneColor(lignes.First());
 
-            // Dessiner le rectangle autour du libellé
             Pen borderPen = new Pen(borderColor, 1);
             RectangleF labelBackgroundRect = new RectangleF(labelPosition.X - 2, labelPosition.Y - 2, labelSize.Width + 4, labelSize.Height + 4);
             g.DrawRectangle(borderPen, labelBackgroundRect);
@@ -484,21 +438,18 @@ public class Visualisation : Form
 
     private void DrawArrowHead(Graphics g, Pen pen, PointF arrowEnd, PointF direction)
     {
-        float arrowSize = 5; // Taille de la tête de la flèche
+        float arrowSize = 5;
 
-        // Calculer l'angle entre le point d'arrivée et la direction
         float angle = (float)Math.Atan2(direction.Y - arrowEnd.Y, direction.X - arrowEnd.X);
 
-        // Calculer les points de la tête de la flèche avec une symétrie correcte
         PointF point1 = new PointF(
-            arrowEnd.X - arrowSize * (float)Math.Cos(angle - Math.PI / 6), // Point gauche de la flèche
-            arrowEnd.Y - arrowSize * (float)Math.Sin(angle - Math.PI / 6)); // Point gauche de la flèche
+            arrowEnd.X - arrowSize * (float)Math.Cos(angle - Math.PI / 6),
+            arrowEnd.Y - arrowSize * (float)Math.Sin(angle - Math.PI / 6));
 
         PointF point2 = new PointF(
-            arrowEnd.X - arrowSize * (float)Math.Cos(angle + Math.PI / 6), // Point droit de la flèche
-            arrowEnd.Y - arrowSize * (float)Math.Sin(angle + Math.PI / 6)); // Point droit de la flèche
+            arrowEnd.X - arrowSize * (float)Math.Cos(angle + Math.PI / 6),
+            arrowEnd.Y - arrowSize * (float)Math.Sin(angle + Math.PI / 6));
 
-        // Dessiner les lignes de la tête de la flèche
         g.DrawLine(pen, arrowEnd, point1);
         g.DrawLine(pen, arrowEnd, point2);
     }
@@ -519,3 +470,4 @@ public class Visualisation : Form
         Application.Run(new Visualisation());
     }
 }
+
