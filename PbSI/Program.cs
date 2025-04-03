@@ -28,7 +28,6 @@ namespace PbSI
             List<int> arrivee;
             float tempsDeplacementDepart = 0;
             float tempsDeplacementArrivee = 0;
-            double distanceMin = double.MaxValue;
             try
             {
                 depart = recherche.IdStationsProches;
