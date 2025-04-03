@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace PbSI
 {
@@ -201,6 +203,7 @@ namespace PbSI
                         break;
                     case ('2'):
                         Console.Clear();
+                        ajouterClient();
                         break;
                     case ('3'):
                         Console.Clear();
@@ -252,9 +255,13 @@ namespace PbSI
                         this.connexion.afficherResultatRequete();
                         break;
                     case 'T':
+                        requete = "SELECT Utilisateur.*, m.total AS total_commandes\r\nFROM Utilisateur\r\nLEFT JOIN (\r\n    SELECT Commande.idClient, SUM(Transaction.Montant) AS total\r\n    FROM Transaction\r\n    JOIN Commande ON Commande.idCommande = Transaction.idCommande\r\n    WHERE Transaction.Reussie = 1\r\n    GROUP BY Commande.idClient\r\n) AS m ON m.idClient = Utilisateur.idClient ORDER BY m.total\r\n";
+                        derniere_requete = requete;
+                        this.connexion.executerRequete(requete);
+                        this.connexion.afficherResultatRequete();
                         break;
                     case 'C':
-                        Console.WriteLine("\nTri multiple par ordre du plus important au moins important (e.g. APCM):");
+                        Console.WriteLine("\nTri multiple par ordre du plus important au moins important (e.g. APCM). L'option de tri par total dépensé n'est pas disponible:");
                         string tri_multiple = Console.ReadLine();
                         string requete_finale = base_requete+" ORDER BY ";
                         for(int i=0; i < tri_multiple.Length; i++)
@@ -268,9 +275,6 @@ namespace PbSI
                                 case 'R':
                                     if (requete_finale[requete_finale.Length-1]!=',' && i!=0) requete_finale+=',';
                                     requete_finale += "Adresse ";
-                                    break;
-                                case 'T':
-                                    if (requete_finale[requete_finale.Length-1]!=',' && i!=0) requete_finale+=',';
                                     break;
                                 case 'M':
                                     requete_finale += "DESC";
@@ -307,6 +311,99 @@ namespace PbSI
                         return;
                 }
                 choix = (char)Console.ReadKey(false).Key;
+            }
+        }
+
+        public void ajouterClient()
+        {
+            while (true)    
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Ajout de client\n");
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("  1.  Ajout manuel");
+                Console.WriteLine("  2.  Importer depuis un fichier");
+                Console.WriteLine("  3.  Retour");
+                Console.WriteLine("----------------------------------------------------\n\n");
+                Console.WriteLine("Menu choisi:");
+                Console.ResetColor();
+                char menu_choisi = (char)Console.ReadKey(false).Key;
+
+                switch (menu_choisi)
+                {
+                    case ('1'):
+                        Console.Clear();
+                        string[] champs = { "Nom :", "Prénom :", "Adresse :", "Numéro de téléphone :", "Email :", "Nom de l'entreprise (facultatif) :", "Mot de passe :", "id de la station la plus proche :" };
+                        string[] valeurs = new string[champs.Length];
+                        for(int i=0; i < champs.Length; i++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine(champs[i]+"\n");
+                            Console.ResetColor();
+                            valeurs[i] = Console.ReadLine();
+                            Console.WriteLine("\n"); 
+                        }
+                        string requete = "INSERT INTO Client (NomEntreprise, MotDePasse) VALUES ('" + valeurs[5] + "', '" + valeurs[6] + "');";
+                        this.connexion.executerRequete(requete);
+                        requete = "SELECT idClient FROM Client ORDER BY idClient DESC LIMIT 1;";
+                        this.connexion.executerRequete(requete);
+                        MySqlDataReader reader = this.connexion.recupererResultatRequete();
+                        int idClient = 0;
+                        if (reader.Read()) //ouvre le reader
+                        {
+                            idClient = reader.GetInt32(0); //colonne 0
+                        }
+
+                        reader.Close();
+                        valeurs[2] = valeurs[2].Replace("'", "''"); // Échappe les apostrophes dans l'adresse
+                        requete = "INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdClient, IdStationProche, EstBanni) " +
+                            "VALUES('" + valeurs[0] +"', '" + valeurs[1] + "', '" + valeurs[2] + "', '" + valeurs[3] + "', '" + valeurs[4] +"', NULL, "+idClient+", " + valeurs[7] +", 0)";
+                        this.connexion.executerRequete(requete);
+                        Console.Clear();
+
+                        break;
+                    case ('2'):
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Import par fichier:" +
+                            "Le fichier doit être au format xml et doit être obtenu en exécutant la requête:\n " +
+                            "EXPORTER SELECT * FROM Utilisateur Join Client ON Client.idClient = Utilisateur.idClient WHERE Client.idClient=?;\n" +
+                            "Depuis l'espace SQL dédié de l'interface");
+                        Console.ResetColor();
+                        Console.WriteLine("Chemin d'accès du fichier:");
+                        string cheminFichier = Console.ReadLine();
+
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.Load(cheminFichier);
+
+                        foreach (XmlNode node in xmlDoc.SelectNodes("//export_client_1"))
+                        {
+
+                            requete = "INSERT INTO Client (NomEntreprise, MotDePasse) VALUES ('" + node["NomEntreprise"]?.InnerText + "', '" + node["MotDePasse"]?.InnerText + "');";
+                            this.connexion.executerRequete(requete);
+
+                            requete = "INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdClient, IdStationProche, EstBanni) " +
+                                             "VALUES ('" + node["Nom"]?.InnerText + "', '" + node["Prenom"]?.InnerText + "', '" +
+                                             node["Adresse"]?.InnerText + "', '" + node["Telephone"]?.InnerText + "', '" +
+                                             node["Email"]?.InnerText + "', " + node["IdClient"]?.InnerText + ", " +
+                                             node["IdStationProche"]?.InnerText + ", " + (node["EstBanni"]?.InnerText == "true" ? "1" : "0") + ");";
+
+                            this.connexion.executerRequete(requete);
+                        }
+
+                        Console.WriteLine("Importation terminée !");
+
+                        break;
+                    case ('3'):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        break;
+                }
             }
         }
 

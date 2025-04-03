@@ -41,10 +41,18 @@ namespace PbSI
             {
                 this.requete = this.maConnexion.CreateCommand();
                 this.requete.CommandText = stringRequete;
+                this.requete.ExecuteNonQuery(); // Exécute la requête
             }
-            catch (MySqlException e) {
-                Console.WriteLine("erreur:" + e.ToString());
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur SQL : " + e.Message);
             }
+        }
+
+
+        public MySqlDataReader recupererResultatRequete()
+        {
+            return this.requete.ExecuteReader();
         }
 
         public void afficherResultatRequete()

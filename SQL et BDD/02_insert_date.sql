@@ -16,8 +16,8 @@ INSERT INTO Station (Nom, Latitude, Longitude) VALUES
 
 INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdClient, IdStationProche, EstBanni) VALUES
 ('Dupond', 'Jean', '10 rue de Paris', '0123456789', 'jean.dupond@email.com', NULL, 1, 1, FALSE),
-('Marie', 'Tom', '11 rue de la Paix', '0123486489', 'tom.marie@email.com', NULL, 3, 1, FALSE),
-('Jarrar', 'Cédric', '11 rue des Lampes', '012343030', 'cedric.jarrar@email.com', NULL, 4, 1, FALSE),
+('Marie', 'Tom', '11 rue de la Paix', '0123486489', 'tom.marie@email.com', NULL, 2, 1, FALSE),
+('Jarrar', 'Cédric', '11 rue des Lampes', '012343030', 'cedric.jarrar@email.com', NULL, 3, 1, FALSE),
 ('Martin', 'Sofie', '15 avenue de Lyon', '0987654321', 'sofie.martin@email.com', 1, NULL, 2, FALSE);
 
 INSERT INTO Recette (Nom) VALUES
