@@ -479,7 +479,7 @@ namespace PbSI
                 var contenu = graphe.TrouverNoeudParId(id).Contenu;
                 if(contenu != null)
                 {
-                    libelleChemin.Add(contenu.Libelle);
+                    libelleChemin.Add(contenu.Libelle + " (Ligne " + contenu.Ligne + ")");
                 }
             }
 

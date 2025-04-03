@@ -42,7 +42,7 @@ namespace PbSI
                 if (resultat != null)
                 {
                     double tempsTotal = tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
-                    Console.WriteLine("Temps total de déplacement : " + (int)tempsTotal);
+                    Console.WriteLine("Temps total de déplacement : " + (int)tempsTotal + "");
                 }
                 else
                 {
