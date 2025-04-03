@@ -57,7 +57,7 @@ namespace PbSI
 
             Console.ReadKey();
 
-            //Menu menu = new Menu();
+            Menu menu = new Menu();
 
         }
         
