@@ -72,7 +72,8 @@ namespace PbSI
             Console.WriteLine("Ecrire une commande SQL l'éxecutera");
             Console.WriteLine("\n\nDes mots clefs à rajouter avant la commande permettent différentes fonctionnalités:");            
             Console.WriteLine("AFFICHER: Executera le code SQL et affiche le résultat");             
-            Console.WriteLine("EXPORTER: Executera le code SQL et exportera le résultat dans un fichier XML");                
+            Console.WriteLine("EXPORTER: Executera le code SQL et exportera le résultat dans un fichier XML");
+            Console.WriteLine("\n\nRETOUR: Retourner au menu principal");
             Console.Write("Entrez votre commande : \n");
             Console.ResetColor();
 
@@ -82,6 +83,7 @@ namespace PbSI
             while (true)
             {    
                 string requete = Console.ReadLine();
+                if (requete == "RETOUR") return;
  
                 try
                 {
@@ -221,47 +223,90 @@ namespace PbSI
 
         public void afficherClients()
         {
-            string base_requete = "SELECT * FROM Utilisateurs";
-            
+            string base_requete = "SELECT * FROM Utilisateur WHERE idClient is not NULL";
+            char choix=' ';
+            string derniere_requete=base_requete;//on note la dernière requete exécutée sans indiquer l'ordre de tri(utile pour changer l'ordre avec - et +)
+            string requete="";
+
             while (true)
             {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Liste des clients:\n");
-                Console.WriteLine("Tri possible: A: Ordre Alphabétique; R: Rue; M: Montant des achats cumulés; C: combinaisons de plusieurs tris");
-                Console.WriteLine("Ordre de tri: +: du plus petit au plus grand; -:du plus grand au plus petit (défaut: + )");
-                Console.WriteLine("X: Retour");
-                char choix = (char)Console.ReadKey(false).Key;
+                Console.WriteLine("Tri possible: A: Ordre Alphabétique; R: Rue; T: Total du montant des achats; C: combinaisons de plusieurs tris");
+                Console.WriteLine("Ordre de tri: P: du plus petit au plus grand; M:du plus grand au plus petit (défaut: + )");
+                Console.WriteLine("X: Retour\n");
+                Console.ResetColor();
                 switch (choix)
                 {
                     case 'A':
-                        this.connexion.executerRequete("SELECT * FROM Utilisateur ORDER BY nom ASC;");
+                        requete = base_requete + " ORDER BY Nom ";
+                        derniere_requete = requete;
+                        this.connexion.executerRequete(requete);
+                        this.connexion.afficherResultatRequete();
                         break;
                     case 'R':
+                        requete = base_requete + " ORDER BY Adresse ";
+                        derniere_requete = requete;
+                        this.connexion.executerRequete(requete);
+                        this.connexion.afficherResultatRequete();
                         break;
-                    case 'M':
+                    case 'T':
                         break;
                     case 'C':
-                        Console.WriteLine("\nTri multiple par ordre du plus important au moins important (e.g. A+C-):");
+                        Console.WriteLine("\nTri multiple par ordre du plus important au moins important (e.g. APCM):");
                         string tri_multiple = Console.ReadLine();
+                        string requete_finale = base_requete+" ORDER BY ";
                         for(int i=0; i < tri_multiple.Length; i++)
                         {
                             switch (tri_multiple[i])
                             {
                                 case 'A':
-                                    this.connexion.executerRequete("SELECT * FROM Utilisateur ORDER BY nom ASC;");
+                                    if (requete_finale[requete_finale.Length-1]!=',' && i!=0) requete_finale+=',';
+                                    requete_finale += "Nom ";
                                     break;
                                 case 'R':
+                                    if (requete_finale[requete_finale.Length-1]!=',' && i!=0) requete_finale+=',';
+                                    requete_finale += "Adresse ";
+                                    break;
+                                case 'T':
+                                    if (requete_finale[requete_finale.Length-1]!=',' && i!=0) requete_finale+=',';
                                     break;
                                 case 'M':
+                                    requete_finale += "DESC";
                                     break;
                             }
                         }
+                        Console.WriteLine(requete_finale);
+                        this.connexion.executerRequete(requete_finale);
+                        this.connexion.afficherResultatRequete();
                         break;
-                    case '+':
-
+                    case 'P':
+                        requete = derniere_requete;
+                        this.connexion.executerRequete(requete);
+                        this.connexion.afficherResultatRequete();
+                        break;
+                    case 'M':
+                        if(derniere_requete!="")
+                        {
+                            if(derniere_requete == base_requete)//dès qu'on l'entre dans l'interface et qu'on appui sur -
+                            {
+                                derniere_requete += " ORDER BY id";
+                            }
+                            requete = derniere_requete + " DESC";
+                            this.connexion.executerRequete(requete);
+                            this.connexion.afficherResultatRequete();
+                        }
+                        break;
+                    case ' '://Cas par défaut, affichage lorsqu'on arrive sur la page
+                        this.connexion.executerRequete(base_requete);
+                        this.connexion.afficherResultatRequete();
+                        break;
                     case 'X':
                         Console.Clear();
                         return;
                 }
+                choix = (char)Console.ReadKey(false).Key;
             }
         }
 
