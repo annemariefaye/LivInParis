@@ -334,6 +334,8 @@ namespace PbSI
 
         }
 
+
+
         /// <summary>
         /// Retourne l'indice du noeud non exploré avec la distance minimale
         /// </summary>
@@ -407,8 +409,6 @@ namespace PbSI
                 }
             }
 
-            Console.WriteLine($"Distance minimale entre {departIndex} et {arriveeIndex} : {distances[arriveeIndex]}");
-            
             
             if (distances[arriveeIndex] == double.MaxValue)
             {
@@ -416,14 +416,14 @@ namespace PbSI
                 return;
             }
 
-            Console.WriteLine($"Distance minimale entre {departIndex} et {arriveeIndex} : {distances[arriveeIndex]}");
-            List<int> chemin = new List<int>();
+            //Console.WriteLine($"Distance minimale entre {departIndex} et {arriveeIndex} : {distances[arriveeIndex]}");
+            /*List<int> chemin = new List<int>();
             for (int v = arriveeIndex; v != -1; v = parents[v])
             {
                 chemin.Add(v);
             }
             chemin.Reverse();
-            Console.WriteLine("Chemin le plus court : " + string.Join("->", chemin));
+            Console.WriteLine("Chemin le plus court : " + string.Join("->", chemin));*/
 
 
 
@@ -481,7 +481,7 @@ namespace PbSI
             }
 
             // Affichage
-            if (distances[departIndex, arriveeIndex] == double.MaxValue)
+            /*if (distances[departIndex, arriveeIndex] == double.MaxValue)
             {
                 Console.WriteLine($"Aucun chemin trouvé entre {departIndex} et {arriveeIndex}.");
                 return;
@@ -502,11 +502,113 @@ namespace PbSI
 
             chemin.Reverse();
 
-            Console.WriteLine("Chemin le plus court : " + string.Join(" -> ", chemin));
+            Console.WriteLine("Chemin le plus court : " + string.Join(" -> ", chemin));*/
         }
 
 
 
+        public static ResultatChemin AEtoile(Graphe<StationMetro> graphe, int depart, int arrivee)
+        {
+            var listeAdjacence = graphe.ListeAdjacence;
+            int nbNodes = graphe.Noeuds.Count;
+
+            double[] gScore = new double[nbNodes];
+            double[] fScore = new double[nbNodes];
+            int[] parents = new int[nbNodes];
+            bool[] dejaExplore = new bool[nbNodes];
+
+            for (int i = 0; i < nbNodes; i++)
+            {
+                gScore[i] = double.MaxValue;
+                fScore[i] = double.MaxValue;
+                parents[i] = -1;
+            }
+
+            gScore[depart] = 0;
+            fScore[depart] = Heuristique(graphe, depart, arrivee);
+
+            PriorityQueue<int, double> openSet = new PriorityQueue<int, double>();
+            openSet.Enqueue(depart, fScore[depart]);
+
+            Dictionary<int, double> openSetEntries = new Dictionary<int, double>();
+            openSetEntries[depart] = fScore[depart];
+
+            while (openSet.Count > 0)
+            {
+                int current = openSet.Dequeue();
+                openSetEntries.Remove(current);
+
+                if (current == arrivee)
+                    break;
+
+                dejaExplore[current] = true;
+
+                if (!listeAdjacence.ContainsKey(graphe.TrouverNoeudParId(current)))
+                    continue;
+
+                foreach (var (voisin, poids) in listeAdjacence[graphe.TrouverNoeudParId(current)])
+                {
+                    int voisinId = voisin.Id;
+                    if (dejaExplore[voisinId]) continue;
+
+                    double tentativeGScore = gScore[current] + poids;
+
+                    if (tentativeGScore < gScore[voisinId])
+                    {
+                        parents[voisinId] = current;
+                        gScore[voisinId] = tentativeGScore;
+                        fScore[voisinId] = gScore[voisinId] + Heuristique(graphe, voisinId, arrivee);
+
+                        if (!openSetEntries.ContainsKey(voisinId) || fScore[voisinId] < openSetEntries[voisinId])
+                        {
+                            openSetEntries[voisinId] = fScore[voisinId];
+                            openSet.Enqueue(voisinId, fScore[voisinId]);
+                        }
+                    }
+                }
+            }
+
+            List<int> chemin = ObtenirChemin(parents, depart, arrivee);
+            return new ResultatChemin(gScore[arrivee], chemin);
+        }
+
+
+
+        private static double Heuristique(Graphe<StationMetro> graphe, int a, int b)
+        {
+            Noeud<StationMetro> noeudA = graphe.TrouverNoeudParId(a);
+            Noeud<StationMetro> noeudB = graphe.TrouverNoeudParId(b);
+
+            if (noeudA == null || noeudB == null) return 0;
+
+            double dx = noeudA.Contenu.Longitude - noeudB.Contenu.Longitude;
+            double dy = noeudA.Contenu.Latitude - noeudB.Contenu.Latitude;
+            return Math.Sqrt(dx * dx + dy * dy);
+        }
+
+
+        public static ResultatChemin AEtoileListe(Graphe<StationMetro> graphe, List<int> depart, List<int> arrivee)
+        {
+            double distanceMin = double.MaxValue;
+            List<int> cheminMin = new List<int>();
+
+            foreach (int id in depart)
+            {
+                foreach (int id2 in arrivee)
+                {
+                    ResultatChemin resultat = AEtoile(graphe, id, id2);
+                    if (resultat.PoidsTotal < distanceMin)
+                    {
+                        distanceMin = resultat.PoidsTotal;
+                        cheminMin = resultat.Chemin;
+                    }
+                }
+            }
+
+            AfficherChemin(cheminMin, graphe);
+            Console.WriteLine($"Poids total du chemin est de : " + distanceMin);
+            return new ResultatChemin(distanceMin, cheminMin);
+        }
 
 
         #endregion

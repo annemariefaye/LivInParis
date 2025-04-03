@@ -12,6 +12,19 @@ namespace PbSI
             ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
             Graphe<StationMetro> graphe = reseau.Graphe;
 
+            Chronometreur.ChronometreDijkstra(graphe, 1, 206);
+            Console.WriteLine("\n");
+
+            Chronometreur.ChronometreAEtoile(graphe, 1, 260);
+            Console.WriteLine("\n");
+
+            Chronometreur.ChronometreBellmanFord(graphe, 1, 206);
+            Console.WriteLine("\n");
+
+            Chronometreur.ChronometreFloydWarshall(graphe, 1, 206);
+            Console.WriteLine("\n");
+
+
             double[,] m = graphe.MatriceAdjacence;
             var l = graphe.ListeAdjacence;
 
@@ -59,7 +72,9 @@ namespace PbSI
 
             Menu menu = new Menu();
 
+
+
         }
-        
+
     }
 }
