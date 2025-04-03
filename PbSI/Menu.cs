@@ -25,7 +25,8 @@ namespace PbSI
                 Console.WriteLine("----------------------------------------------------");
                 Console.WriteLine("  1.  Interface SQL");
                 Console.WriteLine("  2.  Exporter une requête SQL");
-                Console.WriteLine("  3.  Quitter");
+                Console.WriteLine("  3.  Module Statistique");
+                Console.WriteLine("  4.  Quitter");
                 Console.WriteLine("----------------------------------------------------");
                 Console.Write(" Sélectionnez une option : ");
 
@@ -48,6 +49,11 @@ namespace PbSI
                         break;
 
                     case "3":
+                        Console.WriteLine("Module Statistique");
+                        Statistiques statistiques = new Statistiques(this.bdd);
+                        break;
+
+                    case "4":
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Merci d'avoir utilisé LivInParis ! À bientôt !");
                         Console.ResetColor();

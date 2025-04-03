@@ -9,7 +9,7 @@ namespace PbSI
         static async Task Main(string[] args)
         {
             
-            ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
+            /*ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
             Graphe<StationMetro> graphe = reseau.Graphe;
 
             double[,] m = graphe.MatriceAdjacence;
@@ -55,7 +55,7 @@ namespace PbSI
 
             Console.WriteLine("Appuyez sur une touche pour continuer...");
 
-            Console.ReadKey();
+            Console.ReadKey();*/
 
             Menu menu = new Menu();
 
