@@ -6,7 +6,8 @@ INSERT INTO Client (NomEntreprise, MotDePasse) VALUES
 
 INSERT INTO Cuisinier (MotDePasse) VALUES
 ('cuisine123'),
-('chef789');
+('chef789'),
+('allinedessine92');
 
 INSERT INTO Station (Nom, Latitude, Longitude) VALUES
 ('Gare de Lyon', 40.8632, 5.4764),
@@ -20,9 +21,9 @@ INSERT INTO Recette (Nom) VALUES
 ('Ratatouille'),
 ('Tarte aux fraises');
 
-INSERT INTO Plat (Nom, Prix, IdCuisinier, Type, Personnes, DateFabrication, DatePeremption, Regime, IdRecette, CheminAccesPhoto, Nationalite) VALUES
-('Lasagnes', 12.50, 1, 'Plat Principal', 2, '2025-03-01', '2025-03-03', 'Végétarien', 1, 'lasagnes.jpg', 'Italienne'),
-('Couscous', 15.00, 2, 'Plat Principal', 4, '2025-03-02', '2025-03-04', 'Halal', 2, 'couscous.jpg', 'Marocaine');
+INSERT INTO Plat (Nom, Prix, IdCuisinier, Type, Personnes, DateFabrication, DatePeremption, Regime, IdRecette, CheminAccesPhoto, Nationalite, Proteines) VALUES
+('Lasagnes', 12.50, 1, 'Plat Principal', 2, '2025-03-01', '2025-03-03', 'Végétarien', 1, 'lasagnes.jpg', 'Italienne', 300),
+('Couscous', 15.00, 2, 'Plat Principal', 4, '2025-03-02', '2025-03-04', 'Halal', 2, 'couscous.jpg', 'Marocaine', 250);
 
 INSERT INTO Ingredient (Nom, Prix) VALUES
 ('Tomates', 2.50),
@@ -65,3 +66,34 @@ INSERT INTO Transaction (IdCommande, Montant, Reussie, DateTransaction) VALUES
 (1, 25.00, TRUE, NOW()),
 (2, 15.00, TRUE, NOW());
 
+
+INSERT INTO CategorieAmbiance (Nom) VALUES 
+('Brunch'),
+('Déjeuner en famille'),
+('Soirée romantique'),
+('Soirée solo'),
+('Anniversaire'),
+('Enfant');
+
+
+INSERT INTO PlatCategorieAmbiance (IdPlat, IdCategorie) VALUES 
+(1, 1), 
+(1, 3),  
+(2, 2), 
+(2, 4); 
+
+
+INSERT INTO NotationCuisinier (IdCuisinier, Note, Commentaire) VALUES 
+(1, 5, 'Excellent plat, très savoureux !'),
+(2, 4, 'Bon service, mais le plat était un peu trop salé.'),
+(1, 3, 'Correct, mais peut faire mieux.'),
+(3, 5, 'Un vrai délice, je reviendrai !');
+
+
+INSERT INTO Musique (Titre, Nationalite) VALUES 
+('O Sole Mio', 'Italienne'),
+('Café Tacuba', 'Marocaine'),
+('La Vie en Rose', 'Française'),
+('Despacito', 'Espagnole'),
+('Kalinka', 'Russe'),
+('Jiyuu no Tsubasa', 'Japonais');

@@ -32,10 +32,13 @@ CREATE TABLE Utilisateur (
     IdClient INT DEFAULT NULL,
     IdStationProche INT,
     EstBanni BOOL DEFAULT FALSE,
+    PointFidelite INT DEFAULT 0,
     FOREIGN KEY (IdCuisinier) REFERENCES Cuisinier (IdCuisinier),
     FOREIGN KEY (IdClient) REFERENCES Client(IdClient),
     FOREIGN KEY (IdStationProche) REFERENCES Station(IdStation) 
 );
+
+
 CREATE TABLE Recette(
 	IdRecette INT AUTO_INCREMENT PRIMARY KEY,
 	Nom VARCHAR(100) NOT NULL
@@ -54,6 +57,7 @@ CREATE TABLE Plat (
     IdRecette INT NOT NULL,
     CheminAccesPhoto VARCHAR(255) NULL,
     Nationalite VARCHAR (255) NOT NULL,
+    Proteines DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (IdRecette) REFERENCES Recette(IdRecette),
     FOREIGN KEY (IdCuisinier) REFERENCES Utilisateur(Id)
 );
@@ -103,8 +107,6 @@ CREATE TABLE Livraison (
     FOREIGN KEY (IdStationArrivee) REFERENCES Station(IdStation)
 );
 
-
-
 CREATE TABLE Ligne (
 	IdLigne INT AUTO_INCREMENT PRIMARY KEY,
     Nom VARCHAR(255)
@@ -126,4 +128,39 @@ CREATE TABLE Transaction (
     DateTransaction DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (IdCommande) REFERENCES Commande(IdCommande) 
 );
+
+
+CREATE TABLE CategorieAmbiance(
+    IdCategorie INT AUTO_INCREMENT PRIMARY KEY,
+    Nom VARCHAR(100) NOT NULL UNIQUE
+
+);
+
+
+CREATE TABLE PlatCategorieAmbiance(
+    IdPlat INT NOT NULL,
+    IdCategorie INT NOT NULL,
+    FOREIGN KEY (IdPlat) REFERENCES Plat(IdPlat),
+    FOREIGN KEY (IdCategorie) REFERENCES CategorieAmbiance(IdCategorie),
+    PRIMARY KEY (IdPlat, IdCategorie)
+);
+
+
+CREATE TABLE NotationCuisinier (
+    IdNotation INT AUTO_INCREMENT PRIMARY KEY,
+    IdCuisinier INT NOT NULL,
+    Note INT CHECK (Note >= 1 AND Note <= 5),
+    Commentaire TEXT,
+    DateNotation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (IdCuisinier) REFERENCES Cuisinier(IdCuisinier)
+);
+
+
+CREATE TABLE Musique (
+    IdMusique INT AUTO_INCREMENT PRIMARY KEY,
+    Titre VARCHAR(255) NOT NULL,
+    Nationalite VARCHAR(250) NOT NULL
+);
+
+
 
