@@ -131,7 +131,7 @@ namespace PbSI
 
             double c = 2 * Math.Asin(Math.Sqrt(a));
 
-            return RayonTerre * c; // Distance en km
+            return RayonTerre * c;
         }
 
 

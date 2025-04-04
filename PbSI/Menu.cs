@@ -1132,7 +1132,6 @@ namespace PbSI
                 this.connexion.executerRequete(requeteAdresseClient);
                 var reader = this.connexion.recupererResultatRequete();
 
-                
                 if (reader.Read())
                 {
                     adresseDepart = reader.GetString(0);
@@ -1160,8 +1159,9 @@ namespace PbSI
             }
             readerPlats.Close();
 
-            int idPlat;
+            int idPlat = -1;
             bool identifiantPlatValide = false;
+            string adresseCuisinier = "";
 
             while (!identifiantPlatValide)
             {
@@ -1182,54 +1182,8 @@ namespace PbSI
 
                 if (readerCuisinier.Read())
                 {
-                    string adresseCuisinier = readerCuisinier.GetString(0);
+                    adresseCuisinier = readerCuisinier.GetString(0);
                     identifiantPlatValide = true;
-
-                    Console.Clear();
-                    RechercheStationProche rechercheDepart = new RechercheStationProche(adresseDepart, graphe);
-                    RechercheStationProche rechercheArrivee = new RechercheStationProche(adresseCuisinier, graphe);
-                    await rechercheDepart.InitialiserAsync();
-                    Console.WriteLine("\n\n");
-                    await rechercheArrivee.InitialiserAsync();
-                    Console.WriteLine("\n\n");
-
-                    List<int> depart = rechercheDepart.IdStationsProches;
-                    List<int> arrivee = rechercheArrivee.IdStationsProches;
-
-                    float tempsDeplacementDepart = rechercheDepart.TempsDeplacement;
-                    float tempsDeplacementArrivee = rechercheArrivee.TempsDeplacement;
-
-                    var resultat = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
-
-                    if (resultat != null)
-                    {
-                        double tempsTotal = tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
-                        Console.WriteLine("Temps total de déplacement : " + (int)tempsTotal + " minutes.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Aucun chemin trouvé.");
-                        return;
-                    }
-
-                    string requeteCommande = "INSERT INTO Commande (IdClient, Statut) VALUES (" + idClient + ", 'En attente');";
-                    this.connexion.executerRequete(requeteCommande);
-
-                    string requeteIdCommande = "SELECT MAX(IdCommande) FROM Commande;";
-                    this.connexion.executerRequete(requeteIdCommande);
-                    var readerCommande = this.connexion.recupererResultatRequete();
-                    int idCommande = 0;
-
-                    if (readerCommande.Read())
-                    {
-                        idCommande = readerCommande.GetInt32(0);
-                    }
-                    readerCommande.Close();
-
-                    string requeteLigneDeCommande = "INSERT INTO LigneDeCommande (IdCommande, IdPlat, Quantite, DateLivraison, LieuLivraison) VALUES (" + idCommande + ", " + idPlat + ", 1, CURDATE(), '" + adresseCuisinier + "');";
-                    this.connexion.executerRequete(requeteLigneDeCommande);
-
-                    Console.WriteLine("Commande créée avec succès !");
                 }
                 else
                 {
@@ -1239,7 +1193,54 @@ namespace PbSI
                 }
                 readerCuisinier.Close();
             }
+
+            Console.Clear();
+            RechercheStationProche rechercheDepart = new RechercheStationProche(adresseDepart, graphe);
+            RechercheStationProche rechercheArrivee = new RechercheStationProche(adresseCuisinier, graphe);
+            await rechercheDepart.InitialiserAsync();
+            Console.WriteLine("\n\n");
+            await rechercheArrivee.InitialiserAsync();
+            Console.WriteLine("\n\n");
+
+            List<int> depart = rechercheDepart.IdStationsProches;
+            List<int> arrivee = rechercheArrivee.IdStationsProches;
+
+            float tempsDeplacementDepart = rechercheDepart.TempsDeplacement;
+            float tempsDeplacementArrivee = rechercheArrivee.TempsDeplacement;
+
+            var resultat = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
+
+            if (resultat != null)
+            {
+                double tempsTotal = tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
+                Console.WriteLine("Temps total de déplacement : " + (int)tempsTotal + " minutes.");
+            }
+            else
+            {
+                Console.WriteLine("Aucun chemin trouvé.");
+                return;
+            }
+
+            string requeteCommande = "INSERT INTO Commande (IdClient, Statut) VALUES (" + idClient + ", 'En attente');";
+            this.connexion.executerRequete(requeteCommande);
+
+            string requeteIdCommande = "SELECT MAX(IdCommande) FROM Commande;";
+            this.connexion.executerRequete(requeteIdCommande);
+            var readerCommande = this.connexion.recupererResultatRequete();
+            int idCommande = 0;
+
+            if (readerCommande.Read())
+            {
+                idCommande = readerCommande.GetInt32(0);
+            }
+            readerCommande.Close();
+
+            string requeteLigneDeCommande = "INSERT INTO LigneDeCommande (IdCommande, IdPlat, Quantite, DateLivraison, LieuLivraison) VALUES (" + idCommande + ", " + idPlat + ", 1, CURDATE(), '" + adresseCuisinier + "');";
+            this.connexion.executerRequete(requeteLigneDeCommande);
+
+            Console.WriteLine("Commande créée avec succès !");
         }
+
 
 
         public void modifierCommande()
