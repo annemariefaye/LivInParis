@@ -1,621 +1,473 @@
 using PbSI;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
-
-namespace Visuel
+public class Visualisation : Form
 {
-    internal class Visualisation : Form
+    private Graphe<StationMetro> graphe;
+    private Dictionary<string, Color> ligneColors;
+    private float minX, maxX, minY, maxY;
+    private List<Noeud<StationMetro>> nodesSousGraphe = new List<Noeud<StationMetro>>();
+    private bool afficherSousGraphe = false;
+
+    public Visualisation()
     {
-        private double[,] adjacencyMatrix;
+        ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
+        graphe = reseau.Graphe;
+        ligneColors = new Dictionary<string, Color>();
+        this.Text = "Graphe du Métro de Paris";
+        this.Size = new Size(6000, 4000);
+        this.BackColor = Color.White;
 
-        private string[] nodes;
-
-        public Visualisation()
+        FlowLayoutPanel buttonPanel = new FlowLayoutPanel
         {
-            ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
-            
-            Graphe<int> graphe = reseau.Graphe;
-            
-            adjacencyMatrix = graphe.MatriceAdjacence;
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = false,
+            Padding = new Padding(10),
+            Margin = new Padding(10)
+        };
 
-            nodes = new string[graphe.Noeuds.Count];
-            int index = 0;
+        Button saveButton = new Button
+        {
+            Text = "Enregistrer en tant qu'image",
+            Width = 200,
+            Height = 30,
+            BackColor = Color.LightBlue,
+            FlatStyle = FlatStyle.Flat
+        };
+        saveButton.Click += SaveButton_Click;
+        buttonPanel.Controls.Add(saveButton);
 
-            foreach (var membres in graphe.Noeuds)
-            {
-                nodes[index] = membres.Key.ToString();
-                index++;
-            }
+        Button allGraphButton = new Button
+        {
+            Text = "Afficher tout le graphe",
+            Width = 200,
+            Height = 30,
+            BackColor = Color.LightGreen,
+            FlatStyle = FlatStyle.Flat
+        };
+        allGraphButton.Click += (sender, e) =>
+        {
+            afficherSousGraphe = false;
+            this.Invalidate();
+        };
+        buttonPanel.Controls.Add(allGraphButton);
 
-            this.Text = "Graphe - Matrice d'Adjacence";
-            this.Size = new Size(1500, 1500);
-            this.Paint += new PaintEventHandler(DrawGraphWeighted);
+        Button subGraphButton = new Button
+        {
+            Text = "Afficher sous-graphe",
+            Width = 200,
+            Height = 30,
+            BackColor = Color.LightCoral,
+            FlatStyle = FlatStyle.Flat
+        };
+        subGraphButton.Click += async (sender, e) =>
+        {
+            await ChargerSousGrapheAsync();
+            afficherSousGraphe = true;
+            this.Invalidate();
+        };
+        buttonPanel.Controls.Add(subGraphButton);
+
+        this.Controls.Add(buttonPanel);
+        this.Paint += new PaintEventHandler(DrawGraph);
+        NormalizeCoordinates();
+        this.Load += async (sender, e) => await ChargerDonneesAsync();
+    }
+
+    private async Task ChargerSousGrapheAsync()
+    {
+        RechercheStationProche recherche = new RechercheStationProche("55 Rue du Faubourg Saint-Honoré, 75008 Paris, France", graphe);
+        RechercheStationProche recherche2 = new RechercheStationProche("40 allée de Bercy, 75012 Paris", graphe);
+        await recherche.InitialiserAsync();
+        await recherche2.InitialiserAsync();
+
+        List<int> depart = recherche.IdStationsProches;
+        List<int> arrivee = recherche2.IdStationsProches;
+
+        try
+        {
+            ResultatChemin sousGrapheSolution = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
+            List<int> nodesSousGrapheIds = sousGrapheSolution.Chemin;
+            nodesSousGraphe = nodesSousGrapheIds.Select(id => graphe.TrouverNoeudParId(id)).ToList();
         }
-
-        private void DrawGraphLines(object sender, PaintEventArgs e)
+        catch (Exception e)
         {
-            Graphics g = e.Graphics;
-            int size = 40; // Taille des noeuds
-            int spacing = 45; // Espacement horizontal entre les n�uds
-            PointF[] positions = new PointF[nodes.Length];
-
-            int centerY = this.ClientSize.Height / 2; // Centre vertical de la fen�tre
-
-            // Calculer les positions des n�uds en deux lignes, face � face
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                float x =
-                    (i / 2) * spacing
-                    + (this.ClientSize.Width / 2 - (spacing * (nodes.Length / 4))); // Centrer les n�uds
-                float y = (i % 2 == 0) ? centerY - 50 : centerY + 50; // Ligne sup�rieure ou inf�rieure
-                positions[i] = new PointF(x, y);
-            }
-
-            Pen edgePen = new Pen(Color.Black, 2);
-            Font font = new Font("Arial", 12);
-            Brush textBrush = Brushes.Black;
-
-            // Dessiner les arêtes
-            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-            {
-                for (int j = i + 1; j < adjacencyMatrix.GetLength(1); j++)
-                {
-                    if (adjacencyMatrix[i, j] != 0)
-                    {
-                        // Dessiner une ligne droite entre les n�uds
-                        g.DrawLine(edgePen, positions[i], positions[j]);
-                    }
-                }
-            }
-
-            // Dessiner les n�uds
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                float x = positions[i].X - size / 2;
-                float y = positions[i].Y - size / 2;
-                g.FillEllipse(Brushes.Blue, x, y, size, size);
-                g.DrawEllipse(Pens.Black, x, y, size, size);
-                g.DrawString(nodes[i], font, textBrush, x + size / 3, y + size / 3);
-            }
-        }
-
-        private void DrawGraphCircle(object sender, PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
-            int size = 40;
-            /// Taille des n�uds
-            int radius = 500;
-            /// Rayon du cercle o� sont plac�s les n�uds
-            PointF[] positions = new PointF[nodes.Length];
-
-            int centerX = this.ClientSize.Width / 2;
-            int centerY = this.ClientSize.Height / 2;
-
-            /// Calcul des positions des sommets sur un cercle
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                float angle = (float)(i * 2 * Math.PI / nodes.Length);
-                positions[i] = new PointF(
-                    centerX + (float)(radius * Math.Cos(angle)),
-                    centerY + (float)(radius * Math.Sin(angle))
-                );
-            }
-
-            Pen edgePen = new Pen(Color.Black, 2);
-            Font font = new Font("Arial", 5);
-            Brush brush = Brushes.White;
-            Brush textBrush = Brushes.Black;
-
-            /// Dessiner les ar�tes
-            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-            {
-                for (int j = i + 1; j < adjacencyMatrix.GetLength(1); j++)
-                {
-                    if (adjacencyMatrix[i, j] != 0)
-                    {
-                        g.DrawLine(edgePen, positions[i], positions[j]);
-                    }
-                }
-            }
-        }
-
-        private void DrawGraphWeighted(object sender, PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
-            int size =5; // Taille des n�uds
-            int radius = 200; // Rayon pour les n�uds
-            PointF[] positions = new PointF[nodes.Length];
-
-            int centerX = this.ClientSize.Width / 2;
-            int centerY = this.ClientSize.Height / 2;
-
-            // Calculer le degr� de chaque n�ud
-            int[] degrees = new int[nodes.Length];
-            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-            {
-                for (int j = 0; j < adjacencyMatrix.GetLength(1); j++)
-                {
-                    if (adjacencyMatrix[i, j] != 0)
-                    {
-                        degrees[i]++;
-                    }
-                }
-            }
-
-            // Normaliser les degr�s pour les positions
-            float maxDegree = degrees.Max();
-            float[] normalizedDegrees = degrees.Select(d => d / maxDegree).ToArray();
-
-            // Calculer les positions des sommets selon leur degr�
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                float angle = (float)(i * 2 * Math.PI / nodes.Length);
-                float dynamicRadius = radius * (1 + normalizedDegrees[i]); // Ajustement en fonction du degr�
-                positions[i] = new PointF(
-                    centerX + (float)(dynamicRadius * Math.Cos(angle)),
-                    centerY + (float)(dynamicRadius * Math.Sin(angle))
-                );
-            }
-
-            Pen edgePen = new Pen(Color.Black, 2);
-            Font font = new Font("Arial", 12);
-            Brush brush = Brushes.White;
-            Brush textBrush = Brushes.Black;
-
-            // Dessiner les ar�tes
-            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-            {
-                for (int j = i + 1; j < adjacencyMatrix.GetLength(1); j++)
-                {
-                    if (adjacencyMatrix[i, j] != 0)
-                    {
-                        g.DrawLine(edgePen, positions[i], positions[j]);
-                    }
-                }
-            }
-
-            // Dessiner les n�uds
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                float x = positions[i].X - size / 2;
-                float y = positions[i].Y - size / 2;
-                g.FillEllipse(Brushes.Blue, x, y, size, size);
-                g.DrawEllipse(Pens.Black, x, y, size, size);
-                g.DrawString(nodes[i], font, textBrush, x + size / 3, y + size / 3);
-            }
-        }
-
-        private void DrawGraphWeightedCurved(object sender, PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
-            int size = 40; // Taille des n�uds
-            int radius = 200; // Rayon pour les n�uds
-            PointF[] positions = new PointF[nodes.Length];
-
-            int centerX = this.ClientSize.Width / 2;
-            int centerY = this.ClientSize.Height / 2;
-
-            // Calculer le degr� de chaque n�ud
-            int[] degrees = new int[nodes.Length];
-            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-            {
-                for (int j = 0; j < adjacencyMatrix.GetLength(1); j++)
-                {
-                    if (adjacencyMatrix[i, j] == 1)
-                    {
-                        degrees[i]++;
-                    }
-                }
-            }
-
-            // Normaliser les degr�s pour les positions
-            float maxDegree = degrees.Max();
-            float[] normalizedDegrees = degrees.Select(d => d / maxDegree).ToArray();
-
-            // Calculer les positions des sommets selon leur degr�
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                float angle = (float)(i * 2 * Math.PI / nodes.Length);
-                float dynamicRadius = radius * (1 + normalizedDegrees[i]); // Ajustement en fonction du degr�
-                positions[i] = new PointF(
-                    centerX + (float)(dynamicRadius * Math.Cos(angle)),
-                    centerY + (float)(dynamicRadius * Math.Sin(angle))
-                );
-            }
-
-            Pen edgePen = new Pen(Color.Black, 2);
-            Font font = new Font("Arial", 12);
-            Brush brush = Brushes.White;
-            Brush textBrush = Brushes.Black;
-
-            // Dessiner les ar�tes en courbes
-            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-            {
-                for (int j = i + 1; j < adjacencyMatrix.GetLength(1); j++)
-                {
-                    if (adjacencyMatrix[i, j] == 1)
-                    {
-                        // Calculer le point de contr�le pour la courbe
-                        PointF midPoint = new PointF(
-                            (positions[i].X + positions[j].X) / 2,
-                            (positions[i].Y + positions[j].Y) / 2
-                        );
-
-                        // Ajuster le point de contr�le pour cr�er une courbe
-                        float controlPointOffset = 50; // Ajuster cette valeur pour modifier la courbure
-                        PointF controlPoint = new PointF(
-                            midPoint.X,
-                            midPoint.Y - controlPointOffset
-                        );
-
-                        // Dessiner la courbe B�zier
-                        g.DrawBezier(
-                            edgePen,
-                            positions[i],
-                            controlPoint,
-                            controlPoint,
-                            positions[j]
-                        );
-                    }
-                }
-            }
-
-            // Dessiner les n�uds
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                float x = positions[i].X - size / 2;
-                float y = positions[i].Y - size / 2;
-                g.FillEllipse(Brushes.Blue, x, y, size, size);
-                g.DrawEllipse(Pens.Black, x, y, size, size);
-                g.DrawString(nodes[i], font, textBrush, x + size / 3, y + size / 3);
-            }
-        }
-
-        private void DrawGraphOptimizedOld(object sender, PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
-            int size = 20; // Taille des n�uds
-            PointF[] positions = ForceDirectedLayout();
-
-            Pen edgePen = new Pen(Color.Black, 2);
-            Font font = new Font("Arial", 7);
-            Brush brush = Brushes.White;
-            Brush textBrush = Brushes.White;
-
-            // Dessiner les ar�tes en courbes
-            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-            {
-                for (int j = i + 1; j < adjacencyMatrix.GetLength(1); j++)
-                {
-                    if (adjacencyMatrix[i, j] == 1)
-                    {
-                        // D�placer l�g�rement le point de contr�le pour �viter les lignes droites
-                        PointF controlPoint = new PointF(
-                            (positions[i].X + positions[j].X) / 2 + 30,
-                            (positions[i].Y + positions[j].Y) / 2 - 30
-                        );
-
-                        g.DrawBezier(
-                            edgePen,
-                            positions[i],
-                            controlPoint,
-                            controlPoint,
-                            positions[j]
-                        );
-                    }
-                }
-            }
-
-            // Dessiner les n�uds
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                float x = positions[i].X - size / 2;
-                float y = positions[i].Y - size / 2;
-                g.FillEllipse(Brushes.Blue, x, y, size, size);
-                g.DrawEllipse(Pens.Black, x, y, size, size);
-                g.DrawString(nodes[i], font, textBrush, x + size / 3, y + size / 3);
-            }
-        }
-
-        // Algorithme de force-directed layout pour organiser les noeuds
-        private PointF[] ForceDirectedLayout()
-        {
-            Random rand = new Random();
-            PointF[] positions = new PointF[nodes.Length];
-
-            // Initialisation des positions al�atoires
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                positions[i] = new PointF(rand.Next(100, 900), rand.Next(100, 900));
-            }
-
-            int iterations = 100;
-            float attractionFactor = 0.01f; // Force d'attraction
-            float repulsionFactor = 40000f; // Force de r�pulsion
-
-            for (int iter = 0; iter < iterations; iter++)
-            {
-                // Calcul des forces de r�pulsion entre tous les n�uds
-                for (int i = 0; i < nodes.Length; i++)
-                {
-                    for (int j = 0; j < nodes.Length; j++)
-                    {
-                        if (i != j)
-                        {
-                            float dx = positions[i].X - positions[j].X;
-                            float dy = positions[i].Y - positions[j].Y;
-                            float distance = (float)Math.Sqrt(dx * dx + dy * dy) + 0.1f;
-                            float force = repulsionFactor / (distance * distance);
-
-                            positions[i].X += (dx / distance) * force;
-                            positions[i].Y += (dy / distance) * force;
-                        }
-                    }
-                }
-
-                // Calcul des forces d'attraction pour les ar�tes existantes
-                for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-                {
-                    for (int j = 0; j < adjacencyMatrix.GetLength(1); j++)
-                    {
-                        if (adjacencyMatrix[i, j] == 1)
-                        {
-                            float dx = positions[j].X - positions[i].X;
-                            float dy = positions[j].Y - positions[i].Y;
-                            float distance = (float)Math.Sqrt(dx * dx + dy * dy) + 0.1f;
-                            float force = attractionFactor * distance;
-
-                            positions[i].X += (dx / distance) * force;
-                            positions[i].Y += (dy / distance) * force;
-                            positions[j].X -= (dx / distance) * force;
-                            positions[j].Y -= (dy / distance) * force;
-                        }
-                    }
-                }
-            }
-
-            return positions;
-        }
-
-        private void DrawGraphOptimized(object sender, PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
-            int baseSize = 5; // Taille de base des n�uds
-            PointF[] positions = ForceDirectedLayoutMinCrossings();
-
-            // Calculer le degr� de chaque n�ud
-            int[] degrees = new int[nodes.Length];
-            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-            {
-                for (int j = 0; j < adjacencyMatrix.GetLength(1); j++)
-                {
-                    if (adjacencyMatrix[i, j] != 0)
-                    {
-                        degrees[i]++;
-                    }
-                }
-            }
-
-            // Trouver le degr� maximum pour normaliser les tailles et couleurs
-            int maxDegree = degrees.Max();
-
-            Font font = new Font("Arial", 8);
-            Brush textBrush = Brushes.Black;
-
-            // Dessiner les ar�tes avec des couleurs diff�rentes selon le degr� des n�uds
-            for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-            {
-                for (int j = i + 1; j < adjacencyMatrix.GetLength(1); j++)
-                {
-                    if (adjacencyMatrix[i, j] != 0)
-                    {
-                        PointF controlPoint = GetCurvedControlPoint(positions[i], positions[j]);
-                        Color edgeColor = GetColorFromDegrees(degrees[i], degrees[j], maxDegree);
-                        using (Pen edgePen = new Pen(edgeColor, 2))
-                        {
-                            g.DrawBezier(
-                                edgePen,
-                                positions[i],
-                                controlPoint,
-                                controlPoint,
-                                positions[j]
-                            );
-                        }
-                    }
-                }
-            }
-
-            // Dessiner les n�uds
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                float x = positions[i].X - baseSize / 2;
-                float y = positions[i].Y - baseSize / 2;
-
-                // D�terminer la taille et la couleur du n�ud
-                int size = baseSize + degrees[i] * 5; // Augmenter la taille en fonction des connexions
-                Color nodeColor = GetColorFromDegree(degrees[i], maxDegree);
-
-                // Dessiner le n�ud
-                using (Brush nodeBrush = new SolidBrush(nodeColor))
-                {
-                    g.FillEllipse(nodeBrush, x, y, size, size);
-                }
-                g.DrawEllipse(Pens.Black, x, y, size, size);
-                g.DrawString(nodes[i], font, textBrush, x + size / 3, y + size / 3);
-            }
-        }
-
-        // Fonction pour obtenir la couleur des ar�tes en fonction des degr�s des n�uds
-        private Color GetColorFromDegrees(int degreeA, int degreeB, int maxDegree)
-        {
-            float ratioA = (float)degreeA / maxDegree;
-            float ratioB = (float)degreeB / maxDegree;
-
-            // Combine les ratios pour d�terminer la couleur de l'ar�te
-            int red = (int)(255 * (1 - Math.Max(ratioA, ratioB))); // Rouge bas� sur le plus grand degr�
-            int green = (int)(255 * Math.Max(ratioA, ratioB)); // Vert diminue avec l'augmentation du degr�
-
-            return Color.FromArgb(red, green, 0); // Pas de bleu pour les ar�tes
-        }
-
-        // Fonction pour obtenir la couleur en fonction du degr�
-        private Color GetColorFromDegree(int degree, int maxDegree)
-        {
-            float ratio = (float)degree / maxDegree;
-            int red = (int)(255 * (1 - ratio)); // Rouge diminue avec l'augmentation du degr�
-            int green = (int)(255 * ratio); // Vert augmente avec l'augmentation du degr�
-
-            return Color.FromArgb(red, green, 0);
-        }
-
-        // Algorithme force-directed avec heuristique de croisement minimal
-        private PointF[] ForceDirectedLayoutMinCrossings()
-        {
-            Random rand = new Random();
-            PointF[] positions = new PointF[nodes.Length];
-
-            // Initialisation des positions avec un algorithme de type Kamada-Kawai (placement initial bas� sur les distances)
-            for (int i = 0; i < nodes.Length; i++)
-            {
-                positions[i] = new PointF(rand.Next(100, 900), rand.Next(100, 900));
-            }
-
-            int iterations = 200;
-            float attractionFactor = 0.5f;
-            float repulsionFactor = 1000f;
-            float crossingAvoidanceFactor = 50f;
-
-            for (int iter = 0; iter < iterations; iter++)
-            {
-                // Force de r�pulsion entre n�uds
-                for (int i = 0; i < nodes.Length; i++)
-                {
-                    for (int j = 0; j < nodes.Length; j++)
-                    {
-                        if (i != j)
-                        {
-                            float dx = positions[i].X - positions[j].X;
-                            float dy = positions[i].Y - positions[j].Y;
-                            float distance = (float)Math.Sqrt(dx * dx + dy * dy) + 0.1f;
-                            float force = repulsionFactor / (distance * distance);
-
-                            positions[i].X += (dx / distance) * force;
-                            positions[i].Y += (dy / distance) * force;
-                        }
-                    }
-                }
-
-                // Attraction entre les n�uds connect�s
-                for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-                {
-                    for (int j = 0; j < adjacencyMatrix.GetLength(1); j++)
-                    {
-                        if (adjacencyMatrix[i, j] != 0)
-                        {
-                            float dx = positions[j].X - positions[i].X;
-                            float dy = positions[j].Y - positions[i].Y;
-                            float distance = (float)Math.Sqrt(dx * dx + dy * dy) + 0.1f;
-                            float force = attractionFactor * distance;
-
-                            positions[i].X += (dx / distance) * force;
-                            positions[i].Y += (dy / distance) * force;
-                            positions[j].X -= (dx / distance) * force;
-                            positions[j].Y -= (dy / distance) * force;
-                        }
-                    }
-                }
-
-                // �viter le croisement des ar�tes en poussant les n�uds s'ils provoquent un croisement
-                for (int i = 0; i < adjacencyMatrix.GetLength(0); i++)
-                {
-                    for (int j = 0; j < adjacencyMatrix.GetLength(1); j++)
-                    {
-                        if (adjacencyMatrix[i, j] == 1)
-                        {
-                            for (int k = 0; k < adjacencyMatrix.GetLength(0); k++)
-                            {
-                                for (int l = 0; l < adjacencyMatrix.GetLength(1); l++)
-                                {
-                                    if (adjacencyMatrix[k, l] != 0 && (i != k || j != l))
-                                    {
-                                        if (
-                                            EdgesCross(
-                                                positions[i],
-                                                positions[j],
-                                                positions[k],
-                                                positions[l]
-                                            )
-                                        )
-                                        {
-                                            float dx = positions[i].X - positions[k].X;
-                                            float dy = positions[i].Y - positions[k].Y;
-                                            float distance =
-                                                (float)Math.Sqrt(dx * dx + dy * dy) + 0.1f;
-                                            float force =
-                                                crossingAvoidanceFactor / (distance * distance);
-
-                                            positions[i].X += (dx / distance) * force;
-                                            positions[i].Y += (dy / distance) * force;
-                                            positions[k].X -= (dx / distance) * force;
-                                            positions[k].Y -= (dy / distance) * force;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            int panelWidth = this.ClientSize.Width;
-            int panelHeight = this.ClientSize.Height;
-            PointF center = new PointF(panelWidth / 2, panelHeight / 2);
-
-            float minX = positions.Min(p => p.X);
-            float minY = positions.Min(p => p.Y);
-            float maxX = positions.Max(p => p.X);
-            float maxY = positions.Max(p => p.Y);
-
-            float graphWidth = maxX - minX;
-            float graphHeight = maxY - minY;
-
-            float offsetX = center.X - (minX + graphWidth / 2);
-            float offsetY = center.Y - (minY + graphHeight / 2);
-
-            for (int i = 0; i < positions.Length; i++)
-            {
-                positions[i] = new PointF(positions[i].X + offsetX, positions[i].Y + offsetY);
-            }
-
-            return positions;
-        }
-
-        // V�rifie si deux ar�tes se croisent
-        private bool EdgesCross(PointF a, PointF b, PointF c, PointF d)
-        {
-            float denominator = (b.X - a.X) * (d.Y - c.Y) - (b.Y - a.Y) * (d.X - c.X);
-            if (denominator == 0)
-                return false; // Les segments sont parall�les
-
-            float ua = ((c.X - a.X) * (d.Y - c.Y) - (c.Y - a.Y) * (d.X - c.X)) / denominator;
-            float ub = ((c.X - a.X) * (b.Y - a.Y) - (c.Y - a.Y) * (b.X - a.X)) / denominator;
-
-            return (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1);
-        }
-
-        // Calcule un point de contr�le pour �viter les lignes droites
-        private PointF GetCurvedControlPoint(PointF p1, PointF p2)
-        {
-            float midX = (p1.X + p2.X) / 2;
-            float midY = (p1.Y + p2.Y) / 2;
-            float offset = 50;
-
-            return new PointF(midX + offset, midY - offset);
-        }
-
-        [STAThread]
-        static void Main()
-        {
-            Application.Run(new Visualisation());
+            MessageBox.Show($"Erreur : {e.Message}", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
+
+    private async Task ChargerDonneesAsync()
+    {
+        await Task.CompletedTask;
+    }
+
+    private void NormalizeCoordinates()
+    {
+        minX = graphe.Noeuds.Min(n => (float)n.Contenu.Longitude);
+        maxX = graphe.Noeuds.Max(n => (float)n.Contenu.Longitude);
+        minY = graphe.Noeuds.Min(n => (float)n.Contenu.Latitude);
+        maxY = graphe.Noeuds.Max(n => (float)n.Contenu.Latitude);
+    }
+
+    private PointF ConvertToScreenCoordinates(float lon, float lat)
+    {
+        float margin = 0;
+        float scaleX = (this.ClientSize.Width - margin) / (maxX - minX);
+        float scaleY = (this.ClientSize.Height - margin) / (maxY - minY);
+        float scale = Math.Min(scaleX, scaleY) * 0.9f;
+
+        float offsetX = 50;
+        float screenX = (lon - minX) * scale + margin / 2 + offsetX;
+        float upperMargin = 80;
+        float screenY = (maxY - lat) * scale + margin / 2 + upperMargin;
+
+        return new PointF(screenX, screenY);
+    }
+
+    private void DrawArrow(Graphics g, Pen pen, PointF start, PointF end)
+    {
+        g.DrawLine(pen, start, end);
+
+        float arrowSize = 6;
+        double angle = Math.Atan2(end.Y - start.Y, end.X - start.X);
+        PointF arrow1 = new PointF(
+            end.X - (float)(arrowSize * Math.Cos(angle - Math.PI / 6)),
+            end.Y - (float)(arrowSize * Math.Sin(angle - Math.PI / 6))
+        );
+        PointF arrow2 = new PointF(
+            end.X - (float)(arrowSize * Math.Cos(angle + Math.PI / 6)),
+            end.Y - (float)(arrowSize * Math.Sin(angle + Math.PI / 6))
+        );
+        g.DrawLine(pen, end, arrow1);
+        g.DrawLine(pen, end, arrow2);
+    }
+
+    private void DrawGraph(object sender, PaintEventArgs e)
+    {
+        Graphics g = e.Graphics;
+        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        g.Clear(Color.White);
+        Dictionary<Noeud<StationMetro>, PointF> positions = new Dictionary<Noeud<StationMetro>, PointF>();
+
+        foreach (var noeud in graphe.Noeuds)
+        {
+            positions[noeud] = ConvertToScreenCoordinates((float)noeud.Contenu.Longitude, (float)noeud.Contenu.Latitude);
+        }
+
+        if (afficherSousGraphe && nodesSousGraphe != null && nodesSousGraphe.Count > 0)
+        {
+            DrawSousGraphe(g, positions);
+        }
+        else
+        {
+            List<Lien<StationMetro>> linksStraight = new List<Lien<StationMetro>>();
+            List<Lien<StationMetro>> linksCurved = new List<Lien<StationMetro>>();
+
+            foreach (var lien in graphe.Liens)
+            {
+                bool duplicateFound = false;
+                foreach (var straight in linksStraight)
+                {
+                    if (straight.Source.Contenu.Libelle == lien.Source.Contenu.Libelle &&
+                        straight.Destination.Contenu.Libelle == lien.Destination.Contenu.Libelle)
+                    {
+                        if (straight.Source.Contenu.Ligne != lien.Source.Contenu.Ligne)
+                        {
+                            duplicateFound = true;
+                            break;
+                        }
+                    }
+                }
+                if (duplicateFound)
+                {
+                    linksCurved.Add(lien);
+                }
+                else
+                {
+                    linksStraight.Add(lien);
+                }
+            }
+
+            foreach (var lien in linksStraight)
+            {
+                Noeud<StationMetro> source = lien.Source;
+                Noeud<StationMetro> destination = lien.Destination;
+                Color color = GetLigneColor(source.Contenu.Ligne);
+                Pen pen = new Pen(color, 1);
+
+                PointF start = positions[source];
+                PointF end = positions[destination];
+                PointF direction = new PointF((end.X - start.X) * 0.98f + start.X, (end.Y - start.Y) * 0.98f + start.Y);
+
+                DrawArrow(g, pen, start, direction);
+            }
+
+            foreach (var lien in linksCurved)
+            {
+                Noeud<StationMetro> source = lien.Source;
+                Noeud<StationMetro> destination = lien.Destination;
+                Color color = GetLigneColor(source.Contenu.Ligne);
+                Pen pen = new Pen(color, 1);
+
+                PointF start, end;
+                bool switched = false;
+                if (positions[source].X < positions[destination].X ||
+                   (positions[source].X == positions[destination].X && positions[source].Y < positions[destination].Y))
+                {
+                    start = positions[source];
+                    end = positions[destination];
+                }
+                else
+                {
+                    start = positions[destination];
+                    end = positions[source];
+                    switched = true;
+                }
+
+                float dx = end.X - start.X;
+                float dy = end.Y - start.Y;
+                float length = (float)Math.Sqrt(dx * dx + dy * dy);
+                if (length == 0)
+                    length = 1;
+
+                float offsetFactor = 20;
+                float offsetX = -dy / length * offsetFactor;
+                float offsetY = -dx / length * offsetFactor;
+
+                PointF controlPoint1 = new PointF(start.X + offsetX, start.Y + offsetY);
+                PointF controlPoint2 = new PointF(end.X + offsetX, end.Y + offsetY);
+
+                g.DrawBezier(pen, start, controlPoint1, controlPoint2, end);
+
+                float tStart = 0.05f;
+                float bezierXStart = (float)(Math.Pow(1 - tStart, 3) * start.X +
+                    3 * Math.Pow(1 - tStart, 2) * tStart * controlPoint1.X +
+                    3 * (1 - tStart) * Math.Pow(tStart, 2) * controlPoint2.X +
+                    Math.Pow(tStart, 3) * end.X);
+                float bezierYStart = (float)(Math.Pow(1 - tStart, 3) * start.Y +
+                    3 * Math.Pow(1 - tStart, 2) * tStart * controlPoint1.Y +
+                    3 * (1 - tStart) * Math.Pow(tStart, 2) * controlPoint2.Y +
+                    Math.Pow(tStart, 3) * end.Y);
+                PointF arrowStartEnd = new PointF(bezierXStart, bezierYStart);
+
+                float tEnd = 0.95f;
+                float bezierXEnd = (float)(Math.Pow(1 - tEnd, 3) * start.X +
+    3 * Math.Pow(1 - tEnd, 2) * tEnd * controlPoint1.X +
+    3 * (1 - tEnd) * Math.Pow(tEnd, 2) * controlPoint2.X +
+    Math.Pow(tEnd, 3) * end.X);
+                float bezierYEnd = (float)(Math.Pow(1 - tEnd, 3) * start.Y +
+                    3 * Math.Pow(1 - tEnd, 2) * tEnd * controlPoint1.Y +
+                    3 * (1 - tEnd) * Math.Pow(tEnd, 2) * controlPoint2.Y +
+                    Math.Pow(tEnd, 3) * end.Y);
+                PointF arrowEnd = new PointF(bezierXEnd, bezierYEnd);
+
+                if (source.Contenu.Libelle != destination.Contenu.Libelle)
+                {
+                    switch (switched)
+                    {
+                        case true:
+                            DrawArrowHead(g, pen, arrowStartEnd, start);
+                            break;
+                        case false:
+                            DrawArrowHead(g, pen, arrowEnd, end);
+                            break;
+                    }
+                }
+            }
+
+            List<RectangleF> placedElements = new List<RectangleF>();
+            HashSet<string> displayedLabels = new HashSet<string>();
+
+            foreach (var noeud in graphe.Noeuds)
+            {
+                int tailleNoeud = 5;
+                PointF position = positions[noeud];
+
+                RectangleF nodeRect = new RectangleF(position.X - 0.5f * tailleNoeud, position.Y - 0.5f * tailleNoeud, tailleNoeud, tailleNoeud);
+                g.FillEllipse(Brushes.Black, nodeRect);
+
+                placedElements.Add(nodeRect);
+
+                string label = noeud.Contenu.Libelle;
+
+                if (displayedLabels.Contains(label))
+                    continue;
+
+                displayedLabels.Add(label);
+
+                var lignes = graphe.Liens
+                    .Where(lien => lien.Source.Contenu.Libelle == label || lien.Destination.Contenu.Libelle == label)
+                    .Select(lien => lien.Source.Contenu.Ligne)
+                    .Distinct()
+                    .ToList();
+
+                Color contourColor = (lignes.Count == 1) ? GetLigneColor(lignes.First()) : Color.Black;
+                Pen contourPen = new Pen(contourColor, 1);
+
+                Font labelFont = new Font("Arial", 3);
+                SizeF labelSize = g.MeasureString(label, labelFont);
+
+                List<PointF> potentialPositions = new List<PointF>
+                {
+                    new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8),
+                    new PointF(position.X - labelSize.Width / 2, position.Y + 8),
+                };
+
+                for (int offset = 15; offset <= 60; offset += 5)
+                {
+                    potentialPositions.Add(new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - offset));
+                    potentialPositions.Add(new PointF(position.X - labelSize.Width / 2, position.Y + offset));
+                }
+
+                PointF chosenLabelPosition = PointF.Empty;
+                float closestDistance = float.MaxValue;
+
+                foreach (var potentialPosition in potentialPositions)
+                {
+                    RectangleF backgroundRect = new RectangleF(potentialPosition.X - 2, potentialPosition.Y - 2, labelSize.Width + 4, labelSize.Height + 4);
+                    bool intersects = placedElements.Any(rect => rect.IntersectsWith(backgroundRect));
+
+                    if (!intersects)
+                    {
+                        float distance = Math.Abs(potentialPosition.Y - position.Y);
+                        if (distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            chosenLabelPosition = potentialPosition;
+                        }
+                    }
+                }
+
+                if (chosenLabelPosition.IsEmpty)
+                {
+                    chosenLabelPosition = new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8);
+                }
+
+                RectangleF chosenBackgroundRect = new RectangleF(chosenLabelPosition.X - 2, chosenLabelPosition.Y - 2, labelSize.Width + 4, labelSize.Height + 4);
+                placedElements.Add(chosenBackgroundRect);
+
+                g.FillRectangle(Brushes.White, chosenBackgroundRect);
+                g.DrawRectangle(contourPen, chosenBackgroundRect.X, chosenBackgroundRect.Y, chosenBackgroundRect.Width, chosenBackgroundRect.Height);
+                g.DrawString(label, labelFont, Brushes.Black, chosenLabelPosition);
+            }
+        }
+    }
+
+    private void DrawSousGraphe(Graphics g, Dictionary<Noeud<StationMetro>, PointF> positions)
+    {
+        List<Lien<StationMetro>> linksToDraw = graphe.Liens
+            .Where(lien => nodesSousGraphe.Contains(lien.Source) && nodesSousGraphe.Contains(lien.Destination))
+            .ToList();
+
+        foreach (var lien in linksToDraw)
+        {
+            Noeud<StationMetro> source = lien.Source;
+            Noeud<StationMetro> destination = lien.Destination;
+            Color color = GetLigneColor(source.Contenu.Ligne);
+            Pen pen = new Pen(color, 1);
+
+            PointF start = ConvertToScreenCoordinates((float)source.Contenu.Longitude, (float)source.Contenu.Latitude);
+            PointF end = ConvertToScreenCoordinates((float)destination.Contenu.Longitude, (float)destination.Contenu.Latitude);
+
+            PointF direction = new PointF((end.X - start.X) * 0.98f + start.X, (end.Y - start.Y) * 0.98f + start.Y);
+
+            DrawArrow(g, pen, start, direction);
+        }
+
+        foreach (var noeud in nodesSousGraphe)
+        {
+            int tailleNoeud = 5;
+            PointF position = ConvertToScreenCoordinates((float)noeud.Contenu.Longitude, (float)noeud.Contenu.Latitude);
+
+            RectangleF nodeRect = new RectangleF(position.X - 0.5f * tailleNoeud, position.Y - 0.5f * tailleNoeud, tailleNoeud, tailleNoeud);
+            g.FillEllipse(Brushes.Black, nodeRect);
+
+            string label = noeud.Contenu.Libelle;
+
+            Font labelFont = new Font("Arial", 3);
+            SizeF labelSize = g.MeasureString(label, labelFont);
+            PointF labelPosition = new PointF(position.X - labelSize.Width / 2, position.Y - labelSize.Height - 8);
+            g.DrawString(label, labelFont, Brushes.Black, labelPosition);
+
+            Color borderColor;
+            var lignes = linksToDraw
+                .Where(l => l.Source == noeud || l.Destination == noeud)
+                .Select(l => l.Source.Contenu.Ligne)
+                .Distinct()
+                .ToList();
+
+            borderColor = lignes.Count > 1 ? Color.Black : GetLigneColor(lignes.First());
+
+            Pen borderPen = new Pen(borderColor, 1);
+            RectangleF labelBackgroundRect = new RectangleF(labelPosition.X - 2, labelPosition.Y - 2, labelSize.Width + 4, labelSize.Height + 4);
+            g.DrawRectangle(borderPen, labelBackgroundRect);
+        }
+    }
+
+    private void SaveButton_Click(object sender, EventArgs e)
+    {
+        float scaleFactor = 3.0f;
+        using (Bitmap bitmap = new Bitmap((int)(this.ClientSize.Width * scaleFactor), (int)(this.ClientSize.Height * scaleFactor)))
+        {
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(Color.White);
+                g.ScaleTransform(scaleFactor, scaleFactor);
+                DrawGraph(this, new PaintEventArgs(g, this.ClientRectangle));
+            }
+
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp";
+                saveFileDialog.Title = "Enregistrer l'image";
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    bitmap.Save(saveFileDialog.FileName, ImageFormat.Png);
+                }
+            }
+        }
+    }
+
+    private void DrawArrowHead(Graphics g, Pen pen, PointF arrowEnd, PointF direction)
+    {
+        float arrowSize = 5;
+
+        float angle = (float)Math.Atan2(direction.Y - arrowEnd.Y, direction.X - arrowEnd.X);
+
+        PointF point1 = new PointF(
+            arrowEnd.X - arrowSize * (float)Math.Cos(angle - Math.PI / 6),
+            arrowEnd.Y - arrowSize * (float)Math.Sin(angle - Math.PI / 6));
+
+        PointF point2 = new PointF(
+            arrowEnd.X - arrowSize * (float)Math.Cos(angle + Math.PI / 6),
+            arrowEnd.Y - arrowSize * (float)Math.Sin(angle + Math.PI / 6));
+
+        g.DrawLine(pen, arrowEnd, point1);
+        g.DrawLine(pen, arrowEnd, point2);
+    }
+
+    private Color GetLigneColor(string ligne)
+    {
+        if (!ligneColors.ContainsKey(ligne))
+        {
+            Random rand = new Random();
+            ligneColors[ligne] = Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256));
+        }
+        return ligneColors[ligne];
+    }
+
+    [STAThread]
+    static void Main()
+    {
+        Application.Run(new Visualisation());
+    }
 }
+

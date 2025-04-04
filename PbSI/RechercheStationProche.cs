@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace PbSI
 {
-    class RechercheStationProche
+    public class RechercheStationProche
     {
         private readonly string adresse;
         private readonly Graphe<StationMetro> graphe;
-        private int idStationProche = -1;
+        private List<int> idStationsProches = new List<int> { -1};
+        private float tempsDeplacement = 0.0f; //en minutes
         private const double RayonTerre = 6371000.0;
 
         public RechercheStationProche(string adresse, Graphe<StationMetro> graphe)
@@ -22,17 +23,28 @@ namespace PbSI
         public async Task InitialiserAsync()
         {
             (double lon, double lat)? coordonnees = await ConvertirAdresseEnCoordonnees(adresse);
-            RechercherStationProche(coordonnees);
+            RechercherStationsProches(coordonnees);
         }
 
-        public int IdStationProche
+        public List<int> IdStationsProches
         {
             get
             {
-                if (this.idStationProche != -1)
-                    return this.idStationProche;
+                if (this.idStationsProches[0] != -1)
+                    return this.idStationsProches;
                 else
                     throw new Exception("Aucune station trouvée.");
+            }
+        }
+
+        public float TempsDeplacement
+        {
+            get
+            {
+                if (this.tempsDeplacement != 0.0f)
+                    return this.tempsDeplacement;
+                else
+                    throw new Exception("Aucune temps de déplacement calculé");
             }
         }
 
@@ -68,36 +80,40 @@ namespace PbSI
             return null;
         }
 
-        public void RechercherStationProche((double lon, double lat)? coordonneesOriginelles)
+        public void RechercherStationsProches((double lon, double lat)? coordonneesOriginelles)
         {
-            if (coordonneesOriginelles == null) {return;}
+            if (coordonneesOriginelles == null) return;
 
-            Console.WriteLine("Recherche de la station la plus proche..."); 
+            Console.WriteLine("Recherche des stations les plus proches...");
 
             double distanceMin = double.MaxValue;
+            List<int> stationsProches = new List<int>();
 
             foreach (var noeud in this.graphe.Noeuds)
             {
-                Console.WriteLine(noeud.ToString());
-                if (noeud is Noeud<StationMetro> station)
+                if (noeud is Noeud<StationMetro> station && station.Contenu != null)
                 {
-                    if(station.Contenu != null)
+                    (double lon, double lat) coordonneesStation = (station.Contenu.Longitude, station.Contenu.Latitude);
+                    double distance = CalculerDistance(coordonneesOriginelles.Value, coordonneesStation);
+
+                    //Console.WriteLine("La distance est : " + distance);
+
+                    if (distance < distanceMin)
                     {
-                        (double lon, double lat) coordonneesStation = (station.Contenu.Longitude, station.Contenu.Latitude);
-                        double distance = CalculerDistance(coordonneesOriginelles.Value, coordonneesStation);
-
-                        Console.WriteLine("la distance est : " + distance);
-
-                        if (distance < distanceMin)
-                        {
-                            distanceMin = distance;
-                            this.idStationProche = station.Id;
-                        }
+                        distanceMin = distance;
+                        this.tempsDeplacement = (float)distance / 83.3f; // Vitesse moyenne de marche en m/min
+                        stationsProches.Clear();
+                        stationsProches.Add(station.Id);
+                    }
+                    else if (Math.Abs(distance - distanceMin) < 1e-6) 
+                    {
+                        stationsProches.Add(station.Id);
                     }
                 }
             }
 
-            Console.WriteLine(this.idStationProche);
+            this.idStationsProches = stationsProches;
+            Console.WriteLine("Stations les plus proches : " + string.Join(", ", stationsProches));
         }
 
         public double CalculerDistance((double lon, double lat) origine, (double lon, double lat) destination)
@@ -107,15 +123,17 @@ namespace PbSI
             double lon2 = DegresVersRadians(destination.lon);
             double lat2 = DegresVersRadians(destination.lat);
 
-            double deltaLon = lon2 - lon1;
             double deltaLat = lat2 - lat1;
+            double deltaLon = lon2 - lon1;
 
             double a = Math.Pow(Math.Sin(deltaLat / 2), 2) +
                        Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(deltaLon / 2), 2);
-            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double c = 2 * Math.Asin(Math.Sqrt(a));
 
             return RayonTerre * c;
         }
+
 
         private double DegresVersRadians(double degres)
         {

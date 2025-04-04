@@ -1,41 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
 
 namespace PbSI
 {
     internal class Connexion
     {
-
-        MySqlConnection maConnexion;
-        MySqlDataReader reader;
-        MySqlCommand requete;
+        private MySqlConnection maConnexion;
+        private MySqlDataReader reader;
+        private MySqlCommand requete;
 
         public Connexion()
         {
-            MySqlConnection maConnexion = null;
-
             try
             {
-                string connexionString = "SERVER=localhost;PORT=3306;" +
-                                        "DATABASE=LivInParis;" +
-                                        "UID=root;PASSWORD=admin";
+
+                string connexionString = "SERVER=localhost;PORT=3306;UID=root;PASSWORD=admin;";
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
-                this.maConnexion = maConnexion;
+
+                if (maConnexion.State != ConnectionState.Open)
+                {
+                    throw new Exception("Connexion MySQL échouée.");
+                }
+
+                Console.WriteLine("Connexion à MySQL réussie !");
+                CreerBaseSiNonExiste();
+                maConnexion.ChangeDatabase("livinparics");
+
+                Console.WriteLine("Base de données prête !");
+                ExecuterFichiersSQL(new string[] { "01_create_tables.sql", "02_insert_date.sql", "03_select.sql" });
             }
             catch (MySqlException e)
             {
-                Console.WriteLine("Erreur Connexion:" + e.ToString);
-                return;
+                Console.WriteLine("Erreur MySQL: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Erreur: " + e.Message);
             }
         }
 
-        public void executerRequete(string stringRequete)
+        public MySqlDataReader recupererResultatRequete()
+        {
+            return this.requete.ExecuteReader();
+        }
+
+        private void CreerBaseSiNonExiste()
+        {
+            if (maConnexion == null || maConnexion.State != ConnectionState.Open)
+            {
+                Console.WriteLine("Connexion non disponible pour créer la base.");
+                return;
+            }
+
+            try
+            {
+                using (MySqlCommand cmd = new MySqlCommand("CREATE DATABASE IF NOT EXISTS livinparics;", maConnexion))
+                {
+                    cmd.ExecuteNonQuery();
+                    Console.WriteLine("Base de données vérifiée/créée.");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Erreur lors de la création de la base: " + e.Message);
+            }
+        }
+
+        private void ExecuterFichiersSQL(string[] fichiers)
         {
             try
             {
@@ -49,10 +85,25 @@ namespace PbSI
             }
         }
 
-
-        public MySqlDataReader recupererResultatRequete()
+        public void executerRequete(string stringRequete)
         {
-            return this.requete.ExecuteReader();
+            if (maConnexion == null || maConnexion.State != ConnectionState.Open)
+            {
+                Console.WriteLine("Impossible d'exécuter la requête : connexion fermée.");
+                return;
+            }
+
+            try
+            {
+                requete = maConnexion.CreateCommand();
+                requete.CommandText = stringRequete;
+                requete.ExecuteNonQuery();
+                //Console.WriteLine("Requête exécutée avec succès !");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Erreur d'exécution de la requête: " + e.Message);
+            }
         }
 
         public void afficherResultatRequete()
@@ -119,18 +170,21 @@ namespace PbSI
         {
             try
             {
-                // Vérifie si un DataReader est ouvert et le ferme avant d'utiliser un DataAdapter
-                if (this.reader != null && !this.reader.IsClosed)
-                    this.reader.Close();
+                if (reader != null && !reader.IsClosed)
+                    reader.Close();
 
-                string nomCompletFichier = "../export/"+nomFichier + ".xml";
-                using (MySqlDataAdapter adapter = new MySqlDataAdapter(this.requete))
+                if (requete == null)
+                {
+                    Console.WriteLine("Aucune requête à exporter.");
+                    return;
+                }
+
+                string nomCompletFichier = $"../export/{nomFichier}.xml";
+                using (MySqlDataAdapter adapter = new MySqlDataAdapter(requete))
                 {
                     DataTable table = new DataTable(nomFichier);
                     adapter.Fill(table);
-
                     table.WriteXml(nomCompletFichier, XmlWriteMode.WriteSchema);
-
                     Console.WriteLine($"Export terminé : {nomCompletFichier}");
                 }
             }
@@ -140,16 +194,13 @@ namespace PbSI
             }
         }
 
-
         public void fermerConnexion()
         {
-            if (this.reader != null && !this.reader.IsClosed)
-                this.reader.Close();
-            if (this.requete != null)
-                this.requete.Dispose();
-            if (this.maConnexion != null)
-                this.maConnexion.Close();
+            if (maConnexion != null && maConnexion.State == ConnectionState.Open)
+            {
+                maConnexion.Close();
+                Console.WriteLine("Connexion fermée proprement.");
+            }
         }
     }
 }
- 
