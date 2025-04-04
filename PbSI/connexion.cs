@@ -18,7 +18,7 @@ namespace PbSI
             try
             {
 
-                string connexionString = "SERVER=localhost;PORT=3306;UID=root;PASSWORD=admin;";
+                string connexionString = "SERVER=localhost;PORT=3306;UID=root;PASSWORD=root;";
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
 
@@ -73,15 +73,32 @@ namespace PbSI
 
         private void ExecuterFichiersSQL(string[] fichiers)
         {
-            try
+            foreach (var fichier in fichiers)
             {
-                this.requete = this.maConnexion.CreateCommand();
-                this.requete.CommandText = stringRequete;
-                this.requete.ExecuteNonQuery(); 
-            }
-            catch (MySqlException e)
-            {
-                Console.WriteLine("Erreur SQL : " + e.Message);
+                try
+                {
+                    if (!File.Exists(fichier))
+                    {
+                        Console.WriteLine($"Le fichier {fichier} n'existe pas.");
+                        continue;
+                    }
+
+                    string script = File.ReadAllText(fichier);
+                    string[] commandes = script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (string commande in commandes)
+                    {
+                        using (MySqlCommand cmd = new MySqlCommand(commande, maConnexion))
+                        {
+                            cmd.ExecuteNonQuery();
+                            Console.WriteLine($"Commande exécutée : {commande}");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Erreur lors de l'exécution du fichier {fichier}: " + e.Message);
+                }
             }
         }
 
