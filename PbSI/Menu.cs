@@ -52,21 +52,21 @@ namespace PbSI
                         this.pageChoisie = "Menu simplifié";
                         break;
 
-                    case "3":
+                    case '3':
                         Console.WriteLine("Module Statistique");
-                        Statistiques statistiques = new Statistiques(this.bdd);
+                        Statistiques statistiques = new Statistiques(this.connexion);
                         break;
 
-                    case "4":
+                    case '4':
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Merci d'avoir utilisé LivInParis ! À bientôt !");
+                        Console.WriteLine("\nMerci d'avoir utilisé LivInParis ! À bientôt !");
                         Console.ResetColor();
                         Thread.Sleep(1500);
                         return;
 
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.WriteLine("\nOption invalide. Appuyez sur une touche pour continuer...");
                         Console.ResetColor();
                         Console.ReadKey();
                         break;
@@ -179,7 +179,7 @@ namespace PbSI
                         return;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.WriteLine("\nOption invalide. Appuyez sur une touche pour continuer...");
                         Console.ResetColor();
                         Console.ReadKey();
                         break;
@@ -227,7 +227,7 @@ namespace PbSI
                         return;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.WriteLine("\nOption invalide. Appuyez sur une touche pour continuer...");
                         Console.ResetColor();
                         Console.ReadKey();
                         break;

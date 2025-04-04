@@ -35,6 +35,7 @@ INSERT INTO ListeIngredients (IdIngredient, IdRecette, Quantite) VALUES
 
 INSERT INTO Commande (IdClient, DateCommande, Statut) VALUES
 (1, NOW(), 'En attente'),
+(1, NOW(), 'Validée'),
 (2, NOW(), 'Validée'),
 (2, NOW(), 'Validée'),
 (2, NOW(), 'Validée'),
@@ -45,7 +46,8 @@ INSERT INTO LigneDeCommande (IdCommande, IdPlat, Quantite, DateLivraison, LieuLi
 (2, 2, 1, '2025-03-03', '15 avenue de Lyon'),
 (3, 2, 1, '2025-03-03', '15 avenue de Lyon'),
 (4, 2, 1, '2025-03-03', '15 avenue de Lyon'),
-(5, 2, 1, '2025-03-03', '15 avenue de Lyon');
+(5, 2, 1, '2025-03-03', '15 avenue de Lyon'),
+(6, 2, 1, '2025-03-03', '15 avenue de Lyon');
 
 INSERT INTO Livraison (IdLigneCommande, IdLivreur, IdStationDepart, IdStationArrivee, Statut) VALUES
 (1, 1, 1, 2, 'En attente'),
@@ -64,7 +66,9 @@ INSERT INTO Correspondance (IdStation, IdLigne) VALUES
 
 INSERT INTO Transaction (IdCommande, Montant, Reussie, DateTransaction) VALUES
 (1, 25.00, TRUE, NOW()),
-(2, 15.00, TRUE, NOW());
+(2, 15.00, TRUE, NOW()),
+(3, 5.00, TRUE, NOW());
+
 
 
 INSERT INTO CategorieAmbiance (Nom) VALUES 

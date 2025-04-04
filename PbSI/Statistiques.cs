@@ -47,12 +47,13 @@ namespace PbSI
             {
                 case "1":
                     Console.Clear();
-                    commande = "SELECT U.Prenom, U.Nom, COUNT(L.IdLivraison) AS NombreDeLivraisons FROM Utilisateur U JOIN Livraison L ON U.Id = L.IdLivreur JOIN LigneDeCommande LC ON L.IdLigneCommande = LC.IdLigneCommande JOIN Plat P ON LC.IdPlat = P.IdPlat WHERE L.Statut = 'Livrée' GROUP BY U.Id;";
+                    commande = "SELECT U.Prenom, U.Nom, COUNT(L.IdLivraison) NombreDeLivraisons FROM Utilisateur U JOIN Livraison L ON U.Id = L.IdLivreur JOIN LigneDeCommande LC ON L.IdLigneCommande = LC.IdLigneCommande JOIN Plat P ON LC.IdPlat = P.IdPlat WHERE L.Statut = 'Livrée' GROUP BY U.Id;";
                     connexion.executerRequete(commande);
                     Console.WriteLine();
                     connexion.afficherResultatRequete();
                     Console.WriteLine("Appuyez sur une touche pour continuer...");
                     Console.ReadKey();
+                    Menu();
                     break;
                 case "2":
                     Console.Clear();
@@ -64,6 +65,7 @@ namespace PbSI
                     connexion.afficherResultatRequete();
                     Console.WriteLine("Appuyez sur une touche pour continuer...");
                     Console.ReadKey();
+                    Menu();
                     break;
                 case "3":
                     Console.Clear();
@@ -73,27 +75,30 @@ namespace PbSI
                     connexion.afficherResultatRequete();
                     Console.WriteLine("Appuyez sur une touche pour continuer...");
                     Console.ReadKey();
+                    Menu();
                     break;
                 case "4":
                     Console.Clear();
-                    commande = "SELECT U.Nom, U.Prenom, ROUND(AVG(TotalPrix), 2) AS MoyennePrixCommandes FROM Utilisateur U JOIN Commande C ON U.IdClient = C.IdClient JOIN LigneDeCommande LC ON C.IdCommande = LC.IdCommande JOIN Plat P ON LC.IdPlat = P.IdPlat GROUP BY U.Id;\r\n";
+                    commande = "SELECT U.Nom, U.Prenom, ROUND(AVG(P.Prix * LC.Quantite), 2) MoyennePrixCommandes FROM Utilisateur U JOIN Commande C ON U.IdClient = C.IdClient JOIN LigneDeCommande LC ON C.IdCommande = LC.IdCommande JOIN Plat P ON LC.IdPlat = P.IdPlat GROUP BY U.Id;";
                     connexion.executerRequete(commande);
                     Console.WriteLine();
                     connexion.afficherResultatRequete();
                     Console.WriteLine("Appuyez sur une touche pour continuer...");
                     Console.ReadKey();
+                    Menu();
                     break;
                 case "5":
                     Console.Clear();
                     string nationalite = SaisirNationalite();
                     (string dateDebut2, string dateFin2) = SaisirDate();
                     string idClient = SaisirIdClient();
-                    commande = $@"SELECT C.IdCommande, C.DateCommande, P.Nom AS NomPlat, P.Nationalite FROM Commande C JOIN LigneDeCommande LC ON C.IdCommande = LC.IdCommande JOIN Plat P ON LC.IdPlat = P.IdPlat WHERE C.IdClient = {idClient} AND C.DateCommande BETWEEN '{dateDebut2}' AND '{dateFin2}' AND P.Nationalite = '{nationalite}';";
+                    commande = $"SELECT C.IdCommande, C.DateCommande, P.Nom AS NomPlat, P.Nationalite FROM Commande C JOIN LigneDeCommande LC ON C.IdCommande = LC.IdCommande JOIN Plat P ON LC.IdPlat = P.IdPlat WHERE C.IdClient = {idClient} AND C.DateCommande BETWEEN '{dateDebut2}' AND '{dateFin2}' AND P.Nationalite = '{nationalite}';";
                     connexion.executerRequete(commande);
                     Console.WriteLine();
                     connexion.afficherResultatRequete();
                     Console.WriteLine("Appuyez sur une touche pour continuer...");
                     Console.ReadKey();
+                    Menu();
                     break;
                 case "6":
                     Environment.Exit(0);

@@ -44,6 +44,11 @@ namespace PbSI
             }
         }
 
+        public MySqlDataReader recupererResultatRequete()
+        {
+            return this.requete.ExecuteReader();
+        }
+
         private void CreerBaseSiNonExiste()
         {
             if (maConnexion == null || maConnexion.State != ConnectionState.Open)
