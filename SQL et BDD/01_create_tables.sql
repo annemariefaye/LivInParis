@@ -32,7 +32,7 @@ CREATE TABLE Utilisateur (
     IdClient INT DEFAULT NULL,
     IdStationProche INT,
     EstBanni BOOL DEFAULT FALSE,
-    FOREIGN KEY (IdCuisinier) REFERENCES Cuisinier (IdCuisinier),
+    FOREIGN KEY (IdCuisinier) REFERENCES Cuisinier (IdCuisinier) ON DELETE CASCADE,
     FOREIGN KEY (IdClient) REFERENCES Client(IdClient) ON DELETE CASCADE,
     FOREIGN KEY (IdStationProche) REFERENCES Station(IdStation) 
 );
@@ -74,9 +74,11 @@ CREATE TABLE ListeIngredients(
 CREATE TABLE Commande (
     IdCommande INT AUTO_INCREMENT PRIMARY KEY,
     IdClient INT NOT NULL,
+    IdCuisinier INT NOT NULL,
     DateCommande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     Statut ENUM('En attente', 'Validée', 'Livrée', 'Annulée') NOT NULL,
-    FOREIGN KEY (IdClient) REFERENCES Utilisateur(Id) ON DELETE CASCADE
+    FOREIGN KEY (IdClient) REFERENCES Client(IdClient) ON DELETE CASCADE,
+    FOREIGN KEY (IdCuisinier) REFERENCES Cuisinier(IdCuisinier) ON DELETE CASCADE
 );
 
 CREATE TABLE LigneDeCommande (
