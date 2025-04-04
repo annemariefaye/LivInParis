@@ -14,9 +14,14 @@ namespace PbSI
     {
         private string pageChoisie;
         private Connexion connexion;
+        ReseauMetro reseau;
+        Graphe<StationMetro> graphe;
+
         public Menu()
         {
             this.connexion = new Connexion();
+            this.reseau = new ReseauMetro("MetroParis.xlsx");
+            this.graphe = reseau.Graphe;
 
             while (true)
             {
@@ -143,8 +148,7 @@ namespace PbSI
                 Console.WriteLine("  2.  Gestion des cuisines");
                 Console.WriteLine("  3.  Gestion des commandes");
                 Console.WriteLine("  4.  Statistiques");
-                Console.WriteLine("  5.  Autre...");
-                Console.WriteLine("  6.  Retour");
+                Console.WriteLine("  5.  Retour");
                 Console.WriteLine("----------------------------------------------------\n\n");
                 Console.WriteLine("Menu choisi:");
                 Console.ResetColor();
@@ -162,15 +166,13 @@ namespace PbSI
                         break;
                     case ('3'):
                         Console.Clear();
+                        ModuleCommande();
                         break;
                     case ('4'):
                         Statistiques statistiques = new Statistiques(this.connexion);
                         Console.Clear();
                         break;
                     case ('5'):
-                        Console.Clear();
-                        break;
-                    case ('6'):
                         Console.Clear();
                         return;
                     default:
@@ -489,6 +491,7 @@ namespace PbSI
         }
 
 
+
         public void ModuleCuisinier()
         {
             while (true)
@@ -630,7 +633,6 @@ namespace PbSI
         }
 
 
-
         public void supprimerCuisinier()
         {
             Console.Clear();
@@ -644,13 +646,6 @@ namespace PbSI
 
             Console.WriteLine("Cuisinier supprimé avec succès !");
         }
-
-
-
-
-
-
-
 
         public void modifierCuisinier()
         {
@@ -685,7 +680,6 @@ namespace PbSI
         }
 
 
-
         public void afficherPlatsRealisesParCuisinier()
         {
             Console.Clear();
@@ -706,6 +700,155 @@ namespace PbSI
         }
 
 
+        public void ModuleCommande()
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Module Commande !\n");
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("  1.  Créer une nouvelle commande");
+                Console.WriteLine("  2.  Modifier une commande");
+                Console.WriteLine("  3.  Afficher le prix d'une commande");
+                Console.WriteLine("  4.  Afficher les commandes");
+                Console.WriteLine("  5.  Retour");
+                Console.WriteLine("----------------------------------------------------\n\n");
+                Console.WriteLine("Menu choisi:");
+                Console.ResetColor();
+                char menu_choisi = (char)Console.ReadKey(false).Key;
+
+                switch (menu_choisi)
+                {
+                    case ('1'):
+                        Console.Clear();
+                        creerCommande();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('2'):
+                        Console.Clear();
+                        modifierCommande();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('3'):
+                        Console.Clear();
+                        afficherPrixCommande();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('4'):
+                        Console.Clear();
+                        afficherCommandes();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('5'):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\nOption invalide. Appuyez sur une touche pour continuer...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                }
+            }
+        }
+
+        async public void creerCommande()
+        {
+            Console.WriteLine("Identifiant du client :");
+            string idClient = Console.ReadLine();
+
+            Console.WriteLine("Adresse de départ :");
+            string adresseDepart = Console.ReadLine();
+
+            Console.WriteLine("Adresse d'arrivée :");
+            string adresseArrivee = Console.ReadLine();
+
+
+            RechercheStationProche recherche = new RechercheStationProche(adresseDepart, graphe);
+            RechercheStationProche recherche2 = new RechercheStationProche(adresseArrivee, graphe);
+            await recherche.InitialiserAsync();
+            Console.WriteLine();
+            await recherche2.InitialiserAsync();
+            Console.WriteLine();
+
+
+            List<int> depart;
+            List<int> arrivee;
+            float tempsDeplacementDepart = 0;
+            float tempsDeplacementArrivee = 0;
+            try
+            {
+                depart = recherche.IdStationsProches;
+                arrivee = recherche2.IdStationsProches;
+
+                tempsDeplacementDepart = recherche.TempsDeplacement;
+                tempsDeplacementArrivee = recherche2.TempsDeplacement;
+
+                var resultat = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
+
+                if (resultat != null)
+                {
+                    double tempsTotal = tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
+                    Console.WriteLine("Temps total de déplacement : " + (int)tempsTotal + "");
+                }
+                else
+                {
+                    Console.WriteLine("Aucun chemin trouvé.");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Erreur : {e.Message}");
+            }
+
+            Console.WriteLine("Appuyez sur une touche pour continuer...");
+
+            Console.ReadKey();
+
+
+            string requete = "INSERT INTO Commande (IdClient, Statut) VALUES (" + idClient + "', 'En attente')";
+            this.connexion.executerRequete(requete);
+            Console.WriteLine("Commande créée avec succès !");
+        }
+
+        public void modifierCommande()
+        {
+            Console.WriteLine("Identifiant de la commande à modifier :");
+            string idCommande = Console.ReadLine();
+
+            Console.WriteLine("Nouveau statut de la commande :");
+            string nouveauStatut = Console.ReadLine();
+
+            string requete = "UPDATE Commande SET Statut = '" + nouveauStatut + "' WHERE IdCommande = " + idCommande;
+            this.connexion.executerRequete(requete);
+            Console.WriteLine("Commande modifiée avec succès !");
+        }
+
+        public void afficherPrixCommande()
+        {
+            Console.WriteLine("Identifiant de la commande :");
+            string idCommande = Console.ReadLine();
+
+            string requete = "SELECT SUM(Plat.Prix * LigneDeCommande.Quantite) AS PrixTotal FROM LigneDeCommande JOIN Plat ON LigneDeCommande.IdPlat = Plat.IdPlat WHERE LigneDeCommande.IdCommande = " + idCommande;
+            this.connexion.executerRequete(requete);
+            this.connexion.afficherResultatRequete();
+        }
+
+        public void afficherCommandes()
+        {
+            string requete = "SELECT * FROM Commande";
+            this.connexion.executerRequete(requete);
+            this.connexion.afficherResultatRequete();
+        }
 
     }
 }

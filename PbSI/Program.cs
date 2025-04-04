@@ -9,8 +9,7 @@ namespace PbSI
         static async Task Main(string[] args)
         {
             
-            ReseauMetro reseau = new ReseauMetro("MetroParis.xlsx");
-            Graphe<StationMetro> graphe = reseau.Graphe;
+           
 
 
             /*double[,] m = graphe.MatriceAdjacence;
