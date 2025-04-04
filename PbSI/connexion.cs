@@ -1,9 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Data;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
 
 namespace PbSI
 {

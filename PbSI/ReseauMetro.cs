@@ -7,9 +7,13 @@ namespace PbSI
 {
     public class ReseauMetro
     {
+        #region Attributs
         private readonly string chemin;
         private readonly Graphe<StationMetro> graphe;
         private readonly List<Noeud<StationMetro>> stations;
+        #endregion
+
+        #region Constructeurs
 
         public ReseauMetro(string chemin)
         {
@@ -22,9 +26,13 @@ namespace PbSI
             CreerRelations(donneesArcs);
             CreerCorrespondances(donneesArcs);
         }
+        #endregion
 
+        #region Propriétés
         public Graphe<StationMetro> Graphe => this.graphe;
+        #endregion
 
+        #region Méthodes
         private void CreerStations(List<List<string>> donneesNoeuds)
         {
             foreach (var data in donneesNoeuds)
@@ -35,6 +43,10 @@ namespace PbSI
             }
         }
 
+        /// <summary>
+        /// Crée les relations entre les stations à partir des données des arcs
+        /// </summary>
+        /// <param name="donneesArcs">lignes de données des arcs</param>
         private void CreerRelations(List<List<string>> donneesArcs)
         {
             HashSet<(int, int)> relationsAjoutees = new HashSet<(int, int)>();
@@ -62,7 +74,6 @@ namespace PbSI
                     }
                 }
 
-                // Ajout en dur des seuls noeuds qui sont dans ni précédent ni suivant
                 if (dataStation[0] == "44" || dataStation[0] == "69")
                 {
                     int idStation = int.Parse(dataStation[0]);
@@ -87,6 +98,10 @@ namespace PbSI
             }
         }
 
+        /// <summary>
+        /// Crée les correspondances entre les stations à partir des données des arcs
+        /// </summary>
+        /// <param name="donneesArcs">Ligne de données des arcs</param>
         private void CreerCorrespondances(List<List<string>> donneesArcs)
         {
             Dictionary<string, List<int>> correspondances = new Dictionary<string, List<int>>();
@@ -179,4 +194,5 @@ namespace PbSI
             }
         }
     }
+    #endregion
 }

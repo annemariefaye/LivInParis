@@ -184,6 +184,10 @@ namespace PbSI
             UpdateProprietes();
         }
 
+        /// <summary>
+        /// Constructeur avec liste d'adjacence
+        /// </summary>
+        /// <param name="listeAdjacence">Liste d'adjacence du graphe</param>
         public Graphe(Dictionary<Noeud<T>, List<(Noeud<T>, double poids)>> listeAdjacence)
         {
 
@@ -336,6 +340,9 @@ namespace PbSI
             }
         }
 
+        /// <summary>
+        /// Retourne si les liens du graphe
+        /// </summary>
         public HashSet<Lien<T>> Liens
         {
             get { return liens; }
@@ -346,7 +353,12 @@ namespace PbSI
 
         #region Méthodes
 
-
+        /// <summary>
+        /// Retourne le noeud correspondant à l'identifiant donné
+        /// </summary>
+        /// <param name="id">Identifiant du noeud à trouver</param>
+        /// <returns>Noeud de l'identifiant fourni si trouvé</returns>
+        /// <exception cref="KeyNotFoundException"></exception>
         public Noeud<T> TrouverNoeudParId(int id)
         {
             if (noeudsDict.TryGetValue(id, out Noeud<T>? noeud))
