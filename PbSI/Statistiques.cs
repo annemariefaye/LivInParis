@@ -69,7 +69,7 @@ namespace PbSI
                     break;
                 case "3":
                     Console.Clear();
-                    commande = "SELECT ROUND(AVG(TotalPrix), 2) AS MoyennePrixCommandes FROM (SELECT C.IdCommande, SUM(P.Prix * LC.Quantite) AS TotalPrix FROM Commande C JOIN LigneDeCommande LC ON C.IdCommande = LC.IdCommande JOIN Plat P ON LC.IdPlat = P.IdPlat GROUP BY C.IdCommande) AS SousRequete;";
+                    commande = "SELECT ROUND(AVG(TotalPrix), 2) FROM (SELECT C.IdCommande, SUM(P.Prix * LC.Quantite) TotalPrix FROM Commande C JOIN LigneDeCommande LC ON C.IdCommande = LC.IdCommande JOIN Plat P ON LC.IdPlat = P.IdPlat GROUP BY C.IdCommande) SousRequete;";
                     connexion.executerRequete(commande);
                     Console.WriteLine();
                     connexion.afficherResultatRequete();
@@ -92,7 +92,7 @@ namespace PbSI
                     string nationalite = SaisirNationalite();
                     (string dateDebut2, string dateFin2) = SaisirDate();
                     string idClient = SaisirIdClient();
-                    commande = $"SELECT C.IdCommande, C.DateCommande, P.Nom AS NomPlat, P.Nationalite FROM Commande C JOIN LigneDeCommande LC ON C.IdCommande = LC.IdCommande JOIN Plat P ON LC.IdPlat = P.IdPlat WHERE C.IdClient = {idClient} AND C.DateCommande BETWEEN '{dateDebut2}' AND '{dateFin2}' AND P.Nationalite = '{nationalite}';";
+                    commande = $"SELECT C.IdCommande, C.DateCommande, P.Nom NomPlat, P.Nationalite FROM Commande C JOIN LigneDeCommande LC ON C.IdCommande = LC.IdCommande JOIN Plat P ON LC.IdPlat = P.IdPlat WHERE C.IdClient = {idClient} AND C.DateCommande BETWEEN '{dateDebut2}' AND '{dateFin2}' AND P.Nationalite = '{nationalite}';";
                     connexion.executerRequete(commande);
                     Console.WriteLine();
                     connexion.afficherResultatRequete();
