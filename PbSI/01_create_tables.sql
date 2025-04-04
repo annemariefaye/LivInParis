@@ -155,5 +155,7 @@ CREATE TABLE NotationCuisinier (
 CREATE TABLE Musique (
     IdMusique INT AUTO_INCREMENT PRIMARY KEY,
     Titre VARCHAR(255) NOT NULL,
-    Nationalite VARCHAR(250) NOT NULL
+    Nationalite VARCHAR(250) NOT NULL,
+    IdPlat INT NULL,
+    FOREIGN KEY (IdPlat) REFERENCES Plat(IdPlat) ON DELETE CASCADE
 );
