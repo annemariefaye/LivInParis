@@ -31,8 +31,7 @@ namespace PbSI
                 Console.WriteLine("----------------------------------------------------");
                 Console.WriteLine("  1.  Interface SQL");
                 Console.WriteLine("  2.  Menu simplifié");
-                Console.WriteLine("  3.  Module Statistique");
-                Console.WriteLine("  4.  Quitter");
+                Console.WriteLine("  3.  Quitter");
                 Console.WriteLine("----------------------------------------------------");
                 Console.ResetColor();
                 Console.Write(" Sélectionnez une option : ");
@@ -53,11 +52,6 @@ namespace PbSI
                         break;
 
                     case '3':
-                        Console.WriteLine("Module Statistique");
-                        Statistiques statistiques = new Statistiques(this.connexion);
-                        break;
-
-                    case '4':
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("\nMerci d'avoir utilisé LivInParis ! À bientôt !");
                         Console.ResetColor();
@@ -164,11 +158,13 @@ namespace PbSI
                         break;
                     case ('2'):
                         Console.Clear();
+                        ModuleCuisinier();
                         break;
                     case ('3'):
                         Console.Clear();
                         break;
                     case ('4'):
+                        Statistiques statistiques = new Statistiques(this.connexion);
                         Console.Clear();
                         break;
                     case ('5'):
@@ -437,7 +433,6 @@ namespace PbSI
                 {
                     case ('1'):
                         Console.Clear();
-                        //la suppression en cascade est activée, la suppressions dans la table client engendre la suppression dans les autres tables
                         Console.WriteLine("Identifiant client:");
                         string idClient = Console.ReadLine();
                         requete_client += " idClient = "+idClient;
@@ -457,7 +452,6 @@ namespace PbSI
                 }
             }
         }
-
 
         public void modifierClient()
         {
@@ -493,6 +487,224 @@ namespace PbSI
                 }
             }
         }
+
+
+        public void ModuleCuisinier()
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Module Cuisinier !\n");
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("  1.  Afficher les cuisiniers");
+                Console.WriteLine("  2.  Ajouter un cuisinier");
+                Console.WriteLine("  3.  Supprimer un cuisinier");
+                Console.WriteLine("  4.  Modifier un cuisinier");
+                Console.WriteLine("  5.  Afficher les clients servis par un cuisinier");
+                Console.WriteLine("  6.  Afficher les plats réalisés par un cuisinier");
+                Console.WriteLine("  7.  Afficher le plat du jour");
+                Console.WriteLine("  8.  Retour");
+                Console.WriteLine("----------------------------------------------------\n\n");
+                Console.WriteLine("Menu choisi:");
+                Console.ResetColor();
+                char menu_choisi = (char)Console.ReadKey(false).Key;
+
+                switch (menu_choisi)
+                {
+                    case ('1'):
+                        Console.Clear();
+                        afficherCuisiniers();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('2'):
+                        Console.Clear();
+                        ajouterCuisinier(); 
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('3'):
+                        Console.Clear();
+                        supprimerCuisinier();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('4'):
+                        Console.Clear();
+                        modifierCuisinier();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('5'):
+                        Console.Clear();
+                        afficherClientsServisParCuisinier();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('6'):
+                        Console.Clear();
+                        afficherPlatsRealisesParCuisinier();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('7'):
+                        Console.Clear();
+                        afficherPlatDuJour();
+                        Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                    case ('8'):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\nOption invalide. Appuyez sur une touche pour continuer...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+                }
+            }
+        }
+
+        public void afficherCuisiniers()
+        {
+            string requete = "SELECT Utilisateur.Nom, Utilisateur.Prenom, Cuisinier.PlatDuJour FROM Cuisinier JOIN Utilisateur ON Cuisinier.IdCuisinier = Utilisateur.IdCuisinier";
+            this.connexion.executerRequete(requete);
+            this.connexion.afficherResultatRequete();
+        }
+
+        public void ajouterCuisinier()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Ajout de cuisinier\n");
+
+            Console.WriteLine("Nom du cuisinier :");
+            string nom = Console.ReadLine();
+
+            Console.WriteLine("Prénom du cuisinier :");
+            string prenom = Console.ReadLine();
+
+            Console.WriteLine("Adresse du cuisinier :");
+            string adresse = Console.ReadLine();
+
+            Console.WriteLine("Téléphone du cuisinier :");
+            string telephone = Console.ReadLine();
+
+            Console.WriteLine("Email du cuisinier :");
+            string email = Console.ReadLine();
+
+            Console.WriteLine("Mot de passe du cuisinier :");
+            string motDePasse = Console.ReadLine();
+
+            Console.WriteLine("Plat du jour du cuisinier :");
+            string platDuJour = Console.ReadLine();
+
+            string requeteCuisinier = "INSERT INTO Cuisinier (MotDePasse, PlatDuJour) VALUES ('" + motDePasse + "', '" + platDuJour + "')";
+            this.connexion.executerRequete(requeteCuisinier);
+
+            string requeteIdCuisinier = "SELECT IdCuisinier FROM Cuisinier ORDER BY IdCuisinier DESC LIMIT 1";
+            this.connexion.executerRequete(requeteIdCuisinier);
+            var reader = this.connexion.recupererResultatRequete();
+            int idCuisinier = 0;
+
+            if (reader.Read())
+            {
+                idCuisinier = reader.GetInt32(0);
+            }
+
+            reader.Close();
+
+            string requeteUtilisateur = "INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier) VALUES ('" + nom + "', '" + prenom + "', '" + adresse + "', '" + telephone + "', '" + email + "', " + idCuisinier + ")";
+            this.connexion.executerRequete(requeteUtilisateur);
+
+            Console.WriteLine("Cuisinier ajouté avec succès !");
+        }
+
+
+
+        public void supprimerCuisinier()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Identifiant du cuisinier à supprimer :");
+            string idCuisinier = Console.ReadLine();
+
+            string requeteSupprimerCuisinier = $"DELETE FROM Cuisinier WHERE IdCuisinier = {idCuisinier};";
+            this.connexion.executerRequete(requeteSupprimerCuisinier);
+
+
+            Console.WriteLine("Cuisinier supprimé avec succès !");
+        }
+
+
+
+
+
+
+
+
+        public void modifierCuisinier()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Identifiant du cuisinier à modifier :");
+            string idCuisinier = Console.ReadLine();
+
+            Console.WriteLine("Nouvelle valeur pour le nom :");
+            string nouveauNom = Console.ReadLine();
+
+            Console.WriteLine("Nouveau prénom :");
+            string nouveauPrenom = Console.ReadLine();
+
+            string requete = "UPDATE Utilisateur SET Nom = '" + nouveauNom + "', Prenom = '" + nouveauPrenom + "' WHERE IdCuisinier = " + idCuisinier;
+
+            this.connexion.executerRequete(requete);
+
+            Console.WriteLine("Cuisinier modifié avec succès !");
+        }
+
+
+        public void afficherClientsServisParCuisinier()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Identifiant du cuisinier :");
+            string idCuisinier = Console.ReadLine();
+            string requete = $"SELECT DISTINCT Utilisateur.Nom, Utilisateur.Prenom FROM Commande JOIN Utilisateur ON Commande.IdClient = Utilisateur.IdClient JOIN LigneDeCommande ON Commande.IdCommande = LigneDeCommande.IdCommande JOIN Plat ON LigneDeCommande.IdPlat = Plat.IdPlat WHERE Plat.IdCuisinier = {idCuisinier};";
+            this.connexion.executerRequete(requete);
+            this.connexion.afficherResultatRequete();
+        }
+
+
+
+        public void afficherPlatsRealisesParCuisinier()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Identifiant du cuisinier :");
+            string idCuisinier = Console.ReadLine();
+            string requete = "SELECT Plat.Nom, COUNT(*) as Frequence FROM Commande JOIN LigneDeCommande ON Commande.IdCommande = LigneDeCommande.IdCommande JOIN Plat ON LigneDeCommande.IdPlat = Plat.IdPlat WHERE Plat.IdCuisinier = " + idCuisinier + " GROUP BY Plat.Nom;";
+            this.connexion.executerRequete(requete);
+            this.connexion.afficherResultatRequete();
+        }
+
+        public void afficherPlatDuJour()
+        {
+            Console.Clear();
+            string requete = "SELECT Utilisateur.Nom, Utilisateur.Prenom, Cuisinier.PlatDuJour FROM Cuisinier JOIN Utilisateur ON Cuisinier.IdCuisinier = Utilisateur.IdCuisinier";
+            this.connexion.executerRequete(requete);
+            this.connexion.afficherResultatRequete();
+        }
+
 
 
     }

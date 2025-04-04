@@ -4,10 +4,10 @@ INSERT INTO Client (NomEntreprise, MotDePasse) VALUES
 ('Boulangerie Dupont', 'mdp123'),
 ('Entreprise XYZ', 'xyz789');
 
-INSERT INTO Cuisinier (MotDePasse) VALUES
-('cuisine123'),
-('chef789'),
-('allinedessine92');
+INSERT INTO Cuisinier (MotDePasse, PlatDuJour) VALUES
+('cuisine123', 'sushi'),
+('chef789', 'burger'),
+('allinedessine92', 'raclette');
 
 INSERT INTO Station (Nom, Latitude, Longitude) VALUES
 ('Gare de Lyon', 40.8632, 5.4764),
