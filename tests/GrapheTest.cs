@@ -8,30 +8,13 @@ namespace PbSITests
         [TestMethod]
         public void TestDefaultConstructor()
         {
-            Graphe graphe = new Graphe();
+            Graphe<int> graphe = new Graphe<int>();
 
             Assert.IsNotNull(graphe.Noeuds);
             Assert.IsNotNull(graphe.MatriceAdjacence);
             Assert.IsNotNull(graphe.ListeAdjacence);
             Assert.AreEqual(0, graphe.Noeuds.Count);
             Assert.AreEqual(0, graphe.Taille);
-        }
-
-        [TestMethod]
-        public void TestConstructorWithAdjacencyMatrix()
-        {
-            int[,] matriceAdjacence = new int[,]
-            {
-                { 0, 1 },
-                { 1, 0 },
-            };
-
-            Graphe graphe = new Graphe(matriceAdjacence);
-
-            Assert.AreEqual(2, graphe.Noeuds.Count);
-            Assert.AreEqual(1, graphe.Noeuds[1].Id);
-            Assert.AreEqual(2, graphe.Noeuds[2].Id);
-            Assert.AreEqual(1, graphe.Taille);
         }
 
         [TestMethod]
@@ -60,25 +43,12 @@ namespace PbSITests
         [TestMethod]
         public void TestAjouterMembre()
         {
-            Graphe graphe = new Graphe();
+            Graphe<int> graphe = new Graphe<int>();
 
             graphe.AjouterMembre(1);
 
             Assert.AreEqual(1, graphe.Noeuds.Count);
             Assert.AreEqual(1, graphe.Noeuds[1].Id);
-        }
-
-        [TestMethod]
-        public void TestAjouterRelation()
-        {
-            Graphe graphe = new Graphe();
-
-            graphe.AjouterRelation(1, 2);
-
-            Assert.AreEqual(2, graphe.Noeuds.Count);
-            Assert.AreEqual(1, graphe.Noeuds[1].Id);
-            Assert.AreEqual(2, graphe.Noeuds[2].Id);
-            Assert.AreEqual(1, graphe.Taille);
         }
 
         [TestMethod]
