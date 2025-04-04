@@ -1,1 +1,0 @@
-SET @IdCuisinier = 1; SELECT C.IdClient, C.NomEntreprise, COUNT(L.IdCommande) AS NombreDeCommandes FROM Client C JOIN Commande CO ON C.IdClient = CO.IdClient JOIN LigneDeCommande L ON CO.IdCommande = L.IdCommande JOIN Plat P ON L.IdPlat = P.IdPlat WHERE P.IdCuisinier = @IdCuisinier GROUP BY C.IdClient, C.NomEntreprise ORDER BY NombreDeCommandes DESC;
