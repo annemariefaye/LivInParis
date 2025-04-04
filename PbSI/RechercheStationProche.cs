@@ -102,17 +102,16 @@ namespace PbSI
                     {
                         distanceMin = distance;
                         this.tempsDeplacement = (float)distance / 83.3f; // Vitesse moyenne de marche en m/min
-                        stationsProches.Clear(); // On enlève les anciennes stations si on trouve plus proche
+                        stationsProches.Clear();
                         stationsProches.Add(station.Id);
                     }
-                    else if (Math.Abs(distance - distanceMin) < 1e-6) // Tolérance pour éviter erreurs de précision
+                    else if (Math.Abs(distance - distanceMin) < 1e-6) 
                     {
                         stationsProches.Add(station.Id);
                     }
                 }
             }
 
-            // Stocke la liste des stations proches
             this.idStationsProches = stationsProches;
             Console.WriteLine("Stations les plus proches : " + string.Join(", ", stationsProches));
         }
@@ -124,15 +123,17 @@ namespace PbSI
             double lon2 = DegresVersRadians(destination.lon);
             double lat2 = DegresVersRadians(destination.lat);
 
-            double deltaLon = lon2 - lon1;
             double deltaLat = lat2 - lat1;
+            double deltaLon = lon2 - lon1;
 
             double a = Math.Pow(Math.Sin(deltaLat / 2), 2) +
                        Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(deltaLon / 2), 2);
-            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
-            return RayonTerre * c;
+            double c = 2 * Math.Asin(Math.Sqrt(a));
+
+            return RayonTerre * c; // Distance en km
         }
+
 
         private double DegresVersRadians(double degres)
         {
