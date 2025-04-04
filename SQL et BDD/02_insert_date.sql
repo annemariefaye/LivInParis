@@ -6,9 +6,9 @@ INSERT INTO Client (NomEntreprise, MotDePasse) VALUES
 (null, 'boul2025'),
 (null, 'gerard10');
 
-INSERT INTO Cuisinier (MotDePasse) VALUES
-('cuisine123'),
-('chef789');
+INSERT INTO Cuisinier (MotDePasse, idPlatDuJour) VALUES
+('cuisine123', 1),
+('chef789',null);
 
 INSERT INTO Station (Nom, Latitude, Longitude) VALUES
 ('Gare de Lyon', 40.8632, 5.4764),
@@ -45,7 +45,9 @@ INSERT INTO Commande (IdClient, DateCommande, Statut) VALUES
 
 INSERT INTO LigneDeCommande (IdCommande, IdPlat, Quantite, DateLivraison, LieuLivraison) VALUES
 (1, 1, 2, '2025-03-02', '10 rue de Paris'),
-(2, 2, 1, '2025-03-03', '15 avenue de Lyon');
+(2, 2, 1, '2025-03-03', '15 avenue de Lyon'),
+(2, 1, 1, '2025-03-03', '15 avenue de Lyon'),
+(2, 1, 1, '2025-03-03', '15 avenue de Lyon');
 
 INSERT INTO Livraison (IdLigneCommande, IdLivreur, IdStationDepart, IdStationArrivee, Statut) VALUES
 (1, 1, 1, 2, 'En attente'),

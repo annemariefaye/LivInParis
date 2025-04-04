@@ -1,9 +1,1 @@
-SELECT Utilisateur.*, m.total AS total_commandes
-FROM Utilisateur
-LEFT JOIN (
-    SELECT Commande.idClient, SUM(Transaction.Montant) AS total
-    FROM Transaction
-    JOIN Commande ON Commande.idCommande = Transaction.idCommande
-    WHERE Transaction.Reussie = 1
-    GROUP BY Commande.idClient
-) AS m ON m.idClient = Utilisateur.idClient;
+SET @IdCuisinier = 1; SELECT C.IdClient, C.NomEntreprise, COUNT(L.IdCommande) AS NombreDeCommandes FROM Client C JOIN Commande CO ON C.IdClient = CO.IdClient JOIN LigneDeCommande L ON CO.IdCommande = L.IdCommande JOIN Plat P ON L.IdPlat = P.IdPlat WHERE P.IdCuisinier = @IdCuisinier GROUP BY C.IdClient, C.NomEntreprise ORDER BY NombreDeCommandes DESC;

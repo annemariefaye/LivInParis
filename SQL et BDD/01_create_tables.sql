@@ -10,7 +10,8 @@ CREATE TABLE Client(
 
 CREATE TABLE Cuisinier(
     IdCuisinier INT AUTO_INCREMENT PRIMARY KEY,
-    MotDePasse VARCHAR(255) NOT NULL   
+    MotDePasse VARCHAR(255) NOT NULL,
+    IdPlatDuJour INT DEFAULT NULL
 );
 
 CREATE TABLE Station (

@@ -156,6 +156,7 @@ namespace PbSI
                         break;
                     case ('2'):
                         Console.Clear();
+                        ModuleCuisinier();
                         break;
                     case ('3'):
                         Console.Clear();
@@ -178,6 +179,9 @@ namespace PbSI
                 }
             }
         }
+
+
+        //-----------------------Module Client-------------------
 
         public void ModuleClient()
         {
@@ -369,7 +373,7 @@ namespace PbSI
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Import par fichier:" +
-                            "Le fichier doit être au format xml et doit être obtenu en exécutant la requête:\n " +
+                            "Le fichier doit être au format xml en exécutant la requête:\n " +
                             "EXPORTER SELECT * FROM Utilisateur Join Client ON Client.idClient = Utilisateur.idClient WHERE Client.idClient=?;\n" +
                             "Depuis l'espace SQL dédié de l'interface");
                         Console.ResetColor();
@@ -379,20 +383,26 @@ namespace PbSI
                         XmlDocument xmlDoc = new XmlDocument();
                         xmlDoc.Load(cheminFichier);
 
-                        foreach (XmlNode node in xmlDoc.SelectNodes("//export_client_1"))
+                        string nomFichier = System.IO.Path.GetFileNameWithoutExtension(cheminFichier);
+                        string xpath = "//" + nomFichier;
+                        try
                         {
+                            foreach (XmlNode node in xmlDoc.SelectNodes(xpath))
+                            {
 
-                            requete = "INSERT INTO Client (NomEntreprise, MotDePasse) VALUES ('" + node["NomEntreprise"]?.InnerText + "', '" + node["MotDePasse"]?.InnerText + "');";
-                            this.connexion.executerRequete(requete);
+                                requete = "INSERT INTO Client (NomEntreprise, MotDePasse) VALUES ('" + node["NomEntreprise"]?.InnerText + "', '" + node["MotDePasse"]?.InnerText + "');";
+                                this.connexion.executerRequete(requete);
 
-                            requete = "INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdClient, IdStationProche, EstBanni) " +
-                                             "VALUES ('" + node["Nom"]?.InnerText + "', '" + node["Prenom"]?.InnerText + "', '" +
-                                             node["Adresse"]?.InnerText + "', '" + node["Telephone"]?.InnerText + "', '" +
-                                             node["Email"]?.InnerText + "', " + node["IdClient"]?.InnerText + ", " +
-                                             node["IdStationProche"]?.InnerText + ", " + (node["EstBanni"]?.InnerText == "true" ? "1" : "0") + ");";
+                                requete = "INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdClient, IdStationProche, EstBanni) " +
+                                                 "VALUES ('" + node["Nom"]?.InnerText + "', '" + node["Prenom"]?.InnerText + "', '" +
+                                                 node["Adresse"]?.InnerText + "', '" + node["Telephone"]?.InnerText + "', '" +
+                                                 node["Email"]?.InnerText + "', " + node["IdClient"]?.InnerText + ", " +
+                                                 node["IdStationProche"]?.InnerText + ", " + (node["EstBanni"]?.InnerText == "true" ? "1" : "0") + ");";
 
-                            this.connexion.executerRequete(requete);
+                                this.connexion.executerRequete(requete);
+                            }
                         }
+                        catch { }
 
                         Console.WriteLine("Importation terminée !");
 
@@ -486,6 +496,289 @@ namespace PbSI
             }
         }
 
+        //-----------------------Module Client-------------------
+
+        public void ModuleCuisinier()
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Module Client !\n");
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("  1.  Afficher les cuisiniers");
+                Console.WriteLine("  2.  Ajouter un cuisinier");
+                Console.WriteLine("  3.  Supprimer un cuisinier");
+                Console.WriteLine("  4.  Modifier un cuisinier");
+                Console.WriteLine("  5.  Retour");
+                Console.WriteLine("----------------------------------------------------\n\n");
+                Console.WriteLine("Menu choisi:");
+                Console.ResetColor();
+                char menu_choisi = (char)Console.ReadKey(false).Key;
+
+                switch (menu_choisi)
+                {
+                    case ('1'):
+                        Console.Clear();
+                        this.afficherCuisiniers();
+                        break;
+                    case ('2'):
+                        Console.Clear();
+                        ajouterCuisinier();
+                        break;
+                    case ('3'):
+                        Console.Clear();
+                        supprimerCuisinier();
+                        break;
+                    case ('4'):
+                        Console.Clear();
+                        modifierCuisinier();
+                        break;
+                    case ('5'):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        break;
+                }
+            }
+        }
+
+        public void afficherCuisiniers()
+        {
+            string base_requete = "SELECT * FROM Utilisateur JOIN Cuisinier ON Utilisateur.idCuisinier = Cuisinier.idCuisinier ";
+            char choix = ' ';
+            string requete = "";
+            string idCuisinier = "";
+
+            while (true)
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Liste des cuisiniers:\n");
+                Console.WriteLine("Recherches possible: C: Clients servis; F: fréquence des plats réalisés; P: plat du jour");
+                Console.WriteLine("X: Retour\n");
+                Console.ResetColor();
+                switch (choix)
+                {
+                    case 'C':
+                        Console.WriteLine("Identifiant du cuisinier:");
+                        idCuisinier = Console.ReadLine();
+                        requete = "SELECT C.IdClient, C.NomEntreprise, COUNT(L.IdCommande) AS NombreDeCommandes FROM Client C JOIN Commande CO ON C.IdClient = CO.IdClient JOIN LigneDeCommande L ON CO.IdCommande = L.IdCommande JOIN Plat P ON L.IdPlat = P.IdPlat WHERE P.IdCuisinier ="+ idCuisinier+" GROUP BY C.IdClient, C.NomEntreprise ORDER BY NombreDeCommandes DESC;";
+                        this.connexion.executerRequete(requete);
+                        this.connexion.afficherResultatRequete();
+                        break;
+                    case 'F':
+                        Console.WriteLine("Identifiant du cuisinier:");
+                        idCuisinier = Console.ReadLine();
+                        requete = "SELECT P.Nom, COUNT(L.IdLigneCommande) AS Frequence FROM Plat P JOIN LigneDeCommande L ON P.IdPlat = L.IdPlat WHERE P.IdCuisinier = "+idCuisinier+" GROUP BY P.IdPlat ORDER BY Frequence DESC;";
+                        this.connexion.executerRequete(requete);
+                        this.connexion.afficherResultatRequete();
+                        break;
+                    case 'P':
+                        Console.WriteLine("Identifiant du cuisinier:");
+                        idCuisinier = Console.ReadLine();
+                        requete = "SELECT Nom, Prix FROM Plat JOIN Cuisinier ON Cuisinier.idPlatDuJour = Plat.idPlat WHERE Cuisinier.idCuisinier = "+idCuisinier;
+                        this.connexion.executerRequete(requete);
+                        this.connexion.afficherResultatRequete();
+                        break;
+                    case ' '://Cas par défaut, affichage lorsqu'on arrive sur la page
+                        this.connexion.executerRequete(base_requete);
+                        this.connexion.afficherResultatRequete();
+                        break;
+                    case 'X':
+                        Console.Clear();
+                        return;
+                }
+                choix = (char)Console.ReadKey(false).Key;
+            }
+        }
+
+        public void ajouterCuisinier()
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Ajout de cuisinier\n");
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("  1.  Ajout manuel");
+                Console.WriteLine("  2.  Importer depuis un fichier");
+                Console.WriteLine("  3.  Retour");
+                Console.WriteLine("----------------------------------------------------\n\n");
+                Console.WriteLine("Menu choisi:");
+                Console.ResetColor();
+                char menu_choisi = (char)Console.ReadKey(false).Key;
+
+                switch (menu_choisi)
+                {
+                    case ('1'):
+                        Console.Clear();
+                        string[] champs = { "Nom :", "Prénom :", "Adresse :", "Numéro de téléphone :", "Email :", "Id du plat du jour (facultatif) :", "Mot de passe :", "id de la station la plus proche :" };
+                        string[] valeurs = new string[champs.Length];
+                        for (int i = 0; i < champs.Length; i++)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine(champs[i] + "\n");
+                            Console.ResetColor();
+                            valeurs[i] = Console.ReadLine();
+                            Console.WriteLine("\n");
+                        }
+                        string requete = "INSERT INTO Cuisine (MotDePasse, IdPlatDuJour) VALUES ('" + valeurs[6] + "', '" + valeurs[5] + "');";
+                        this.connexion.executerRequete(requete);
+                        requete = "SELECT idCuisinier FROM Cuisinier ORDER BY idCuisinier DESC LIMIT 1;";
+                        this.connexion.executerRequete(requete);
+                        MySqlDataReader reader = this.connexion.recupererResultatRequete();
+                        int idCuisinier = 0;
+                        if (reader.Read()) //ouvre le reader
+                        {
+                            idCuisinier = reader.GetInt32(0); //colonne 0
+                        }
+
+                        reader.Close();
+                        valeurs[2] = valeurs[2].Replace("'", "''"); // Échappe les apostrophes dans l'adresse
+                        requete = "INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdClient, IdStationProche, EstBanni) " +
+                            "VALUES('" + valeurs[0] + "', '" + valeurs[1] + "', '" + valeurs[2] + "', '" + valeurs[3] + "', '" + valeurs[4] + "'," + idCuisinier + ",NULL, " + valeurs[7] + ", 0)";
+                        this.connexion.executerRequete(requete);
+                        Console.Clear();
+
+                        break;
+                    case ('2'):
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Import par fichier:" +
+                            "Le fichier doit être au format xml obtenu en exécutant la requête:\n " +
+                            "EXPORTER SELECT * FROM Utilisateur JOIN Cuisinier ON Utilisateur.idCuisinier = Cuisinier.idCuisinier WHERE Cuisinier.idCuisinier=?;\n" +
+                            "Depuis l'espace SQL dédié de l'interface");
+                        Console.ResetColor();
+                        Console.WriteLine("Chemin d'accès absolu du fichier (e.g. C:\\Users\\...\\export.xml):");
+                        string cheminFichier = Console.ReadLine();
+
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.Load(cheminFichier);
+
+                        string nomFichier = System.IO.Path.GetFileNameWithoutExtension(cheminFichier);
+                        string xpath = "//" + nomFichier;
+
+
+                        try
+                        {
+
+                            foreach (XmlNode node in xmlDoc.SelectNodes(xpath))
+                            {
+
+                                requete = "INSERT INTO Cuisinier (MotDePasse, idPlatDuJour) VALUES ('" + node["MotDePasse"]?.InnerText + "', '" + node["idPlatDuJour"]?.InnerText + "');";
+                                this.connexion.executerRequete(requete);
+                                Console.WriteLine(requete);
+                                requete = "INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdStationProche, EstBanni) " +
+                                                 "VALUES ('" + node["Nom"]?.InnerText + "', '" + node["Prenom"]?.InnerText + "', '" +
+                                                 node["Adresse"]?.InnerText + "', '" + node["Telephone"]?.InnerText + "', '" +
+                                                 node["Email"]?.InnerText + "', " + node["IdCuisinier"]?.InnerText + ", " +
+                                                 node["IdStationProche"]?.InnerText + ", " + (node["EstBanni"]?.InnerText == "true" ? "1" : "0") + ");";
+
+                                Console.WriteLine(requete);
+                                this.connexion.executerRequete(requete);
+                                this.connexion.afficherResultatRequete();
+                            }
+                        }
+                        catch {}
+
+                        Console.WriteLine("\nImportation terminée !\n");
+
+                        break;
+                    case ('3'):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        break;
+                }
+            }
+        }
+
+        public void supprimerCuisinier()
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Moyen d'identification du cuisinier à supprimer: \n");
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("  1.  Identifiant du cuisinier");
+                Console.WriteLine("  2.  Retour");
+                Console.WriteLine("----------------------------------------------------\n\n");
+                Console.WriteLine("Mode choisi:");
+                Console.ResetColor();
+                char menu_choisi = (char)Console.ReadKey(false).Key;
+
+                switch (menu_choisi)
+                {
+                    case ('1'):
+                        Console.Clear();
+                        //la suppression en cascade est activée, la suppressions dans la table Cuisinier engendre la suppression dans les autres tables mais pas pour toutes
+                        Console.WriteLine("Identifiant cuisinier:");
+                        string idCuisinier = Console.ReadLine();
+                        //on supprime d'abord les ingrédients car on ne peut pas utiliser la suppression en cascade
+                        string requete = "DELETE I FROM Ingredient I JOIN ListeIngredients LI ON LI.IdIngredient = I.IdIngredient JOIN Plat P ON LI.IdRecette = P.IdRecette\r\nWHERE P.IdCuisinier = "+idCuisinier;
+                        this.connexion.executerRequete(requete);
+                        requete = "DELETE R FROM Recette R JOIN Plat P ON P.IdRecette = R.IdRecette WHERE P.IdCuisinier = " + idCuisinier;
+                        this.connexion.executerRequete(requete);
+                        requete = "DELETE FROM Cuisinier WHERE IdCuisinier = " + idCuisinier;
+                        this.connexion.executerRequete(requete);
+                        Console.Clear();
+                        Console.WriteLine("Cuisinier supprimé !\n");
+                        break;
+                    case ('2'):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Option invalide. Appuyez sur une touche pour continuer...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        break;
+                }
+            }
+        }
+
+
+        public void modifierCuisinier()
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Interface de modification des cuisiniers\n");
+                Console.WriteLine("Tapez 'X' pour revenir au menu précédent\n\n");
+                Console.WriteLine("Identifiant du cuisinier à modifier: \n");
+                Console.ResetColor();
+                string identifiant_cuisinier = Console.ReadLine();
+
+                switch (identifiant_cuisinier)
+                {
+                    case ("X"):
+                        Console.Clear();
+                        return;
+                    default:
+                        Console.WriteLine("informations du client:");
+                        string requete = "SELECT * FROM Utilisateur JOIN Cuisinier ON Cuisinier.idCuisinier = Utilisateur.IdCuisinier WHERE Utilisateur.IdCuisinier =" + identifiant_cuisinier;
+                        this.connexion.executerRequete(requete);
+                        this.connexion.afficherResultatRequete();
+                        Console.WriteLine("Quelle colonne souhaitez-vous modifier:");
+                        string colonne = Console.ReadLine();
+                        string table = (colonne == "idPlatDuJour" || colonne == "MotDePasse") ? "Cuisinier" : "Utilisateur";
+                        Console.WriteLine("Quelle est la nouvelle valeur de la colonne " + colonne);
+                        string nouvelleValeur = Console.ReadLine();
+                        requete = "UPDATE " + table + " SET " + colonne + " = '" + nouvelleValeur + "' WHERE idClient = " + identifiant_cuisinier;
+                        this.connexion.executerRequete(requete);
+                        Console.Clear();
+                        Console.WriteLine("Le cuisinier a été modifiée avec succès");
+                        break;
+                }
+            }
+        }
 
     }
 }
