@@ -30,7 +30,6 @@ namespace PbSI
 
         public Menu()
         {
-            // Initialisation des membres
             this.connexion = new Connexion();
             this.reseau = new ReseauMetro("MetroParis.xlsx");
             this.graphe = reseau.Graphe;
@@ -175,7 +174,7 @@ namespace PbSI
                 {
                     case ('1'):
                         Console.Clear();
-                        ModuleClient();
+                        await ModuleClient();
                         break;
                     case ('2'):
                         Console.Clear();
@@ -204,7 +203,7 @@ namespace PbSI
         #endregion
 
         #region Client
-        public void ModuleClient()
+        public async Task ModuleClient()
         {
             while (true)
             {
@@ -229,7 +228,7 @@ namespace PbSI
                         break;
                     case ('2'):
                         Console.Clear();
-                        ajouterClient();
+                        await ajouterClient();
                         break;
                     case ('3'):
                         Console.Clear();
@@ -256,7 +255,7 @@ namespace PbSI
         {
             string base_requete = "SELECT * FROM Utilisateur WHERE idClient is not NULL";
             char choix=' ';
-            string derniere_requete=base_requete;//on note la dernière requete exécutée sans indiquer l'ordre de tri(utile pour changer l'ordre avec - et +)
+            string derniere_requete=base_requete;
             string requete="";
 
             while (true)
@@ -342,7 +341,7 @@ namespace PbSI
             }
         }
 
-        public void ajouterClient()
+        public async Task ajouterClient()
         {
             while (true)    
             {
@@ -361,33 +360,7 @@ namespace PbSI
                 {
                     case ('1'):
                         Console.Clear();
-                        string[] champs = { "Nom :", "Prénom :", "Adresse :", "Numéro de téléphone :", "Email :", "Nom de l'entreprise (facultatif) :", "Mot de passe :", "id de la station la plus proche :" };
-                        string[] valeurs = new string[champs.Length];
-                        for(int i=0; i < champs.Length; i++)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine(champs[i]+"\n");
-                            Console.ResetColor();
-                            valeurs[i] = Console.ReadLine();
-                            Console.WriteLine("\n"); 
-                        }
-                        string requete = "INSERT INTO Client (NomEntreprise, MotDePasse) VALUES ('" + valeurs[5] + "', '" + valeurs[6] + "');";
-                        this.connexion.executerRequete(requete);
-                        requete = "SELECT idClient FROM Client ORDER BY idClient DESC LIMIT 1;";
-                        this.connexion.executerRequete(requete);
-                        MySqlDataReader reader = this.connexion.recupererResultatRequete();
-                        int idClient = 0;
-                        if (reader.Read()) //ouvre le reader
-                        {
-                            idClient = reader.GetInt32(0); //colonne 0
-                        }
-
-                        reader.Close();
-                        valeurs[2] = valeurs[2].Replace("'", "''"); // Échappe les apostrophes dans l'adresse
-                        requete = "INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdClient, IdStationProche, EstBanni) " +
-                            "VALUES('" + valeurs[0] +"', '" + valeurs[1] + "', '" + valeurs[2] + "', '" + valeurs[3] + "', '" + valeurs[4] +"', NULL, "+idClient+", " + valeurs[7] +", 0)";
-                        this.connexion.executerRequete(requete);
-                        Console.Clear();
+                        await ajouterClientManuel();
 
                         break;
                     case ('2'):
@@ -403,6 +376,8 @@ namespace PbSI
 
                         XmlDocument xmlDoc = new XmlDocument();
                         xmlDoc.Load(cheminFichier);
+
+                        string requete = "";
 
                         foreach (XmlNode node in xmlDoc.SelectNodes("//export_client_1"))
                         {
@@ -435,6 +410,101 @@ namespace PbSI
             }
         }
 
+
+        public async Task ajouterClientManuel()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Ajout d'un client\n");
+            Console.ResetColor();
+
+            string nom;
+            do
+            {
+                Console.WriteLine("Nom :");
+                nom = Console.ReadLine();
+            } while (string.IsNullOrWhiteSpace(nom) || !Regex.IsMatch(nom, @"^[A-Za-zÀ-ÖØ-öø-ÿ\-]+$"));
+
+            string prenom;
+            do
+            {
+                Console.WriteLine("Prénom :");
+                prenom = Console.ReadLine();
+            } while (string.IsNullOrWhiteSpace(prenom) || !Regex.IsMatch(prenom, @"^[A-Za-zÀ-ÖØ-öø-ÿ\-]+$"));
+
+            string adresse;
+            do
+            {
+                Console.WriteLine("Adresse :");
+                adresse = Console.ReadLine();
+
+                Console.WriteLine("Vérification de l'adresse...");
+                bool adresseValide = await VerifierAdresseAsync(adresse);
+                Console.WriteLine($"Adresse valide : {adresseValide}");
+
+                if (!adresseValide)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Adresse invalide. Veuillez entrer une adresse réelle.");
+                    Console.ResetColor();
+                    adresse = null;
+                }
+            } while (string.IsNullOrWhiteSpace(adresse));
+
+            string telephone;
+            do
+            {
+                Console.WriteLine("Numéro de téléphone (10 chiffres) :");
+                telephone = Console.ReadLine();
+            } while (string.IsNullOrWhiteSpace(telephone) || !Regex.IsMatch(telephone, @"^\d{10}$"));
+
+            string email;
+            do
+            {
+                Console.WriteLine("Email :");
+                email = Console.ReadLine();
+            } while (string.IsNullOrWhiteSpace(email) || !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"));
+
+            Console.WriteLine("Nom de l'entreprise (facultatif) :");
+            string nomEntreprise = Console.ReadLine();
+
+            Console.WriteLine("Mot de passe :");
+            string motDePasse = Console.ReadLine();
+
+            int idStation = -1;
+            string idStationStr;
+            do
+            {
+                Console.WriteLine("Id de la station la plus proche :");
+                idStationStr = Console.ReadLine();
+            } while (!int.TryParse(idStationStr, out idStation) || idStation <= 0);
+
+            string requeteClient = $"INSERT INTO Client (NomEntreprise, MotDePasse) VALUES ('{nomEntreprise}', '{motDePasse}');";
+            this.connexion.executerRequete(requeteClient);
+
+            string requeteIdClient = "SELECT IdClient FROM Client ORDER BY IdClient DESC LIMIT 1;";
+            this.connexion.executerRequete(requeteIdClient);
+            var reader = this.connexion.recupererResultatRequete();
+
+            int idClient = 0;
+            if (reader.Read())
+            {
+                idClient = reader.GetInt32(0);
+            }
+            reader.Close();
+
+            adresse = adresse.Replace("'", "''");
+            string requeteUtilisateur = $"INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdClient, IdStationProche, EstBanni) " +
+                                        $"VALUES('{nom}', '{prenom}', '{adresse}', '{telephone}', '{email}', NULL, {idClient}, {idStation}, 0);";
+            this.connexion.executerRequete(requeteUtilisateur);
+
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Client ajouté avec succès !");
+            Console.ResetColor();
+        }
+
+
         public void supprimerClient()
         {
             while (true)
@@ -449,17 +519,12 @@ namespace PbSI
                 Console.ResetColor();
                 char menu_choisi = (char)Console.ReadKey(false).Key;
 
-                string requete_client = "DELETE FROM Client WHERE";//pour pouvoir par la suite rajouter d'autres moyens de suppression de clients
+                string requete_client = "DELETE FROM Client WHERE";
                 switch (menu_choisi)
                 {
                     case ('1'):
                         Console.Clear();
-                        Console.WriteLine("Identifiant client:");
-                        string idClient = Console.ReadLine();
-                        requete_client += " idClient = "+idClient;
-                        this.connexion.executerRequete(requete_client);
-                        Console.Clear();
-                        Console.WriteLine("Client supprimé !\n");
+                        supprimerClientSousMenu();
                         break;
                     case ('2'):
                         Console.Clear();
@@ -481,33 +546,106 @@ namespace PbSI
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Interface de modification des clients\n");
                 Console.WriteLine("Tapez 'X' pour revenir au menu précédent\n\n");
-                Console.WriteLine("Identifiant du client à modifier: \n");
-                Console.ResetColor();
-                string identifiant_client = Console.ReadLine();
+                string idClientStr = "";
+                int idClient = -1;
+                bool clientExistant = false;
 
-                switch (identifiant_client)
+                while (!clientExistant)
                 {
-                    case ("X"):
-                        Console.Clear();
-                        return;
-                    default:
-                        Console.WriteLine("informations du client:");
-                        string requete = "SELECT * FROM Utilisateur JOIN Client ON Client.IdClient = Utilisateur.IdClient WHERE Utilisateur.IdClient ="+identifiant_client;
-                        this.connexion.executerRequete(requete);
-                        this.connexion.afficherResultatRequete();
-                        Console.WriteLine("Quelle colonne souhaitez-vous modifier:");
-                        string colonne = Console.ReadLine();
-                        string table = (colonne == "NomEntreprise" || colonne == "MotDePasse") ? "Client" : "Utilisateur";
-                        Console.WriteLine("Quelle est la nouvelle valeur de la colonne " + colonne);
-                        string nouvelleValeur=Console.ReadLine();
-                        requete = "UPDATE "+table+" SET "+colonne+" = '"+nouvelleValeur+"' WHERE idClient = "+identifiant_client;
-                        this.connexion.executerRequete(requete);
-                        Console.Clear();
-                        Console.WriteLine("La requete a été modifiée avec succès");
-                        break;
+                    Console.WriteLine("Identifiant du client à modifier: \n");
+                    idClientStr = Console.ReadLine();
+
+                    if (!int.TryParse(idClientStr, out idClient))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("L'identifiant doit être un nombre valide. Veuillez réessayer.");
+                        Console.ResetColor();
+                        continue;
+                    }
+
+                    string requeteVerifClient = $"SELECT COUNT(*) FROM Client WHERE IdClient = {idClient};";
+                    this.connexion.executerRequete(requeteVerifClient);
+
+                    var reader = this.connexion.recupererResultatRequete();
+                    if (reader.Read() && reader.GetInt32(0) > 0)
+                    {
+                        clientExistant = true;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Aucun client trouvé avec cet identifiant. Veuillez réessayer.");
+                        Console.ResetColor();
+                    }
+                    reader.Close();
                 }
+                
+
+                Console.WriteLine("informations du client:");
+                string requete = "SELECT * FROM Utilisateur JOIN Client ON Client.IdClient = Utilisateur.IdClient WHERE Utilisateur.IdClient ="+idClient;
+                this.connexion.executerRequete(requete);
+                this.connexion.afficherResultatRequete();
+                Console.WriteLine("Quelle colonne souhaitez-vous modifier:");
+                string colonne = Console.ReadLine();
+                string table = (colonne == "NomEntreprise" || colonne == "MotDePasse") ? "Client" : "Utilisateur";
+                Console.WriteLine("Quelle est la nouvelle valeur de la colonne " + colonne);
+                string nouvelleValeur=Console.ReadLine();
+                requete = "UPDATE "+table+" SET "+colonne+" = '"+nouvelleValeur+"' WHERE idClient = "+idClient;
+                this.connexion.executerRequete(requete);
+                Console.Clear();
+                Console.WriteLine("La requete a été modifiée avec succès");
+
             }
         }
+
+        public void supprimerClientSousMenu()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            string idClientStr = "";
+            int idClient = -1;
+            bool clientExistant = false;
+
+            while (!clientExistant)
+            {
+                Console.WriteLine("Identifiant du client à supprimer :");
+                idClientStr = Console.ReadLine();
+
+                if (!int.TryParse(idClientStr, out idClient))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("L'identifiant doit être un nombre valide. Veuillez réessayer.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                string requeteVerifClient = $"SELECT COUNT(*) FROM Client WHERE IdClient = {idClient};";
+                this.connexion.executerRequete(requeteVerifClient);
+
+                var reader = this.connexion.recupererResultatRequete();
+                if (reader.Read() && reader.GetInt32(0) > 0)
+                {
+                    clientExistant = true;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Aucun client trouvé avec cet identifiant. Veuillez réessayer.");
+                    Console.ResetColor();
+                }
+                reader.Close();
+            }
+
+            string requeteSupprimerClient = $"DELETE FROM Client WHERE IdClient = {idClient};";
+            this.connexion.executerRequete(requeteSupprimerClient);
+
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Client supprimé avec succès !");
+            Console.ResetColor();
+        }
+
         #endregion
 
         #region Cuisinier
@@ -542,7 +680,7 @@ namespace PbSI
                         break;
                     case ('2'):
                         Console.Clear();
-                        await ajouterCuisinier(this.graphe); 
+                        await ajouterCuisinier(); 
                         Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
                         Console.ReadKey();
                         Console.Clear();
@@ -603,7 +741,7 @@ namespace PbSI
             this.connexion.afficherResultatRequete();
         }
 
-        public async Task ajouterCuisinier(Graphe<StationMetro> graphe)
+        public async Task ajouterCuisinier()
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
