@@ -7,6 +7,7 @@ using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using NAudio.Wave;
 
 namespace PbSI
 {
@@ -16,12 +17,18 @@ namespace PbSI
         private Connexion connexion;
         ReseauMetro reseau;
         Graphe<StationMetro> graphe;
+        private static WaveOutEvent _dispositifSortie;
+        private static AudioFileReader _fichierAudio;
+        private static bool _isPlaying;
+        private string maroc;
 
         public Menu()
         {
             this.connexion = new Connexion();
             this.reseau = new ReseauMetro("MetroParis.xlsx");
             this.graphe = reseau.Graphe;
+
+            this.maroc = "maroc.mp3";
 
             while (true)
             {
@@ -801,6 +808,9 @@ namespace PbSI
             Console.WriteLine("Choisissez un plat en entrant son identifiant :");
             string idPlat = Console.ReadLine();
 
+            // Musique
+            PlayAudioAsync(maroc);
+
             string requeteAdresseCuisinier = "SELECT Utilisateur.Adresse FROM Utilisateur JOIN Plat ON Utilisateur.Id = Plat.IdCuisinier WHERE Plat.IdPlat = " + idPlat;
             this.connexion.executerRequete(requeteAdresseCuisinier);
             var readerCuisinier = this.connexion.recupererResultatRequete();
@@ -867,6 +877,7 @@ namespace PbSI
             this.connexion.executerRequete(requeteLigneDeCommande);
 
             Console.WriteLine("Commande créée avec succès !");
+            StopAudio();
         }
 
 
@@ -898,6 +909,72 @@ namespace PbSI
             string requete = "SELECT * FROM Commande";
             this.connexion.executerRequete(requete);
             this.connexion.afficherResultatRequete();
+        }
+
+        /// Fonction asynchrone pour jouer de la musique en même temps que de jouer au jeu
+        static async Task PlayAudioAsync(string chemin)
+        {
+            Task.Run(() =>
+            {
+                using (var fichierAudio = new AudioFileReader(chemin))
+                using (var dispositifSortie = new WaveOutEvent())
+                {
+                    dispositifSortie.Init(fichierAudio);
+                    dispositifSortie.Play();
+
+                    /// On attend que la musique finisse
+                    while (dispositifSortie.PlaybackState == PlaybackState.Playing)
+                    {
+                        Task.Delay(100).Wait(); /// On évite de bloquer le thread principal
+                    }
+                }
+            });
+        }
+
+        /// Fonction asynchrone pour jouer de la musique en boucle en même temps que de jouer au jeu
+
+        static void PlayAudioLoop(string chemin)
+        {
+            _fichierAudio = new AudioFileReader(chemin);
+            _dispositifSortie = new WaveOutEvent();
+            _dispositifSortie.Init(_fichierAudio);
+            _dispositifSortie.Play();
+            _isPlaying = true; /// Indique que la musique est en lecture
+
+            /// Événement pour jouer la musique en boucle
+            _dispositifSortie.PlaybackStopped += (sender, args) =>
+            {
+                if (_isPlaying)
+                {
+                    _fichierAudio.Position = 0; /// Remet le fichier audio au début
+                    _dispositifSortie.Play(); /// Rejoue la musique
+                }
+            };
+
+            /// Attendre que la musique finisse ou qu'elle soit arrêtée
+            while (_isPlaying)
+            {
+                /// Vérifie si la musique est toujours en lecture
+                if (_dispositifSortie.PlaybackState != PlaybackState.Playing)
+                {
+                    break; /// Sort de la boucle si la musique s'arrête
+                }
+                Task.Delay(100).Wait(); /// Petite pause pour éviter de bloquer le thread principal
+            }
+        }
+
+        static void StopAudio()
+        {
+            /// Vérifie si le dispositif de sortie est initialisé avant d'arrêter
+            if (_dispositifSortie != null)
+            {
+                _isPlaying = false; /// Indique que la musique ne doit plus jouer
+                _dispositifSortie.Stop();
+                _dispositifSortie.Dispose(); /// Libère les ressources
+                _fichierAudio.Dispose(); /// Libère les ressources
+                _dispositifSortie = null; /// Réinitialise la référence
+                _fichierAudio = null; /// Réinitialise la référence
+            }
         }
 
     }
