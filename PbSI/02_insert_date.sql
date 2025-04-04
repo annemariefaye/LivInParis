@@ -13,9 +13,16 @@ INSERT INTO Station (Nom, Latitude, Longitude) VALUES
 ('Gare de Lyon', 40.8632, 5.4764),
 ('Châtelet', 45.3880, 3.3489);
 
-INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdClient, IdStationProche, EstBanni) VALUES
-('Dupond', 'Jean', '10 rue de Paris', '0123456789', 'jean.dupond@email.com', NULL, 1, 1, FALSE),
-('Martin', 'Sofie', '15 avenue de Lyon', '0987654321', 'sofie.martin@email.com', 1, NULL, 2, FALSE);
+
+INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdClient, IdStationProche, EstBanni) VALUES
+('Dupond', 'Louis', '8 rue Sainte-Anne, 75001 Paris', '0123456789', 'louis.dupond@email.com', 1, 1, FALSE),
+('Martin', 'Clara', '55 Rue du Faubourg Saint-Honoré, 75008 Paris', '0987654321', 'clara.martin@email.com', 2, 2, FALSE);
+
+
+INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdStationProche, EstBanni) VALUES
+('Choi', 'Min-Jun', '20 avenue des Champs-Élysées, 75008 Paris', '0147852369', 'minjun.choi@email.com', 1, 1, FALSE),
+('Leroy', 'Amandine', '12 Rue de Rivoli, 75001 Paris', '0147852368', 'amandine.leroy@email.com', 2, 2, FALSE),
+('Dumont', 'Julien', '15 Boulevard Montmartre, 75002 Paris', '0147852367', 'julien.dumont@email.com', 3, 1, FALSE);
 
 INSERT INTO Recette (Nom) VALUES
 ('Ratatouille'),
