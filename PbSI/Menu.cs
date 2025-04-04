@@ -970,33 +970,51 @@ namespace PbSI
 
         public async Task creerCommande()
         {
-            Console.WriteLine("Identifiant du client :");
-            string idClient = Console.ReadLine();
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
 
-            string requeteAdresseClient = "SELECT Adresse FROM Utilisateur WHERE Id = " + idClient;
-            this.connexion.executerRequete(requeteAdresseClient);
-            var reader = this.connexion.recupererResultatRequete();
+            int idClient = -1;
+            bool identifiantClientValide = false;
+            string adresseDepart = "";
 
-            string adresseDepart;
-            if (reader.Read())
+            while (!identifiantClientValide)
             {
-                adresseDepart = reader.GetString(0);
-                Console.WriteLine("Adresse du client : " + adresseDepart);
-            }
-            else
-            {
-                Console.WriteLine("Client introuvable.");
-                return;
-            }
-            reader.Close();
+                Console.WriteLine("Identifiant du client :");
+                string idClientStr = Console.ReadLine();
 
-            string requetePlats = "SELECT IdPlat, Nom FROM Plat WHERE IdCuisinier IS NOT NULL";
+                if (!int.TryParse(idClientStr, out idClient))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("L'identifiant doit être un nombre valide. Veuillez réessayer.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                string requeteAdresseClient = "SELECT Adresse FROM Utilisateur WHERE Id = " + idClient + ";";
+                this.connexion.executerRequete(requeteAdresseClient);
+                var reader = this.connexion.recupererResultatRequete();
+
+                
+                if (reader.Read())
+                {
+                    adresseDepart = reader.GetString(0);
+                    Console.WriteLine("Adresse du client : " + adresseDepart);
+                    identifiantClientValide = true;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Client introuvable. Veuillez réessayer.");
+                    Console.ResetColor();
+                }
+                reader.Close();
+            }
+
+            string requetePlats = "SELECT IdPlat, Nom FROM Plat WHERE IdCuisinier IS NOT NULL;";
             this.connexion.executerRequete(requetePlats);
             var readerPlats = this.connexion.recupererResultatRequete();
 
             Console.Clear();
-
-
             Console.WriteLine("Plats disponibles :");
             while (readerPlats.Read())
             {
@@ -1004,102 +1022,184 @@ namespace PbSI
             }
             readerPlats.Close();
 
+            int idPlat;
+            bool identifiantPlatValide = false;
 
-            Console.WriteLine("Choisissez un plat en entrant son identifiant :");
-            string idPlat = Console.ReadLine();
-
-            // Musique
-            PlayAudioAsync(maroc);
-
-            string requeteAdresseCuisinier = "SELECT Utilisateur.Adresse FROM Utilisateur JOIN Plat ON Utilisateur.Id = Plat.IdCuisinier WHERE Plat.IdPlat = " + idPlat;
-            this.connexion.executerRequete(requeteAdresseCuisinier);
-            var readerCuisinier = this.connexion.recupererResultatRequete();
-
-            string adresseCuisinier;
-            if (readerCuisinier.Read())
+            while (!identifiantPlatValide)
             {
-                adresseCuisinier = readerCuisinier.GetString(0);
+                Console.WriteLine("Choisissez un plat en entrant son identifiant :");
+                string idPlatStr = Console.ReadLine();
+
+                if (!int.TryParse(idPlatStr, out idPlat))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("L'identifiant du plat doit être un nombre valide. Veuillez réessayer.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                string requeteAdresseCuisinier = "SELECT Utilisateur.Adresse FROM Utilisateur JOIN Plat ON Utilisateur.Id = Plat.IdCuisinier WHERE Plat.IdPlat = " + idPlat + ";";
+                this.connexion.executerRequete(requeteAdresseCuisinier);
+                var readerCuisinier = this.connexion.recupererResultatRequete();
+
+                if (readerCuisinier.Read())
+                {
+                    string adresseCuisinier = readerCuisinier.GetString(0);
+                    identifiantPlatValide = true;
+
+                    Console.Clear();
+                    RechercheStationProche rechercheDepart = new RechercheStationProche(adresseDepart, graphe);
+                    RechercheStationProche rechercheArrivee = new RechercheStationProche(adresseCuisinier, graphe);
+                    await rechercheDepart.InitialiserAsync();
+                    Console.WriteLine("\n\n");
+                    await rechercheArrivee.InitialiserAsync();
+                    Console.WriteLine("\n\n");
+
+                    List<int> depart = rechercheDepart.IdStationsProches;
+                    List<int> arrivee = rechercheArrivee.IdStationsProches;
+
+                    float tempsDeplacementDepart = rechercheDepart.TempsDeplacement;
+                    float tempsDeplacementArrivee = rechercheArrivee.TempsDeplacement;
+
+                    var resultat = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
+
+                    if (resultat != null)
+                    {
+                        double tempsTotal = tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
+                        Console.WriteLine("Temps total de déplacement : " + (int)tempsTotal + " minutes.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Aucun chemin trouvé.");
+                        return;
+                    }
+
+                    string requeteCommande = "INSERT INTO Commande (IdClient, Statut) VALUES (" + idClient + ", 'En attente');";
+                    this.connexion.executerRequete(requeteCommande);
+
+                    string requeteIdCommande = "SELECT MAX(IdCommande) FROM Commande;";
+                    this.connexion.executerRequete(requeteIdCommande);
+                    var readerCommande = this.connexion.recupererResultatRequete();
+                    int idCommande = 0;
+
+                    if (readerCommande.Read())
+                    {
+                        idCommande = readerCommande.GetInt32(0);
+                    }
+                    readerCommande.Close();
+
+                    string requeteLigneDeCommande = "INSERT INTO LigneDeCommande (IdCommande, IdPlat, Quantite, DateLivraison, LieuLivraison) VALUES (" + idCommande + ", " + idPlat + ", 1, CURDATE(), '" + adresseCuisinier + "');";
+                    this.connexion.executerRequete(requeteLigneDeCommande);
+
+                    Console.WriteLine("Commande créée avec succès !");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Aucun cuisinier trouvé pour ce plat. Veuillez réessayer.");
+                    Console.ResetColor();
+                }
+                readerCuisinier.Close();
             }
-            else
-            {
-                Console.WriteLine("Aucun cuisinier trouvé pour ce plat.");
-                return;
-            }
-            readerCuisinier.Close();
-
-            Console.Clear();
-
-            RechercheStationProche rechercheDepart = new RechercheStationProche(adresseDepart, graphe);
-            RechercheStationProche rechercheArrivee = new RechercheStationProche(adresseCuisinier, graphe);
-            await rechercheDepart.InitialiserAsync();
-            Console.WriteLine("\n\n");
-            await rechercheArrivee.InitialiserAsync();
-            Console.WriteLine("\n\n");
-
-
-            List<int> depart = rechercheDepart.IdStationsProches;
-            List<int> arrivee = rechercheArrivee.IdStationsProches;
-
-            float tempsDeplacementDepart = rechercheDepart.TempsDeplacement;
-            float tempsDeplacementArrivee = rechercheArrivee.TempsDeplacement;
-
-            var resultat = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
-
-            if (resultat != null)
-            {
-                double tempsTotal = tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
-                Console.WriteLine("Temps total de déplacement : " + (int)tempsTotal + " minutes.");
-            }
-            else
-            {
-                Console.WriteLine("Aucun chemin trouvé.");
-                return;
-            }
-
-            Console.WriteLine("\n\n");
-
-
-            string requeteCommande = "INSERT INTO Commande (IdClient, Statut) VALUES (" + idClient + ", 'En attente')";
-            this.connexion.executerRequete(requeteCommande);
-
-            string requeteIdCommande = "SELECT MAX(IdCommande) FROM Commande";
-            this.connexion.executerRequete(requeteIdCommande);
-            var readerCommande = this.connexion.recupererResultatRequete();
-            int idCommande = 0;
-
-            if (readerCommande.Read())
-            {
-                idCommande = readerCommande.GetInt32(0);
-            }
-            readerCommande.Close();
-
-            string requeteLigneDeCommande = "INSERT INTO LigneDeCommande (IdCommande, IdPlat, Quantite, DateLivraison, LieuLivraison) VALUES (" + idCommande + ", " + idPlat + ", 1, CURDATE(), '" + adresseCuisinier + "')";
-            this.connexion.executerRequete(requeteLigneDeCommande);
-
-            Console.WriteLine("Commande créée avec succès !");
-            StopAudio();
         }
 
 
         public void modifierCommande()
         {
-            Console.WriteLine("Identifiant de la commande à modifier :");
-            string idCommande = Console.ReadLine();
+            int idCommande = -1;
+            bool idValide = false;
+
+            while (!idValide)
+            {
+                Console.WriteLine("Identifiant de la commande à modifier :");
+                string idCommandeStr = Console.ReadLine();
+
+                if (!int.TryParse(idCommandeStr, out idCommande))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("L'identifiant doit être un nombre valide. Veuillez réessayer.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                string requeteVerifCommande = "SELECT COUNT(*) FROM Commande WHERE IdCommande = " + idCommande + ";";
+                this.connexion.executerRequete(requeteVerifCommande);
+                var reader = this.connexion.recupererResultatRequete();
+
+                if (reader.Read() && reader.GetInt32(0) > 0)
+                {
+                    idValide = true;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Aucune commande trouvée avec cet identifiant. Veuillez réessayer.");
+                    Console.ResetColor();
+                }
+
+                reader.Close();
+            }
 
             Console.WriteLine("Nouveau statut de la commande :");
+            Console.WriteLine("('En attente', 'Validée', 'Livrée', 'Annulée')");
             string nouveauStatut = Console.ReadLine();
 
-            string requete = "UPDATE Commande SET Statut = '" + nouveauStatut + "' WHERE IdCommande = " + idCommande;
+            while (string.IsNullOrWhiteSpace(nouveauStatut) ||
+                   (nouveauStatut != "En attente" &&
+                    nouveauStatut != "Validée" &&
+                    nouveauStatut != "Livrée" &&
+                    nouveauStatut != "Annulée"))
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Le statut n'est pas valide. Veuillez saisir un nouveau statut.");
+                Console.WriteLine("('En attente', 'Validée', 'Livrée', 'Annulée')");
+                Console.ResetColor();
+                nouveauStatut = Console.ReadLine();
+            }
+
+            string requete = "UPDATE Commande SET Statut = '" + nouveauStatut + "' WHERE IdCommande = " + idCommande + ";";
             this.connexion.executerRequete(requete);
             Console.WriteLine("Commande modifiée avec succès !");
         }
 
+
         public void afficherPrixCommande()
         {
-            Console.WriteLine("Identifiant de la commande :");
-            string idCommande = Console.ReadLine();
+            int idCommande = -1;
+            bool idValide = false;
 
-            string requete = "SELECT SUM(Plat.Prix * LigneDeCommande.Quantite) AS PrixTotal FROM LigneDeCommande JOIN Plat ON LigneDeCommande.IdPlat = Plat.IdPlat WHERE LigneDeCommande.IdCommande = " + idCommande;
+            while (!idValide)
+            {
+                Console.WriteLine("Identifiant de la commande :");
+                string idCommandeStr = Console.ReadLine();
+
+                if (!int.TryParse(idCommandeStr, out idCommande))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("L'identifiant doit être un nombre valide. Veuillez réessayer.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                string requeteVerifCommande = "SELECT COUNT(*) FROM Commande WHERE IdCommande = " + idCommande + ";";
+                this.connexion.executerRequete(requeteVerifCommande);
+                var reader = this.connexion.recupererResultatRequete();
+
+                if (reader.Read() && reader.GetInt32(0) > 0)
+                {
+                    idValide = true;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Aucune commande trouvée avec cet identifiant. Veuillez réessayer.");
+                    Console.ResetColor();
+                }
+                reader.Close();
+            }
+
+            string requete = "SELECT SUM(Plat.Prix * LigneDeCommande.Quantite) AS PrixTotal FROM LigneDeCommande JOIN Plat ON LigneDeCommande.IdPlat = Plat.IdPlat WHERE LigneDeCommande.IdCommande = " + idCommande + ";";
             this.connexion.executerRequete(requete);
             this.connexion.afficherResultatRequete();
         }
