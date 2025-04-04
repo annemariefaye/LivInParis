@@ -58,6 +58,7 @@ namespace PbSI
             Console.ReadKey();*/
 
             Menu menu = new Menu();
+            await menu.InitialiserAsync();
 
 
 

@@ -8,6 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using NAudio.Wave;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace PbSI
 {
@@ -24,11 +30,15 @@ namespace PbSI
 
         public Menu()
         {
+            // Initialisation des membres
             this.connexion = new Connexion();
             this.reseau = new ReseauMetro("MetroParis.xlsx");
             this.graphe = reseau.Graphe;
-
             this.maroc = "maroc.mp3";
+        }
+
+        public async Task InitialiserAsync()
+        {
 
             while (true)
             {
@@ -59,7 +69,7 @@ namespace PbSI
                         break;
                     case '2':
                         Console.Clear();
-                        MenuSimplifie();
+                        await MenuSimplifie();
                         this.pageChoisie = "Menu simplifié";
                         break;
 
@@ -80,6 +90,7 @@ namespace PbSI
             }
         }
 
+        #region Menus
         public void MenuSQL()
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -87,8 +98,8 @@ namespace PbSI
             Console.ForegroundColor = ConsoleColor.Yellow;
 
             Console.WriteLine("Ecrire une commande SQL l'éxecutera");
-            Console.WriteLine("\n\nDes mots clefs à rajouter avant la commande permettent différentes fonctionnalités:");            
-            Console.WriteLine("AFFICHER: Executera le code SQL et affiche le résultat");             
+            Console.WriteLine("\n\nDes mots clefs à rajouter avant la commande permettent différentes fonctionnalités:");
+            Console.WriteLine("AFFICHER: Executera le code SQL et affiche le résultat");
             Console.WriteLine("EXPORTER: Executera le code SQL et exportera le résultat dans un fichier XML");
             Console.WriteLine("\n\nRETOUR: Retourner au menu principal");
             Console.Write("Entrez votre commande : \n");
@@ -96,33 +107,33 @@ namespace PbSI
 
             string mot_clef;
 
-                
+
             while (true)
             {
                 string requete = Console.ReadLine();
-                if (requete == "RETOUR") return;
- 
+                if (requete.ToUpper() == "RETOUR") return;
+
                 try
                 {
-                    this.connexion.executerRequete(requete.Substring(9));   
+                    this.connexion.executerRequete(requete.Substring(9));
 
-                    mot_clef = "";                        
+                    mot_clef = "";
                     if (requete.Length < 8) break;
-                        
-                    for(int i = 0; i < 8; i++) 
-                    {     
-                        mot_clef += requete[i];  
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        mot_clef += requete[i];
                     }
-                        
-                    if(mot_clef == "AFFICHER")   
-                    {       
+
+                    if (mot_clef.ToUpper() == "AFFICHER")
+                    {
                         Console.WriteLine("Résultat de la commande:\n");
                         connexion.afficherResultatRequete();
                     }
-                        
-                    if(mot_clef == "EXPORTER")   
+
+                    if (mot_clef.ToUpper() == "EXPORTER")
                     {
-                        if(requete.Substring(9).Substring(0,6)!="SELECT")
+                        if (requete.Substring(9).Substring(0, 6) != "SELECT")
                         {
                             Console.WriteLine("erreur: la commande n'est pas une requête de de retrait de données (SELECT)");
                         }
@@ -135,16 +146,15 @@ namespace PbSI
                     }
                 }
                 catch (Exception ex)
-                {     
+                {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Erreur : " + ex.Message);
-                    Console.ResetColor();    
+                    Console.ResetColor();
                 }
-            }    
+            }
             Console.ReadKey();
         }
-
-        public void MenuSimplifie()
+        public async Task MenuSimplifie()
         {
             while (true)
             {
@@ -169,7 +179,7 @@ namespace PbSI
                         break;
                     case ('2'):
                         Console.Clear();
-                        ModuleCuisinier();
+                        await ModuleCuisinier();
                         break;
                     case ('3'):
                         Console.Clear();
@@ -191,7 +201,9 @@ namespace PbSI
                 }
             }
         }
+        #endregion
 
+        #region Client
         public void ModuleClient()
         {
             while (true)
@@ -496,10 +508,10 @@ namespace PbSI
                 }
             }
         }
+        #endregion
 
-
-
-        public void ModuleCuisinier()
+        #region Cuisinier
+        public async Task ModuleCuisinier()
         {
             while (true)
             {
@@ -530,7 +542,7 @@ namespace PbSI
                         break;
                     case ('2'):
                         Console.Clear();
-                        ajouterCuisinier(); 
+                        await ajouterCuisinier(this.graphe); 
                         Console.WriteLine("\n\nAppuyez sur une touche pour continuer...");
                         Console.ReadKey();
                         Console.Clear();
@@ -591,26 +603,58 @@ namespace PbSI
             this.connexion.afficherResultatRequete();
         }
 
-        public void ajouterCuisinier()
+        public async Task ajouterCuisinier(Graphe<StationMetro> graphe)
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Ajout de cuisinier\n");
 
-            Console.WriteLine("Nom du cuisinier :");
-            string nom = Console.ReadLine();
+            string nom;
+            do
+            {
+                Console.WriteLine("Nom du cuisinier :");
+                nom = Console.ReadLine();
+            } while (string.IsNullOrWhiteSpace(nom) || !Regex.IsMatch(nom, @"^[A-Za-zÀ-ÖØ-öø-ÿ\-]+$"));
 
-            Console.WriteLine("Prénom du cuisinier :");
-            string prenom = Console.ReadLine();
+            string prenom;
+            do
+            {
+                Console.WriteLine("Prénom du cuisinier :");
+                prenom = Console.ReadLine();
+            } while (string.IsNullOrWhiteSpace(prenom) || !Regex.IsMatch(prenom, @"^[A-Za-zÀ-ÖØ-öø-ÿ\-]+$"));
 
-            Console.WriteLine("Adresse du cuisinier :");
-            string adresse = Console.ReadLine();
+            string adresse;
+            do
+            {
+                Console.WriteLine("Adresse du cuisinier :");
+                adresse = Console.ReadLine();
 
-            Console.WriteLine("Téléphone du cuisinier :");
-            string telephone = Console.ReadLine();
+                Console.WriteLine("Vérification de l'adresse...");
+                bool adresseValide = await VerifierAdresseAsync(adresse);
+                Console.WriteLine($"Adresse valide : {adresseValide}");
 
-            Console.WriteLine("Email du cuisinier :");
-            string email = Console.ReadLine();
+                if (!adresseValide)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Adresse invalide. Veuillez entrer une adresse réelle.");
+                    Console.ResetColor();
+                    adresse = null;
+                }
+            } while (string.IsNullOrWhiteSpace(adresse));
+
+            string telephone;
+            do
+            {
+                Console.WriteLine("Téléphone du cuisinier (10 chiffres) :");
+                telephone = Console.ReadLine();
+            } while (string.IsNullOrWhiteSpace(telephone) || !Regex.IsMatch(telephone, @"^\d{10}$"));
+
+            string email;
+            do
+            {
+                Console.WriteLine("Email du cuisinier :");
+                email = Console.ReadLine();
+            } while (string.IsNullOrWhiteSpace(email) || !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"));
 
             Console.WriteLine("Mot de passe du cuisinier :");
             string motDePasse = Console.ReadLine();
@@ -618,60 +662,157 @@ namespace PbSI
             Console.WriteLine("Plat du jour du cuisinier :");
             string platDuJour = Console.ReadLine();
 
-            string requeteCuisinier = "INSERT INTO Cuisinier (MotDePasse, PlatDuJour) VALUES ('" + motDePasse + "', '" + platDuJour + "')";
+            // Ajout du cuisinier
+            string requeteCuisinier = $"INSERT INTO Cuisinier (MotDePasse, PlatDuJour) VALUES ('{motDePasse}', '{platDuJour}')";
             this.connexion.executerRequete(requeteCuisinier);
 
+            // Récupération ID cuisinier
             string requeteIdCuisinier = "SELECT IdCuisinier FROM Cuisinier ORDER BY IdCuisinier DESC LIMIT 1";
             this.connexion.executerRequete(requeteIdCuisinier);
             var reader = this.connexion.recupererResultatRequete();
             int idCuisinier = 0;
-
             if (reader.Read())
             {
                 idCuisinier = reader.GetInt32(0);
             }
-
             reader.Close();
 
-            string requeteUtilisateur = "INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier) VALUES ('" + nom + "', '" + prenom + "', '" + adresse + "', '" + telephone + "', '" + email + "', " + idCuisinier + ")";
+            // Ajout utilisateur
+            string requeteUtilisateur = $"INSERT INTO Utilisateur (Nom, Prenom, Adresse, Telephone, Email, IdCuisinier) " +
+                                        $"VALUES ('{nom}', '{prenom}', '{adresse}', '{telephone}', '{email}', {idCuisinier})";
             this.connexion.executerRequete(requeteUtilisateur);
 
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Cuisinier ajouté avec succès !");
+            Console.ResetColor();
         }
-
 
         public void supprimerCuisinier()
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Identifiant du cuisinier à supprimer :");
-            string idCuisinier = Console.ReadLine();
 
-            string requeteSupprimerCuisinier = $"DELETE FROM Cuisinier WHERE IdCuisinier = {idCuisinier};";
-            this.connexion.executerRequete(requeteSupprimerCuisinier);
+            string idCuisinierStr;
+            int idCuisinier;
+            bool cuisinierExistant = false;
 
+            while (!cuisinierExistant)
+            {
+                Console.WriteLine("Identifiant du cuisinier à supprimer :");
+                idCuisinierStr = Console.ReadLine();
 
+                if (!int.TryParse(idCuisinierStr, out idCuisinier))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("L'identifiant doit être un nombre valide. Veuillez réessayer.");
+                    continue; 
+                }
+
+                string requeteVerifCuisinier = $"SELECT COUNT(*) FROM Cuisinier WHERE IdCuisinier = {idCuisinier};";
+                this.connexion.executerRequete(requeteVerifCuisinier);
+
+                var reader = this.connexion.recupererResultatRequete();
+                if (reader.Read() && reader.GetInt32(0) > 0)
+                {
+                    cuisinierExistant = true; 
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Aucun cuisinier trouvé avec cet identifiant. Veuillez réessayer.");
+                }
+                reader.Close();
+
+                string requeteSupprimerCuisinier = $"DELETE FROM Cuisinier WHERE IdCuisinier = {idCuisinier};";
+                this.connexion.executerRequete(requeteSupprimerCuisinier);
+            }
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Cuisinier supprimé avec succès !");
+            Console.ResetColor();
         }
+
 
         public void modifierCuisinier()
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Identifiant du cuisinier à modifier :");
-            string idCuisinier = Console.ReadLine();
 
-            Console.WriteLine("Nouvelle valeur pour le nom :");
-            string nouveauNom = Console.ReadLine();
+            int idCuisinier = -1;
+            bool identifiantValide = false;
 
-            Console.WriteLine("Nouveau prénom :");
-            string nouveauPrenom = Console.ReadLine();
+            while (!identifiantValide)
+            {
+                Console.WriteLine("Identifiant du cuisinier à modifier :");
+                string idCuisinierStr = Console.ReadLine();
 
-            string requete = "UPDATE Utilisateur SET Nom = '" + nouveauNom + "', Prenom = '" + nouveauPrenom + "' WHERE IdCuisinier = " + idCuisinier;
+                if (!int.TryParse(idCuisinierStr, out idCuisinier))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("L'identifiant doit être un nombre valide. Veuillez réessayer.");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    continue;
+                }
 
+                string requeteVerifCuisinier = "SELECT COUNT(*) FROM Cuisinier WHERE IdCuisinier = " + idCuisinier + ";";
+                this.connexion.executerRequete(requeteVerifCuisinier);
+
+                var reader = this.connexion.recupererResultatRequete();
+                if (reader.Read() && reader.GetInt32(0) > 0)
+                {
+                    identifiantValide = true;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Aucun cuisinier trouvé avec cet identifiant. Veuillez réessayer.");
+                }
+                reader.Close();
+            }
+
+            string nouveauNom = "";
+            bool nomValide = false;
+
+            while (!nomValide)
+            {
+                Console.WriteLine("Nouvelle valeur pour le nom :");
+                nouveauNom = Console.ReadLine();
+
+                if (nouveauNom.Any(char.IsDigit))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Le nom ne doit pas contenir de chiffres. Veuillez réessayer.");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    continue;
+                }
+
+                nomValide = true;
+            }
+
+            string nouveauPrenom = "";
+            bool prenomValide = false;
+
+            while (!prenomValide)
+            {
+                Console.WriteLine("Nouveau prénom :");
+                nouveauPrenom = Console.ReadLine();
+
+                if (nouveauPrenom.Any(char.IsDigit))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Le prénom ne doit pas contenir de chiffres. Veuillez réessayer.");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    continue;
+                }
+
+                prenomValide = true;
+            }
+
+            string requete = "UPDATE Utilisateur SET Nom = '" + nouveauNom + "', Prenom = '" + nouveauPrenom + "' WHERE IdCuisinier = " + idCuisinier + ";";
             this.connexion.executerRequete(requete);
 
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Cuisinier modifié avec succès !");
+            Console.ResetColor();
         }
 
 
@@ -679,8 +820,37 @@ namespace PbSI
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Identifiant du cuisinier :");
-            string idCuisinier = Console.ReadLine();
+            int idCuisinier = -1;
+            bool identifiantValide = false;
+
+            while (!identifiantValide)
+            {
+                Console.WriteLine("Identifiant du cuisinier :");
+                string idCuisinierStr = Console.ReadLine();
+
+                if (!int.TryParse(idCuisinierStr, out idCuisinier))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("L'identifiant doit être un nombre valide. Veuillez réessayer.");
+                    continue;
+                }
+
+                string requeteVerifCuisinier = "SELECT COUNT(*) FROM Cuisinier WHERE IdCuisinier = " + idCuisinier + ";";
+                this.connexion.executerRequete(requeteVerifCuisinier);
+
+                var reader = this.connexion.recupererResultatRequete();
+                if (reader.Read() && reader.GetInt32(0) > 0)
+                {
+                    identifiantValide = true;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Aucun cuisinier trouvé avec cet identifiant. Veuillez réessayer.");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                }
+                reader.Close();
+            }
             string requete = $"SELECT DISTINCT Utilisateur.Nom, Utilisateur.Prenom FROM Commande JOIN Utilisateur ON Commande.IdClient = Utilisateur.IdClient JOIN LigneDeCommande ON Commande.IdCommande = LigneDeCommande.IdCommande JOIN Plat ON LigneDeCommande.IdPlat = Plat.IdPlat WHERE Plat.IdCuisinier = {idCuisinier};";
             this.connexion.executerRequete(requete);
             this.connexion.afficherResultatRequete();
@@ -691,8 +861,37 @@ namespace PbSI
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Identifiant du cuisinier :");
-            string idCuisinier = Console.ReadLine();
+            int idCuisinier = -1;
+            bool identifiantValide = false;
+
+            while (!identifiantValide)
+            {
+                Console.WriteLine("Identifiant du cuisinier :");
+                string idCuisinierStr = Console.ReadLine();
+
+                if (!int.TryParse(idCuisinierStr, out idCuisinier))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("L'identifiant doit être un nombre valide. Veuillez réessayer.");
+                    continue;
+                }
+
+                string requeteVerifCuisinier = "SELECT COUNT(*) FROM Cuisinier WHERE IdCuisinier = " + idCuisinier + ";";
+                this.connexion.executerRequete(requeteVerifCuisinier);
+
+                var reader = this.connexion.recupererResultatRequete();
+                if (reader.Read() && reader.GetInt32(0) > 0)
+                {
+                    identifiantValide = true;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Aucun cuisinier trouvé avec cet identifiant. Veuillez réessayer.");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                }
+                reader.Close();
+            }
             string requete = "SELECT Plat.Nom, COUNT(*) as Frequence FROM Commande JOIN LigneDeCommande ON Commande.IdCommande = LigneDeCommande.IdCommande JOIN Plat ON LigneDeCommande.IdPlat = Plat.IdPlat WHERE Plat.IdCuisinier = " + idCuisinier + " GROUP BY Plat.Nom;";
             this.connexion.executerRequete(requete);
             this.connexion.afficherResultatRequete();
@@ -705,8 +904,9 @@ namespace PbSI
             this.connexion.executerRequete(requete);
             this.connexion.afficherResultatRequete();
         }
+        #endregion
 
-
+        #region Commande
         public void ModuleCommande()
         {
             while (true)
@@ -911,6 +1111,9 @@ namespace PbSI
             this.connexion.afficherResultatRequete();
         }
 
+        #endregion
+
+        #region Audio
         /// Fonction asynchrone pour jouer de la musique en même temps que de jouer au jeu
         static async Task PlayAudioAsync(string chemin)
         {
@@ -974,6 +1177,37 @@ namespace PbSI
                 _fichierAudio.Dispose(); /// Libère les ressources
                 _dispositifSortie = null; /// Réinitialise la référence
                 _fichierAudio = null; /// Réinitialise la référence
+            }
+        }
+
+        #endregion
+
+
+        public static async Task<bool> VerifierAdresseAsync(string adresse)
+        {
+            if (string.IsNullOrWhiteSpace(adresse))
+                return false;
+
+            string url = $"https://nominatim.openstreetmap.org/search?format=json&q={Uri.EscapeDataString(adresse)}";
+
+            using HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "C# App");
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                    return false;
+
+                string json = await response.Content.ReadAsStringAsync();
+                JArray data = JArray.Parse(json);
+
+                return data.Count > 0;
+            }
+            catch
+            {
+                return false;
             }
         }
 
