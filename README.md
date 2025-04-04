@@ -122,3 +122,22 @@ Chronometreur.ChronometreBellmanFord(graphe, depart, arrivee);
 Chronometreur.ChronometreFloydWarshall(graphe, depart, arrivee);
 Chronometreur.ChronometreAStar(graphe, depart, arrivee);
 ```
+## Acceder a la BDD:
+
+Pour acceder a la base de données:
+- Utulisateur : root
+- Mot de Passe: root
+  
+## Equipe :
+
+- Anne-Marie Faye  -> pseudo : annemariefaye
+- Valentin Fournel -> pseudo : intfly
+- Maria Ghoch      -> pseudo : ghochii
+  
+## Modules Autres:
+
+1- Ajout de catégories (recommandation --> ambiance: brunch, dejeuner de famille, soirée romantique, anniversaire...)
+2- Nombre de grammes de protéines par plat
+3- Notation des cuisiniers
+4- Recommandation d'une musique par nationalité du plat
+5- Système de plat gratuit au bout de 100 points (1 point = 1 euro)
