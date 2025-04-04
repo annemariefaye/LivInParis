@@ -229,7 +229,7 @@ namespace PbSI
 
         public void afficherClients()
         {
-            string base_requete = "SELECT * FROM Utilisateur WHERE idClient is not NULL";
+            string base_requete = "SELECT * FROM Utilisateur JOIN Client ON Client.idClient = Utilisateur.idClient ";
             char choix=' ';
             string derniere_requete=base_requete;//on note la dernière requete exécutée sans indiquer l'ordre de tri(utile pour changer l'ordre avec - et +)
             string requete="";

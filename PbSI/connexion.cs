@@ -41,7 +41,7 @@ namespace PbSI
             {
                 this.requete = this.maConnexion.CreateCommand();
                 this.requete.CommandText = stringRequete;
-                this.requete.ExecuteNonQuery(); // Exécute la requête
+                this.requete.ExecuteNonQuery(); 
             }
             catch (MySqlException e)
             {
@@ -58,19 +58,62 @@ namespace PbSI
         public void afficherResultatRequete()
         {
             this.reader = this.requete.ExecuteReader();
-            string[] valueString = new string[this.reader.FieldCount];
+
+            int nombreColonnes = this.reader.FieldCount;
+            string[] nomsColonnes = new string[nombreColonnes];
+            int[] taillesColonnes = new int[nombreColonnes];
+
+            // Récupération des noms de colonnes et des tailles maximales
+            for (int i = 0; i < nombreColonnes; i++)
+            {
+                nomsColonnes[i] = this.reader.GetName(i);
+                taillesColonnes[i] = nomsColonnes[i].Length;
+            }
+
+            List<string[]> lignes = new List<string[]>();
+
+            // Lecture des données et mise à jour des tailles de colonnes
             while (this.reader.Read())
             {
-                for (int i = 0; i < this.reader.FieldCount; i++)
+                string[] valeurs = new string[nombreColonnes];
+                for (int i = 0; i < nombreColonnes; i++)
                 {
-                    valueString[i] = this.reader.GetValue(i).ToString();
-                    Console.Write(valueString[i] + ", ");
+                    valeurs[i] = this.reader.GetValue(i).ToString();
+                    if (valeurs[i].Length > taillesColonnes[i])
+                        taillesColonnes[i] = valeurs[i].Length;
+                }
+                lignes.Add(valeurs);
+            }
+
+            // Affichage de l'en-tête
+            for (int i = 0; i < nombreColonnes; i++)
+            {
+                Console.Write(nomsColonnes[i].PadRight(taillesColonnes[i] + 2));
+            }
+            Console.WriteLine();
+
+            // Trait de séparation
+            for (int i = 0; i < nombreColonnes; i++)
+            {
+                Console.Write(new string('-', taillesColonnes[i]) + "  ");
+            }
+            Console.WriteLine();
+
+            // Affichage des lignes
+            foreach (var ligne in lignes)
+            {
+                for (int i = 0; i < nombreColonnes; i++)
+                {
+                    Console.Write(ligne[i].PadRight(taillesColonnes[i] + 2));
                 }
                 Console.WriteLine();
             }
+
             Console.WriteLine();
             this.reader.Close();
         }
+
+
 
         public void exporterResultatRequete(string nomFichier="export")
         {
