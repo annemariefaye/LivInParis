@@ -67,8 +67,8 @@ CREATE TABLE ListeIngredients(
 	IdIngredient INT NOT NULL,
 	IdRecette INT NOT NULL,
 	Quantite INT DEFAULT 1,
-	FOREIGN KEY (IdRecette) REFERENCES Recette (IdRecette),
-	FOREIGN KEY (IdIngredient) REFERENCES Ingredient(IdIngredient),
+	FOREIGN KEY (IdRecette) REFERENCES Recette (IdRecette) ON DELETE CASCADE,
+	FOREIGN KEY (IdIngredient) REFERENCES Ingredient(IdIngredient) ON DELETE CASCADE,
 	PRIMARY KEY(IdIngredient, IdRecette)
 );
 CREATE TABLE Commande (
@@ -87,7 +87,7 @@ CREATE TABLE LigneDeCommande (
     DateLivraison DATE NOT NULL,
     LieuLivraison VARCHAR(255) NOT NULL,
     FOREIGN KEY (IdCommande) REFERENCES Commande(IdCommande) ON DELETE CASCADE,
-    FOREIGN KEY (IdPlat) REFERENCES Plat(IdPlat) 
+    FOREIGN KEY (IdPlat) REFERENCES Plat(IdPlat) ON DELETE CASCADE
 );
 
 
