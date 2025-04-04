@@ -3,7 +3,8 @@ USE LivInParis;
 INSERT INTO Client (NomEntreprise, MotDePasse) VALUES
 ('Boulangerie Dupont', 'mdp123'),
 ('Entreprise XYZ', 'xyz789'),
-(null, 'boul2025');
+(null, 'boul2025'),
+(null, 'gerard10');
 
 INSERT INTO Cuisinier (MotDePasse) VALUES
 ('cuisine123'),
@@ -35,12 +36,12 @@ INSERT INTO ListeIngredients (IdIngredient, IdRecette, Quantite) VALUES
 (1, 1, 3),
 (2, 2, 2);
 
-INSERT INTO Commande (IdClient, IdCuisinier, DateCommande, Statut) VALUES
-(1, 1, NOW(), 'En attente'),
-(2, 1, NOW(), 'Validée'),
-(3, 1, NOW(), 'Validée'),
-(2, 1, NOW(), 'Validée'),
-(1, 1, NOW(), 'Validée');
+INSERT INTO Commande (IdClient, DateCommande, Statut) VALUES
+(1, NOW(), 'En attente'),
+(2, NOW(), 'Validée'),
+(3, NOW(), 'Validée'),
+(2, NOW(), 'Validée'),
+(1, NOW(), 'Validée');
 
 INSERT INTO LigneDeCommande (IdCommande, IdPlat, Quantite, DateLivraison, LieuLivraison) VALUES
 (1, 1, 2, '2025-03-02', '10 rue de Paris'),
