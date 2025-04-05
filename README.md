@@ -125,7 +125,7 @@ Chronometreur.ChronometreAStar(graphe, depart, arrivee);
 ## Acceder a la BDD:
 
 Pour acceder a la base de données:
-- Utulisateur : root
+- Utilisateur : root
 - Mot de Passe: root
   
 ## Equipe :
@@ -141,3 +141,11 @@ Pour acceder a la base de données:
 3- Notation des cuisiniers
 4- Recommandation d'une musique par nationalité du plat
 5- Système de plat gratuit au bout de 100 points (1 point = 1 euro)
+
+## Prompts IA générative
+
+- Créer un graphe du métro parisien à partir des données (stations, lignes, connexions) sur Windows Forms.
+- Afficher les stations sous forme de nœuds en fonction de leur coordonnées et afficher les libellés dans un rectangle colorer.
+- Dessiner les arcs entre les stations avec des couleurs différentes selon les lignes.
+- Ajouter des courbes en arc, s'il y a plus de 1 ligne qui passe par les deux mêmes stations.
+
