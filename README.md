@@ -136,11 +136,11 @@ Pour acceder a la base de données:
   
 ## Modules Autres:
 
-1- Ajout de catégories (recommandation --> ambiance: brunch, dejeuner de famille, soirée romantique, anniversaire...)
-2- Nombre de grammes de protéines par plat
-3- Notation des cuisiniers
-4- Recommandation d'une musique par nationalité du plat
-5- Système de plat gratuit au bout de 100 points (1 point = 1 euro)
+- 1- Ajout de catégories (recommandation --> ambiance: brunch, dejeuner de famille, soirée romantique, anniversaire...)
+- 2- Nombre de grammes de protéines par plat
+- 3- Notation des cuisiniers
+- 4- Recommandation d'une musique par nationalité du plat
+- 5- Système de plat gratuit au bout de 100 points (1 point = 1 euro)
 
 ## Prompts IA générative
 
