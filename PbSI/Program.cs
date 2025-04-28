@@ -8,8 +8,9 @@ namespace PbSI
     {
         static async Task Main(string[] args)
         {
-            Menu menu = new Menu();
-            await menu.InitialiserAsync();
+            //Menu menu = new Menu();
+            //await menu.InitialiserAsync();
+            relationsClientsCuisiniers grapheCC = new relationsClientsCuisiniers();
 
         }
 
