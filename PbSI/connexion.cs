@@ -112,7 +112,7 @@ namespace PbSI
                 requete = maConnexion.CreateCommand();
                 requete.CommandText = stringRequete;
                 requete.ExecuteNonQuery();
-                //Console.WriteLine("Requête exécutée avec succès !");
+                ///Console.WriteLine("Requête exécutée avec succès !");
             }
             catch (Exception e)
             {
@@ -128,7 +128,7 @@ namespace PbSI
             string[] nomsColonnes = new string[nombreColonnes];
             int[] taillesColonnes = new int[nombreColonnes];
 
-            // Récupération des noms de colonnes et des tailles maximales
+            /// Récupération des noms de colonnes et des tailles maximales
             for (int i = 0; i < nombreColonnes; i++)
             {
                 nomsColonnes[i] = this.reader.GetName(i);
@@ -137,7 +137,7 @@ namespace PbSI
 
             List<string[]> lignes = new List<string[]>();
 
-            // Lecture des données et mise à jour des tailles de colonnes
+            /// Lecture des données et mise à jour des tailles de colonnes
             while (this.reader.Read())
             {
                 string[] valeurs = new string[nombreColonnes];
