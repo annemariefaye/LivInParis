@@ -25,11 +25,11 @@ namespace PbSI
                 }
 
                 Console.WriteLine("Connexion à MySQL réussie !");
-                CreerBaseSiNonExiste();
-                maConnexion.ChangeDatabase("livinparics");
+                maConnexion.ChangeDatabase("LivInParis");
 
                 Console.WriteLine("Base de données prête !");
-                ExecuterFichiersSQL(new string[] { "01_create_tables.sql", "02_insert_date.sql", "03_select.sql" });
+                //CreerBaseSiNonExiste();
+                //ExecuterFichiersSQL(new string[] { "01_create_tables.sql", "02_insert_date.sql", "03_select.sql" });
             }
             catch (MySqlException e)
             {

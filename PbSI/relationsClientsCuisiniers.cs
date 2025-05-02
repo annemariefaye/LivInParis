@@ -8,55 +8,82 @@ namespace PbSI
 {
     public class relationsClientsCuisiniers
     {
-        private readonly Graphe<string> graphe;
-        private readonly Connexion connexion;
+        private Graphe<string> graphe;
+        private Connexion connexion;
 
         public relationsClientsCuisiniers()
         {
             this.graphe = new Graphe<string>();
-            this.connexion = new Connexion(); // utilise ta classe Connexion existante
+            this.connexion = new Connexion(); 
+            //Console.Clear();
             ConstruireGraphe();
+            Console.WriteLine("Liens créés:");
+            foreach (var lien in this.graphe.Liens)
+            {
+                Console.WriteLine($"{lien.Source.Id} ({lien.Source.Contenu}) -> {lien.Destination.Id} ({lien.Destination.Contenu})");
+            }
+            ///List<Noeud<T>> noeuds = graphe.Noeuds;
+            /// double[,] ajdacence = this.graphe.MatriceAdjacence;
+            /*for(int i = 0; i < ajdacence.GetLength(0); i++)
+            {
+                for(int j = 0; j < ajdacence.GetLength(1); j++) {
+                    Console.Write(ajdacence[i,j]+" ");
+                }
+                Console.WriteLine();
+            }*/
+
+            /*HashSet<Lien<string>> liens = this.graphe.Liens;
+
+            foreach(Lien<string> l in liens)
+            {
+                Console.WriteLine(l.Source+" "+l.Destination);
+            }*/
+
         }
 
         public Graphe<string> Graphe => this.graphe;
 
         private void ConstruireGraphe()
         {
-            Dictionary<int, string> clients = new Dictionary<int, string>();
-            Dictionary<int, string> cuisiniers = new Dictionary<int, string>();
 
-            // 1. Charger Clients
-            connexion.executerRequete("SELECT Id, Nom FROM Utilisateur WHERE IdClient IS NOT NULL;");
+
+            /// 1. Charger Clients
+            connexion.executerRequete("SELECT IdClient, Nom FROM Utilisateur WHERE IdClient IS NOT NULL;");
             using (var reader = connexion.recupererResultatRequete())
             {
                 while (reader.Read())
                 {
-                    int id = reader.GetInt32("Id");
+                    int id = reader.GetInt32("IdClient");
                     string nom = reader.GetString("Nom");
-                    clients[id] = nom;
                     graphe.AjouterMembre(new Noeud<string>(id, $"Client: {nom}"));
                 }
             }
 
-            // 2. Charger Cuisiniers
-            connexion.executerRequete("SELECT Id, Nom FROM Utilisateur WHERE IdCuisinier IS NOT NULL;");
+            /// 2. Charger Cuisiniers
+            connexion.executerRequete("SELECT IdCuisinier, Nom FROM Utilisateur WHERE IdCuisinier IS NOT NULL;");
             using (var reader = connexion.recupererResultatRequete())
             {
                 while (reader.Read())
                 {
-                    int id = reader.GetInt32("Id");
+                    int id = reader.GetInt32("IdCuisinier");
                     string nom = reader.GetString("Nom");
-                    cuisiniers[id] = nom;
-                    graphe.AjouterMembre(new Noeud<string>(id, $"Cuisinier: {nom}"));
+                    ///Console.WriteLine(-id);
+                    graphe.AjouterMembre(new Noeud<string>(-id, $"Cuisinier: {nom}"));///si cuisinier id negatif, si client: positif
                 }
             }
 
-            // 3. Créer les relations : Client -> Cuisinier (par commandes)
+            /// 3. Créer les relations : Client vers Cuisinier
             string requeteRelations = @"
-                SELECT co.IdClient AS IdClient, p.IdCuisinier AS IdCuisinier
+                SELECT DISTINCT
+                cli.IdClient   AS IdClient,
+                cuis.IdCuisinier AS IdCuisinier
                 FROM Commande co
-                INNER JOIN LigneDeCommande ldc ON ldc.IdCommande = co.IdCommande
-                INNER JOIN Plat p ON p.IdPlat = ldc.IdPlat;
+                  JOIN Utilisateur ucli   ON co.IdClient       = ucli.Id
+                  JOIN Client     cli     ON ucli.IdClient     = cli.IdClient
+                  JOIN LigneDeCommande ldc ON co.IdCommande    = ldc.IdCommande
+                  JOIN Plat        p      ON ldc.IdPlat        = p.IdPlat
+                  JOIN Utilisateur ucui   ON p.IdCuisinier     = ucui.Id
+                  JOIN Cuisinier   cuis   ON ucui.IdCuisinier  = cuis.IdCuisinier;
             ";
 
             connexion.executerRequete(requeteRelations);
@@ -66,13 +93,14 @@ namespace PbSI
                 {
                     int idClient = reader.GetInt32("IdClient");
                     int idCuisinier = reader.GetInt32("IdCuisinier");
+                    Console.WriteLine("idclient:" + idClient + " idCuisinier:" + -idCuisinier);
 
                     var noeudClient = graphe.TrouverNoeudParId(idClient);
-                    var noeudCuisinier = graphe.TrouverNoeudParId(idCuisinier);
+                    var noeudCuisinier = graphe.TrouverNoeudParId(-idCuisinier);
 
                     if (noeudClient != null && noeudCuisinier != null)
                     {
-                        graphe.AjouterRelation(noeudClient, noeudCuisinier, 1); // poids 1 par défaut
+                        graphe.AjouterRelation(noeudClient, noeudCuisinier, 1); /// poids 1 par défaut car toutes les relations ont le même poids
                     }
                 }
             }
