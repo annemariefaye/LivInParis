@@ -1,4 +1,6 @@
-﻿namespace PbSI
+﻿using System.Drawing;
+
+namespace PbSI
 {
     public class Noeud<T> : IEquatable<Noeud<T>> where T : notnull
     {
@@ -10,6 +12,7 @@
         private readonly int id;
 
         private readonly T contenu;
+        private string couleur = "";
 
         #endregion
 
@@ -19,10 +22,19 @@
         /// Constructeur par défaut
         /// </summary>
         /// <param name="id">Identifiant du noeud</param>
+        
         public Noeud(int id, T contenu)
         {
             this.id = id;
             this.contenu = contenu;
+        }
+        
+        
+        public Noeud(int id, T contenu,string couleur)
+        {
+            this.id = id;
+            this.contenu = contenu;
+            this.couleur = couleur;
         }
 
         public Noeud(int id)
@@ -50,7 +62,11 @@
         /// <summary>
         /// Retourne la liste des noeuds voisins
         /// </summary>
-
+        public string Couleur
+        {
+            get { return this.couleur;}
+            set { this.couleur = value; }
+        } 
         #endregion
 
         #region Méthodes
@@ -70,5 +86,6 @@
         {
             return this.id.Equals(other.id);
         }
+        
     }
 }

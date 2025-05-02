@@ -593,7 +593,18 @@ namespace PbSI
             }
         }
 
-
+        public List<Noeud<T>> GetVoisins(Noeud<T> noeud)
+        {
+            List<Noeud<T>> voisins = new List<Noeud<T>>();
+            if (this.ListeAdjacence != null && this.ListeAdjacence.ContainsKey(noeud))
+            {
+                foreach(var voisin in this.ListeAdjacence[noeud])
+                {
+                    voisins.Add(voisin.Item1);
+                }
+            }
+            return voisins;
+        }
         #endregion
     }
 }
