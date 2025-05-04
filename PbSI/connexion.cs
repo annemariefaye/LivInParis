@@ -46,6 +46,24 @@ namespace PbSI
             return this.requete.ExecuteReader();
         }
 
+        public void exportGenerauxXML()
+        {
+            this.executerRequete("SELECT p.Nom AS NomPlat, p.Prix, u.Nom AS NomCuisinier, u.Prenom AS PrenomCuisinier, p.Nationalite FROM Plat p JOIN Utilisateur u ON p.IdCuisinier = u.Id;");
+            this.exporterResultatRequete("infosPlats");
+
+            this.executerRequete("SELECT u.idClient, u.Nom, u.Prenom, COUNT(c.IdCommande) AS NombreCommandes FROM Utilisateur u JOIN Commande c ON u.Id = c.IdClient GROUP BY u.Id;");
+            this.exporterResultatRequete("nombreDeCommandesParClient");
+
+            this.executerRequete("SELECT u.idClient, u.Nom, u.Prenom, SUM(t.Montant) AS TotalDepense FROM Utilisateur u JOIN Commande c ON u.Id = c.IdClient JOIN Transaction t ON c.IdCommande = t.IdCommande WHERE t.Reussie = TRUE GROUP BY u.Id;");
+            this.exporterResultatRequete("totalDepenseParClient");
+
+            this.executerRequete("Select * FROM Utilisateur JOIN Client on Client.idClient = Utilisateur.idClient;");
+            this.exporterResultatRequete("infosClients");
+
+            this.executerRequete("Select * FROM Utilisateur JOIN Cuisinier ON Cuisiner.IdCuisinier = Utilisateur.IdCuisinier;");
+            this.exporterResultatRequete("infosCuisiniers");
+        }
+
         private void CreerBaseSiNonExiste()
         {
             if (maConnexion == null || maConnexion.State != ConnectionState.Open)

@@ -1,0 +1,76 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="nombreDeCommandesParClient" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="nombreDeCommandesParClient">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="idClient" type="xs:int" minOccurs="0" />
+                <xs:element name="Nom" type="xs:string" minOccurs="0" />
+                <xs:element name="Prenom" type="xs:string" minOccurs="0" />
+                <xs:element name="NombreCommandes" type="xs:long" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <nombreDeCommandesParClient>
+    <idClient>1</idClient>
+    <Nom>Dupond</Nom>
+    <Prenom>Jean</Prenom>
+    <NombreCommandes>10</NombreCommandes>
+  </nombreDeCommandesParClient>
+  <nombreDeCommandesParClient>
+    <idClient>2</idClient>
+    <Nom>Marie</Nom>
+    <Prenom>Tom</Prenom>
+    <NombreCommandes>10</NombreCommandes>
+  </nombreDeCommandesParClient>
+  <nombreDeCommandesParClient>
+    <idClient>3</idClient>
+    <Nom>Jarrar</Nom>
+    <Prenom>Cédric</Prenom>
+    <NombreCommandes>9</NombreCommandes>
+  </nombreDeCommandesParClient>
+  <nombreDeCommandesParClient>
+    <Nom>Lévêque</Nom>
+    <Prenom>Agathe</Prenom>
+    <NombreCommandes>8</NombreCommandes>
+  </nombreDeCommandesParClient>
+  <nombreDeCommandesParClient>
+    <idClient>22</idClient>
+    <Nom>Mary</Nom>
+    <Prenom>Margaud</Prenom>
+    <NombreCommandes>3</NombreCommandes>
+  </nombreDeCommandesParClient>
+  <nombreDeCommandesParClient>
+    <Nom>Le Roux</Nom>
+    <Prenom>Alexandre</Prenom>
+    <NombreCommandes>3</NombreCommandes>
+  </nombreDeCommandesParClient>
+  <nombreDeCommandesParClient>
+    <idClient>31</idClient>
+    <Nom>Klein</Nom>
+    <Prenom>Monique</Prenom>
+    <NombreCommandes>4</NombreCommandes>
+  </nombreDeCommandesParClient>
+  <nombreDeCommandesParClient>
+    <Nom>Diaz</Nom>
+    <Prenom>Stéphane</Prenom>
+    <NombreCommandes>1</NombreCommandes>
+  </nombreDeCommandesParClient>
+  <nombreDeCommandesParClient>
+    <Nom>Guérin</Nom>
+    <Prenom>Frédéric</Prenom>
+    <NombreCommandes>6</NombreCommandes>
+  </nombreDeCommandesParClient>
+  <nombreDeCommandesParClient>
+    <Nom>Martin</Nom>
+    <Prenom>Sofie</Prenom>
+    <NombreCommandes>1</NombreCommandes>
+  </nombreDeCommandesParClient>
+</NewDataSet>

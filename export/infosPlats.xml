@@ -1,0 +1,78 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="infosPlats" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="infosPlats">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="NomPlat" type="xs:string" minOccurs="0" />
+                <xs:element name="Prix" type="xs:decimal" minOccurs="0" />
+                <xs:element name="NomCuisinier" type="xs:string" minOccurs="0" />
+                <xs:element name="PrenomCuisinier" type="xs:string" minOccurs="0" />
+                <xs:element name="Nationalite" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <infosPlats>
+    <NomPlat>Lasagnes</NomPlat>
+    <Prix>12.50</Prix>
+    <NomCuisinier>Diaz</NomCuisinier>
+    <PrenomCuisinier>Stéphane</PrenomCuisinier>
+    <Nationalite>Italienne</Nationalite>
+  </infosPlats>
+  <infosPlats>
+    <NomPlat>Pad Thaï au poulet</NomPlat>
+    <Prix>14.08</Prix>
+    <NomCuisinier>Martin</NomCuisinier>
+    <PrenomCuisinier>Sofie</PrenomCuisinier>
+    <Nationalite>Thaïlandaise</Nationalite>
+  </infosPlats>
+  <infosPlats>
+    <NomPlat>Burger végétarien</NomPlat>
+    <Prix>17.48</Prix>
+    <NomCuisinier>Guérin</NomCuisinier>
+    <PrenomCuisinier>Frédéric</PrenomCuisinier>
+    <Nationalite>Américaine</Nationalite>
+  </infosPlats>
+  <infosPlats>
+    <NomPlat>Pizza Margherita</NomPlat>
+    <Prix>11.70</Prix>
+    <NomCuisinier>Martin</NomCuisinier>
+    <PrenomCuisinier>Sofie</PrenomCuisinier>
+    <Nationalite>Italienne</Nationalite>
+  </infosPlats>
+  <infosPlats>
+    <NomPlat>Sushi saumon avocat</NomPlat>
+    <Prix>16.41</Prix>
+    <NomCuisinier>Guérin</NomCuisinier>
+    <PrenomCuisinier>Frédéric</PrenomCuisinier>
+    <Nationalite>Japonaise</Nationalite>
+  </infosPlats>
+  <infosPlats>
+    <NomPlat>Couscous royal</NomPlat>
+    <Prix>19.98</Prix>
+    <NomCuisinier>Diaz</NomCuisinier>
+    <PrenomCuisinier>Stéphane</PrenomCuisinier>
+    <Nationalite>Marocaine</Nationalite>
+  </infosPlats>
+  <infosPlats>
+    <NomPlat>Soupe courge coco</NomPlat>
+    <Prix>18.98</Prix>
+    <NomCuisinier>Martin</NomCuisinier>
+    <PrenomCuisinier>Sofie</PrenomCuisinier>
+    <Nationalite>Fusion</Nationalite>
+  </infosPlats>
+  <infosPlats>
+    <NomPlat>Couscous</NomPlat>
+    <Prix>15.00</Prix>
+    <NomCuisinier>Marie</NomCuisinier>
+    <PrenomCuisinier>Tom</PrenomCuisinier>
+    <Nationalite>Marocaine</Nationalite>
+  </infosPlats>
+</NewDataSet>

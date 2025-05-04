@@ -10,7 +10,8 @@ namespace PbSI
         {
             //Menu menu = new Menu();
             //await menu.InitialiserAsync();
-            relationsClientsCuisiniers grapheCC = new relationsClientsCuisiniers();
+            Connexion connexion = new Connexion();
+            connexion.exportGenerauxXML();
 
         }
 

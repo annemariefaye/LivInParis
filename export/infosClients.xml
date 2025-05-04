@@ -1,0 +1,106 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="infosClients" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="infosClients">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Id" type="xs:int" minOccurs="0" />
+                <xs:element name="Nom" type="xs:string" minOccurs="0" />
+                <xs:element name="Prenom" type="xs:string" minOccurs="0" />
+                <xs:element name="Adresse" type="xs:string" minOccurs="0" />
+                <xs:element name="Telephone" type="xs:string" minOccurs="0" />
+                <xs:element name="Email" type="xs:string" minOccurs="0" />
+                <xs:element name="IdCuisinier" type="xs:int" minOccurs="0" />
+                <xs:element name="IdClient" type="xs:int" minOccurs="0" />
+                <xs:element name="IdStationProche" type="xs:int" minOccurs="0" />
+                <xs:element name="EstBanni" type="xs:boolean" minOccurs="0" />
+                <xs:element name="PointFidelite" type="xs:int" minOccurs="0" />
+                <xs:element name="IdClient1" type="xs:int" minOccurs="0" />
+                <xs:element name="NomEntreprise" type="xs:string" minOccurs="0" />
+                <xs:element name="MotDePasse" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <infosClients>
+    <Id>1</Id>
+    <Nom>Dupond</Nom>
+    <Prenom>Jean</Prenom>
+    <Adresse>10 rue de Paris</Adresse>
+    <Telephone>0123456789</Telephone>
+    <Email>jean.dupond@email.com</Email>
+    <IdClient>1</IdClient>
+    <IdStationProche>1</IdStationProche>
+    <EstBanni>false</EstBanni>
+    <PointFidelite>0</PointFidelite>
+    <IdClient1>1</IdClient1>
+    <NomEntreprise>Boulangerie Dupont</NomEntreprise>
+    <MotDePasse>mdp123</MotDePasse>
+  </infosClients>
+  <infosClients>
+    <Id>2</Id>
+    <Nom>Marie</Nom>
+    <Prenom>Tom</Prenom>
+    <Adresse>11 rue de la Paix</Adresse>
+    <Telephone>0123486489</Telephone>
+    <Email>tom.marie@email.com</Email>
+    <IdClient>2</IdClient>
+    <IdStationProche>1</IdStationProche>
+    <EstBanni>false</EstBanni>
+    <PointFidelite>0</PointFidelite>
+    <IdClient1>2</IdClient1>
+    <NomEntreprise>Entreprise XYZ</NomEntreprise>
+    <MotDePasse>xyz789</MotDePasse>
+  </infosClients>
+  <infosClients>
+    <Id>3</Id>
+    <Nom>Jarrar</Nom>
+    <Prenom>Cédric</Prenom>
+    <Adresse>11 rue des Lampes</Adresse>
+    <Telephone>012343030</Telephone>
+    <Email>cedric.jarrar@email.com</Email>
+    <IdClient>3</IdClient>
+    <IdStationProche>1</IdStationProche>
+    <EstBanni>false</EstBanni>
+    <PointFidelite>0</PointFidelite>
+    <IdClient1>3</IdClient1>
+    <NomEntreprise>Perrot</NomEntreprise>
+    <MotDePasse>&amp;nRZm3de2R</MotDePasse>
+  </infosClients>
+  <infosClients>
+    <Id>5</Id>
+    <Nom>Mary</Nom>
+    <Prenom>Margaud</Prenom>
+    <Adresse>36 avenue Guillaume Cohen, 75004 Paris</Adresse>
+    <Telephone>9558684561</Telephone>
+    <Email>hamonphilippine@durand.fr</Email>
+    <IdClient>22</IdClient>
+    <IdStationProche>2</IdStationProche>
+    <EstBanni>false</EstBanni>
+    <PointFidelite>0</PointFidelite>
+    <IdClient1>22</IdClient1>
+    <NomEntreprise>Loiseau</NomEntreprise>
+    <MotDePasse>$1uFXjGgb^</MotDePasse>
+  </infosClients>
+  <infosClients>
+    <Id>7</Id>
+    <Nom>Klein</Nom>
+    <Prenom>Monique</Prenom>
+    <Adresse>512 chemin de Deschamps, 75002 Paris</Adresse>
+    <Telephone>6236928014</Telephone>
+    <Email>thibaultmahe@hotmail.fr</Email>
+    <IdClient>31</IdClient>
+    <IdStationProche>4</IdStationProche>
+    <EstBanni>false</EstBanni>
+    <PointFidelite>0</PointFidelite>
+    <IdClient1>31</IdClient1>
+    <NomEntreprise>Morel Renault S.A.</NomEntreprise>
+    <MotDePasse>92!3d@Mi!o</MotDePasse>
+  </infosClients>
+</NewDataSet>
