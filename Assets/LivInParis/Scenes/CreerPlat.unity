@@ -6624,6 +6624,13 @@ MonoBehaviour:
   recetteField: {fileID: 922132254}
   nationaliteField: {fileID: 1825767186}
   proteinesField: {fileID: 854860162}
+  nomerreur: {fileID: 1664276323}
+  prixerreur: {fileID: 627010254}
+  personneserreur: {fileID: 218820903}
+  dateFaberreur: {fileID: 1013992347}
+  datePererreur: {fileID: 953844701}
+  nationaliteerreur: {fileID: 2044181973}
+  proteineserreur: {fileID: 2071549508}
   submitButton: {fileID: 973810677}
 --- !u!1 &1369207148
 GameObject:

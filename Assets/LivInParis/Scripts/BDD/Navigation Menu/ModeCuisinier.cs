@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ModeCuisinier : MonoBehaviour
 {
-
     public void RetourPagePrecedente()
     {
         SceneManager.LoadScene(9);
@@ -21,6 +20,4 @@ public class ModeCuisinier : MonoBehaviour
     {
         SceneManager.LoadScene(19);
     }
-
-
 }

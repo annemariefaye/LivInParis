@@ -5372,6 +5372,15 @@ MonoBehaviour:
   telField: {fileID: 854860162}
   clientField: {fileID: 1343737613}
   cuisinierField: {fileID: 676134940}
+  nomUtilisateurErreur: {fileID: 492465252}
+  mdpErreur: {fileID: 288701444}
+  emailErreur: {fileID: 1406050968}
+  nomErreur: {fileID: 1419178881}
+  prenomErreur: {fileID: 1747753447}
+  adresseErreur: {fileID: 1565781320}
+  telErreur: {fileID: 2092919839}
+  clientErreur: {fileID: 1871339922}
+  cuisinierErreur: {fileID: 2117312181}
   estCuisinier: 0
   estClient: 0
   submitButton: {fileID: 973810677}

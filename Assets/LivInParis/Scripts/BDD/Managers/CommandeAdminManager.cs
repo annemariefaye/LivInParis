@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using System;
-using TMPro;
 
 public class CommandeAdminManager : MonoBehaviour
 {
@@ -24,13 +24,15 @@ public class CommandeAdminManager : MonoBehaviour
         form.AddField("dateDebut", dateDebut.text);
         form.AddField("dateFin", dateFin.text);
 
-        using (WWW www = new WWW("http://localhost/livinparis/recuperer_commandes_par_date.php", form))
+        using (
+            WWW www = new WWW("http://localhost/livinparis/recuperer_commandes_par_date.php", form)
+        )
         {
             yield return www;
 
             if (!string.IsNullOrEmpty(www.error))
             {
-                Debug.LogError("Erreur lors de la récupération des plats : " + www.error);
+                Debug.LogError("Erreur lors de la rÃ©cupÃ©ration des plats : " + www.error);
                 yield break;
             }
 
@@ -58,7 +60,7 @@ public class CommandeAdminManager : MonoBehaviour
                 template.Date.text = date.ToString("dd/MM/yyyy");
                 template.Identite.text = donnees[2] + " " + donnees[3];
                 template.Statut.text = donnees[4];
-                Moyenne.text = "Moyenne des prix des commandes : " + donnees[5] + " €";
+                Moyenne.text = "Moyenne des prix des commandes : " + donnees[5] + " â‚¬";
             }
         }
     }

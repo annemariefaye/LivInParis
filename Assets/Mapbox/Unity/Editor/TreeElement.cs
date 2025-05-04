@@ -1,61 +1,69 @@
 namespace Mapbox.Editor
 {
-	using System;
-	using System.Collections.Generic;
-	using UnityEngine;
-	[Serializable]
-	public class TreeElement
-	{
-		[SerializeField] int m_ID;
-		[SerializeField] string m_Name;
-		[SerializeField] int m_Depth;
-		[NonSerialized] TreeElement m_Parent;
-		[NonSerialized] List<TreeElement> m_Children;
+    using System;
+    using System.Collections.Generic;
+    using UnityEngine;
 
-		public int depth
-		{
-			get { return m_Depth; }
-			set { m_Depth = value; }
-		}
+    [Serializable]
+    public class TreeElement
+    {
+        [SerializeField]
+        int m_ID;
 
-		public TreeElement parent
-		{
-			get { return m_Parent; }
-			set { m_Parent = value; }
-		}
+        [SerializeField]
+        string m_Name;
 
-		public List<TreeElement> children
-		{
-			get { return m_Children; }
-			set { m_Children = value; }
-		}
+        [SerializeField]
+        int m_Depth;
 
-		public bool hasChildren
-		{
-			get { return children != null && children.Count > 0; }
-		}
+        [NonSerialized]
+        TreeElement m_Parent;
 
-		public string name
-		{
-			get { return m_Name; } set { m_Name = value; }
-		}
+        [NonSerialized]
+        List<TreeElement> m_Children;
 
-		public int id
-		{
-			get { return m_ID; } set { m_ID = value; }
-		}
+        public int depth
+        {
+            get { return m_Depth; }
+            set { m_Depth = value; }
+        }
 
-		public TreeElement ()
-		{
-		}
+        public TreeElement parent
+        {
+            get { return m_Parent; }
+            set { m_Parent = value; }
+        }
 
-		public TreeElement (string name, int depth, int id)
-		{
-			m_Name = name;
-			m_ID = id;
-			m_Depth = depth;
-		}
-	}
+        public List<TreeElement> children
+        {
+            get { return m_Children; }
+            set { m_Children = value; }
+        }
+
+        public bool hasChildren
+        {
+            get { return children != null && children.Count > 0; }
+        }
+
+        public string name
+        {
+            get { return m_Name; }
+            set { m_Name = value; }
+        }
+
+        public int id
+        {
+            get { return m_ID; }
+            set { m_ID = value; }
+        }
+
+        public TreeElement() { }
+
+        public TreeElement(string name, int depth, int id)
+        {
+            m_Name = name;
+            m_ID = id;
+            m_Depth = depth;
+        }
+    }
 }
-
-

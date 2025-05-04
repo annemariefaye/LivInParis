@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TemplateMenuPlat : MonoBehaviour
 {
@@ -74,5 +74,4 @@ public class TemplateMenuPlat : MonoBehaviour
             DBManager.quantitesDansPanier.Add(IdPlat, quantite);
         }
     }
-
 }

@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Globalization;
+using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PanierManager : MonoBehaviour
 {
@@ -14,7 +14,6 @@ public class PanierManager : MonoBehaviour
     public Button validerButton;
     public GameObject fidelite;
     public TMP_Text fideliteText;
-    public bool fideliteActivee = false;
     public TMP_Text texteTotal;
 
     public TMP_Text fideliteHeader;
@@ -29,38 +28,59 @@ public class PanierManager : MonoBehaviour
         ChargerPanier();
         CalculerTotal();
 
-        if(DBManager.fidelite >= 100)
+        if (DBManager.fidelite >= 100)
         {
             fidelite.SetActive(true);
+            fideliteText.text = "Utiliser mes points";
         }
         else
         {
             fidelite.SetActive(false);
+            fideliteText.text = "Utiliser mes points";
         }
+
     }
 
     public void UtiliserPoints()
     {
-        if (!fideliteActivee)
+        if (!DBManager.fideliteActivee && DBManager.fidelite >= 100)
         {
-            fideliteText.text = "Retirer mes points";
-            total = 0;
-            DBManager.fidelite -= 100;
-            texteTotal.text = $"Total : {total} € . Valider commande";
-            StartCoroutine(DBManager.MettreAJourFidelite());
-            fideliteHeader.text = "Vous avez " + DBManager.fidelite + " points";
-            fideliteActivee = true;
+            float prixMax = float.MinValue;
+            TemplatePanier platOffert = null;
+
+            foreach (TemplatePanier template in tousLesTemplates)
+            {
+                if (quantitesDansPanier[template.idPlat] > 0 &&
+                    float.TryParse(template.prixText.text.Replace("â‚¬", ""), NumberStyles.Float, CultureInfo.InvariantCulture, out float prix))
+                {
+                    if (prix > prixMax)
+                    {
+                        prixMax = prix;
+                        platOffert = template;
+                    }
+                }
+            }
+
+            if (platOffert != null)
+            {
+                DBManager.fidelite -= 100;
+                DBManager.fideliteActivee = true;
+                CalculerTotal();
+                fideliteHeader.text = "Vous avez " + DBManager.fidelite + " points";
+                fideliteText.text = "Retirer mes points";
+            }
         }
-        else
+        else if (DBManager.fideliteActivee)
         {
-            fideliteText.text = "Utiliser mes points";
-            CalculerTotal();
             DBManager.fidelite += 100;
-            StartCoroutine(DBManager.MettreAJourFidelite());
+            DBManager.fideliteActivee = false;
+            CalculerTotal();
             fideliteHeader.text = "Vous avez " + DBManager.fidelite + " points";
-            fideliteActivee = false;
+            fideliteText.text = "Utiliser mes points";
         }
     }
+
+
 
     void ChargerPanier()
     {
@@ -80,6 +100,7 @@ public class PanierManager : MonoBehaviour
     public void CalculerTotal()
     {
         total = 0f;
+        DBManager.idPlatOffert = -1;
 
         foreach (var kvp in quantitesDansPanier)
         {
@@ -87,13 +108,50 @@ public class PanierManager : MonoBehaviour
             int quantite = kvp.Value;
 
             PlatData platData = TrouverPlatParId(idPlat);
-            if (platData != null && float.TryParse(platData.Prix, NumberStyles.Float, CultureInfo.InvariantCulture, out float prixUnitaire))
+            if (
+                platData != null
+                && float.TryParse(
+                    platData.Prix,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out float prixUnitaire
+                )
+            )
             {
                 total += prixUnitaire * quantite;
             }
         }
 
-        texteTotal.text = $"Total : {total} € . Valider commande";
+        float totalAffiche = total;
+
+        if (DBManager.fideliteActivee)
+        {
+            float prixMax = float.MinValue;
+
+            foreach (var kvp in quantitesDansPanier)
+            {
+                if (kvp.Value > 0)
+                {
+                    PlatData platData = TrouverPlatParId(kvp.Key);
+                    if (platData != null &&
+                        float.TryParse(platData.Prix, NumberStyles.Float, CultureInfo.InvariantCulture, out float prix))
+                    {
+                        if (prix > prixMax)
+                        {
+                            prixMax = prix;
+                            DBManager.idPlatOffert = kvp.Key;
+                        }
+                    }
+                }
+            }
+
+            if (prixMax != float.MinValue)
+            {
+                totalAffiche -= prixMax;
+            }
+        }
+
+        texteTotal.text = $"Total : {totalAffiche} â‚¬ . Valider commande";
     }
 
 
@@ -101,8 +159,6 @@ public class PanierManager : MonoBehaviour
     {
         foreach (PlatData plat in MenuPlatManager.Instance.tousLesPlats)
         {
-            
-
             if (plat.IdPlat == idPlat)
             {
                 return plat;
@@ -110,7 +166,6 @@ public class PanierManager : MonoBehaviour
         }
         return null;
     }
-
 
     void AfficherPlatDansPanier(PlatData platData, int quantite)
     {
@@ -121,7 +176,7 @@ public class PanierManager : MonoBehaviour
         panierScript.Init(platData.IdPlat, quantite);
 
         panierScript.titreText.text = platData.Nom;
-        panierScript.prixText.text = platData.Prix + "€";
+        panierScript.prixText.text = platData.Prix + "â‚¬";
         panierScript.quantiteText.text = quantite.ToString();
         panierScript.dateLivraisonInput.text = "";
         panierScript.adresseLivraisonInput.text = "";
@@ -154,16 +209,21 @@ public class PanierManager : MonoBehaviour
         });
     }
 
-
     public void ActiverBouton()
     {
-        bool toutEstValide = true;
+        bool toutEstValide = false;
 
         foreach (TemplatePanier template in tousLesTemplates)
         {
-            if (!template.dateValide || !template.adresseValide)
+            if (DBManager.quantitesDansPanier.ContainsKey(template.idPlat) &&
+                DBManager.quantitesDansPanier[template.idPlat] > 0)
             {
-                toutEstValide = false;
+                if (!template.dateValide || !template.adresseValide)
+                {
+                    validerButton.interactable = false;
+                    return;
+                }
+                toutEstValide = true;
             }
         }
 
@@ -175,13 +235,17 @@ public class PanierManager : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("nomutilisateur", DBManager.nomutilisateur);
 
+        int idPlatOffert = -1;
+        if (DBManager.fideliteActivee)
+        {
+            idPlatOffert = DBManager.idPlatOffert;
+        }
+
         int indexCommande = 0;
         foreach (TemplatePanier template in tousLesTemplates)
         {
-            if (DBManager.quantitesDansPanier[template.idPlat] <= 0)
-            {
-                continue;
-            }
+            if (template.idPlat == idPlatOffert) continue;
+            if (DBManager.quantitesDansPanier[template.idPlat] <= 0) continue;
 
             form.AddField("idPlat[]", template.idPlat);
             form.AddField("quantite[]", DBManager.quantitesDansPanier[template.idPlat]);
@@ -195,9 +259,9 @@ public class PanierManager : MonoBehaviour
 
         if (www.text == "0")
         {
-            Debug.Log("Commande envoyée avec succès");
+            Debug.Log("Commande envoyÃ©e avec succÃ¨s");
             CalculerTotal();
-            if (!fideliteActivee)
+            if (!DBManager.fideliteActivee)
             {
                 DBManager.fidelite += (int)total;
                 StartCoroutine(DBManager.MettreAJourFidelite());
@@ -235,9 +299,35 @@ public class PanierManager : MonoBehaviour
         }
     }
 
+    public void ViderPanier()
+    {
+        foreach (Transform child in parentContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        tousLesTemplates.Clear();
+        DBManager.quantitesDansPanier.Clear();
+    }
+
+    public void PropagerDate(string date)
+    {
+        for (int i = 1; i < tousLesTemplates.Count; i++)
+        {
+            tousLesTemplates[i].dateLivraisonInput.text = tousLesTemplates[0].dateLivraisonInput.text;
+        }
+    }
+
+    public void PropagerAdresse(string adresse)
+    {
+        for (int i = 1; i < tousLesTemplates.Count; i++)
+        {
+            tousLesTemplates[i].adresseLivraisonInput.text = tousLesTemplates[0].adresseLivraisonInput.text;
+        }
+    }
+
     private void Update()
     {
         ActiverBouton();
     }
-
 }

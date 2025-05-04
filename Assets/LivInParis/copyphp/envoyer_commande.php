@@ -59,6 +59,24 @@ for ($index = 0; $index < count($idPlats); $index++) {
                         VALUES ('$idLigneCommande', '$idLivreur', NULL, NULL, 'En attente')";
     mysqli_query($con, $insertLivraison) or die("5 : Erreur insertion livraison à l'index $index");
 }
+$totalMontant = 0;
+for ($index = 0; $index < count($idPlats); $index++) {
+    $idPlat = $idPlats[$index];
+    $quantite = $quantites[$index];
+
+    $getPrixPlatQuery = "SELECT Prix FROM Plat WHERE IdPlat = '$idPlat'";
+    $prixResult = mysqli_query($con, $getPrixPlatQuery);
+    if (!$prixResult || mysqli_num_rows($prixResult) == 0) {
+        echo "6 : Plat introuvable pour le calcul du prix";
+        die();
+    }
+    $prixRow = mysqli_fetch_assoc($prixResult);
+    $prixPlat = $prixRow['Prix'];
+    $totalMontant += $prixPlat * $quantite;
+}
+
+$insertTransaction = "INSERT INTO Transaction (IdCommande, Montant, Reussie) VALUES ('$idCommande', '$totalMontant', TRUE)";
+mysqli_query($con, $insertTransaction) or die("7 : Erreur insertion transaction");
 
 echo "0";
 

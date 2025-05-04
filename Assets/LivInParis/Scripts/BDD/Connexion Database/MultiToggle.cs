@@ -1,6 +1,6 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class MultiToggle : MonoBehaviour
 {
@@ -74,7 +74,13 @@ public class MultiToggle : MonoBehaviour
         cg.alpha = end;
     }
 
-    IEnumerator FadeOutAndDisable(CanvasGroup cg, float start, float end, float duration, GameObject go)
+    IEnumerator FadeOutAndDisable(
+        CanvasGroup cg,
+        float start,
+        float end,
+        float duration,
+        GameObject go
+    )
     {
         yield return StartCoroutine(FadeCanvasGroup(cg, start, end, duration));
         go.SetActive(false);

@@ -15,11 +15,11 @@ public static class CreerCuisinier
 
         if (www.text == "0")
         {
-            Debug.Log("Cuisinier créé avec succès");
+            Debug.Log("Cuisinier crÃ©Ã© avec succÃ¨s");
         }
         else
         {
-            Debug.Log("Erreur dans la création du cuisinier. Erreur # " + www.text);
+            Debug.Log("Erreur dans la crÃ©ation du cuisinier. Erreur # " + www.text);
         }
     }
 }

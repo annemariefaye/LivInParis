@@ -1,8 +1,8 @@
 namespace Mapbox.Unity.MeshGeneration.Components
 {
+    using Mapbox.Unity.MeshGeneration.Data;
     using UnityEngine;
     using Random = UnityEngine.Random;
-    using Mapbox.Unity.MeshGeneration.Data;
 
     [RequireComponent(typeof(MeshRenderer))]
     public class TextureSelector : MonoBehaviour
@@ -16,7 +16,14 @@ namespace Mapbox.Unity.MeshGeneration.Components
         private Material[] _topTextures;
         private Material[] _sideTextures;
 
-        public void Initialize(VectorEntity ve, bool doTextureTop, bool useSatelliteRoof, Material[] topTextures, bool doTextureSides, Material[] sideTextures)
+        public void Initialize(
+            VectorEntity ve,
+            bool doTextureTop,
+            bool useSatelliteRoof,
+            Material[] topTextures,
+            bool doTextureSides,
+            Material[] sideTextures
+        )
         {
             _useSatelliteRoof = useSatelliteRoof;
             _textureTop = doTextureTop;
@@ -37,24 +44,23 @@ namespace Mapbox.Unity.MeshGeneration.Components
             {
                 _meshRenderer.materials = new Material[2]
                 {
-                _topTextures[Random.Range(0, _topTextures.Length)],
-                _sideTextures[Random.Range(0, _sideTextures.Length)]
+                    _topTextures[Random.Range(0, _topTextures.Length)],
+                    _sideTextures[Random.Range(0, _sideTextures.Length)],
                 };
             }
             else if (_textureTop)
             {
                 _meshRenderer.materials = new Material[1]
-               {
-                _topTextures[Random.Range(0, _topTextures.Length)]
-               };
+                {
+                    _topTextures[Random.Range(0, _topTextures.Length)],
+                };
             }
 
             if (_useSatelliteRoof)
             {
-				_meshRenderer.materials[0].mainTexture = _tile.GetRasterData();
+                _meshRenderer.materials[0].mainTexture = _tile.GetRasterData();
                 _meshRenderer.materials[0].mainTextureScale = new Vector2(1f, 1f);
             }
         }
     }
-
 }

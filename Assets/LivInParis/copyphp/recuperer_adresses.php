@@ -10,7 +10,7 @@ if (!$con) {
 
 $nomutilisateur = $_POST['nomutilisateur'];
 
-$nomutilisateurcheckquerry = "SELECT Id, Adresse FROM Utilisateur WHERE NomUtilisateur = '$nomutilisateur';";
+$nomutilisateurcheckquerry = "SELECT Id FROM Utilisateur WHERE NomUtilisateur = '$nomutilisateur';";
 $nomutilisateurcheck = mysqli_query($con, $nomutilisateurcheckquerry);
 
 if (!$nomutilisateurcheck || mysqli_num_rows($nomutilisateurcheck) != 1) {
@@ -20,14 +20,21 @@ if (!$nomutilisateurcheck || mysqli_num_rows($nomutilisateurcheck) != 1) {
 
 $utilisateur = mysqli_fetch_assoc($nomutilisateurcheck);
 $idClient = $utilisateur['Id'];
-$adresseArrivee = $utilisateur['Adresse'];
 
 $query = "
-    SELECT lc.LieuLivraison, p.IdCuisinier, u.Adresse AS AdresseCuisinier
+    SELECT 
+        lc.LieuLivraison, 
+        p.IdCuisinier, 
+        u.Adresse AS AdresseCuisinier, 
+        m.Titre AS TitreMusique
     FROM Commande c
     JOIN LigneDeCommande lc ON c.IdCommande = lc.IdCommande
     JOIN Plat p ON lc.IdPlat = p.IdPlat
     JOIN Utilisateur u ON p.IdCuisinier = u.Id
+    LEFT JOIN (
+        SELECT Titre, Nationalite
+        FROM Musique
+    ) m ON m.Nationalite = p.Nationalite
     WHERE c.IdClient = '$idClient' AND c.Statut = 'En attente'
     ORDER BY lc.DateLivraison ASC
     LIMIT 1;
@@ -41,7 +48,10 @@ if (!$result || mysqli_num_rows($result) == 0) {
 }
 
 $row = mysqli_fetch_assoc($result);
-$adresseDepart = $row['LieuLivraison'];
+$adresseDepart = $row['AdresseCuisinier'];
+$adresseArrivee = $row['LieuLivraison'];
+$idCuisinier = $row['IdCuisinier'];
+$titreMusique = $row['TitreMusique'] ?? 'default';
 
-echo "0\t$adresseDepart\t$adresseArrivee";
+echo "0\t$adresseDepart\t$adresseArrivee\t$idCuisinier\t$titreMusique";
 ?>

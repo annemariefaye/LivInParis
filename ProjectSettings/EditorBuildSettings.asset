@@ -65,4 +65,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/LivInParis/Scenes/Cuisinier Commandes.unity
     guid: 33c9713643583104eae4b03654635759
+  - enabled: 1
+    path: Assets/LivInParis/Scenes/Noter Cuisinier.unity
+    guid: 8cdcd3beffe1d9c43861ddd86bbd5ab1
+  - enabled: 1
+    path: Assets/LivInParis/Scenes/Graphe2D.unity
+    guid: 08759925c869c4d4db53e59b7b622301
+  - enabled: 1
+    path: Assets/LivInParis/Scenes/GrapheCuisinierClient.unity
+    guid: 9d2c277c4ce8f534591a2ebe4c0a6b52
   m_configObjects: {}

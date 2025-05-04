@@ -1,11 +1,12 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace PbSI
 {
-    public class Graphe<T> where T : notnull
+    public class Graphe<T>
+        where T : notnull
     {
         #region Attributs
 
@@ -13,7 +14,7 @@ namespace PbSI
         /// Liste des noeuds du graphe
         /// </summary>
         private readonly List<Noeud<T>> noeuds;
-        private readonly Dictionary<int, Noeud<T>> noeudsDict; // Dictionnaire pour accès par ID
+        private readonly Dictionary<int, Noeud<T>> noeudsDict;
 
         /// <summary>
         /// Liste des liens du graphe
@@ -80,10 +81,11 @@ namespace PbSI
         /// <param name="matriceAdjacence">Matrice d'adjacence du graphe</param>
         public Graphe(double[,] matriceAdjacence, T[] contenus)
         {
-
             if (contenus.Length != matriceAdjacence.GetLength(0))
             {
-                throw new ArgumentException("Le nombre de contenus n'est pas égal au nombre de noeuds");
+                throw new ArgumentException(
+                    "Le nombre de contenus n'est pas égal au nombre de noeuds"
+                );
             }
 
             noeuds = new List<Noeud<T>>();
@@ -91,7 +93,6 @@ namespace PbSI
             noeudsDict = new Dictionary<int, Noeud<T>>();
 
             this.matriceAdjacence = matriceAdjacence;
-
 
             for (int i = 0; i < matriceAdjacence.GetLength(0); i++)
             {
@@ -117,12 +118,10 @@ namespace PbSI
 
         public Graphe(double[,] matriceAdjacence)
         {
-
             noeuds = new List<Noeud<T>>();
             liens = new HashSet<Lien<T>>();
             noeudsDict = new Dictionary<int, Noeud<T>>();
             this.matriceAdjacence = matriceAdjacence;
-
 
             for (int i = 0; i < matriceAdjacence.GetLength(0); i++)
             {
@@ -150,11 +149,16 @@ namespace PbSI
         /// Constructeur avec liste d'adjacence
         /// </summary>
         /// <param name="listeAdjacence">Liste d'adjacence du graphe</param>
-        public Graphe(Dictionary<Noeud<T>, List<(Noeud<T>, double poids)>> listeAdjacence, T[] contenus)
+        public Graphe(
+            Dictionary<Noeud<T>, List<(Noeud<T>, double poids)>> listeAdjacence,
+            T[] contenus
+        )
         {
             if (contenus.Length != listeAdjacence.Count)
             {
-                throw new ArgumentException("Le nombre de contenus n'est pas égal au nombre de noeuds");
+                throw new ArgumentException(
+                    "Le nombre de contenus n'est pas égal au nombre de noeuds"
+                );
             }
 
             noeuds = new List<Noeud<T>>();
@@ -163,7 +167,7 @@ namespace PbSI
 
             this.listeAdjacence = listeAdjacence;
 
-            int index = 0; 
+            int index = 0;
 
             foreach (var noeud in this.listeAdjacence)
             {
@@ -192,7 +196,6 @@ namespace PbSI
         /// <param name="listeAdjacence">Liste d'adjacence du graphe</param>
         public Graphe(Dictionary<Noeud<T>, List<(Noeud<T>, double poids)>> listeAdjacence)
         {
-
             noeuds = new List<Noeud<T>>();
             noeudsDict = new Dictionary<int, Noeud<T>>();
             liens = new HashSet<Lien<T>>();
@@ -222,7 +225,6 @@ namespace PbSI
             this.matriceAdjacence = GetMatriceAdjacence();
             UpdateProprietes();
         }
-
 
         #endregion
 
@@ -265,7 +267,6 @@ namespace PbSI
                 return this.listeAdjacence;
             }
         }
-
 
         /// <summary>
         /// Retourne l'ordre du graphe (nombre de noeuds)
@@ -350,7 +351,6 @@ namespace PbSI
             get { return liens; }
         }
 
-
         #endregion
 
         #region Méthodes
@@ -371,7 +371,6 @@ namespace PbSI
             throw new KeyNotFoundException($"Aucun nœud trouvé avec l'ID {id}");
         }
 
-
         /// <summary>
         /// Ajoute un noeud au graphe
         /// </summary>
@@ -383,18 +382,15 @@ namespace PbSI
                 noeuds.Add(noeud);
                 noeudsDict[noeud.Id] = noeud;
                 this.proprietesCalculees = false;
-
             }
-
         }
-
 
         /// <summary>
         /// Ajoute une relation entre deux noeuds
         /// </summary>
         /// <param name="id1">Identifiant du premier noeud</param>
         /// <param name="id2">Identifiant du second noeud</param>
-        public void AjouterRelation(Noeud<T> source,Noeud<T> destination, double poids=1)
+        public void AjouterRelation(Noeud<T> source, Noeud<T> destination, double poids = 1)
         {
             AjouterMembre(source);
             AjouterMembre(destination);
@@ -428,7 +424,7 @@ namespace PbSI
         /// Construit et retourne la liste d'adjacence du graphe
         /// </summary>
         /// <returns>Liste d'adjacence du graphe</returns>
-     
+
         private Dictionary<Noeud<T>, List<(Noeud<T>, double poids)>> GetListeAdjacence()
         {
             var listeAdjacence = new Dictionary<Noeud<T>, List<(Noeud<T>, double)>>();
@@ -445,7 +441,6 @@ namespace PbSI
 
             return listeAdjacence;
         }
-
 
         /// <summary>
         /// Met à jour les propriétés du graphe
@@ -541,24 +536,24 @@ namespace PbSI
         /// </summary>
         public void AfficherListeAdjacence()
         {
-            if(this.listeAdjacence != null)
+            if (this.listeAdjacence != null)
             {
                 foreach (var kvp in this.listeAdjacence)
                 {
-                    Console.Write($"Noeud {kvp.Key.Id} -> ");
+                    string output = $"Noeud {kvp.Key.Id} -> ";
+
                     foreach (var (destination, poids) in kvp.Value)
                     {
-                        Console.Write($"(Noeud {destination.Id}, Poids : {poids}) ");
+                        output += $"(Noeud {destination.Id}, Poids : {poids}) ";
                     }
-                    Console.WriteLine();
+
+                    Debug.Log(output);
                 }
             }
-
             else
             {
-                Console.WriteLine("Liste d'adjacence null");
+                Debug.Log("Liste d'adjacence null");
             }
-
         }
 
         /// <summary>
@@ -570,31 +565,45 @@ namespace PbSI
             {
                 int taille = this.matriceAdjacence.GetLength(0);
 
-
-                Console.Write("      ");
+                string output = "      ";
                 foreach (var noeud in noeuds)
                 {
-                    Console.Write($"Noeud {noeud.Id}  ");
+                    output += $"Noeud {noeud.Id}  ";
                 }
-                Console.WriteLine();
+                output += "\n";
 
                 for (int i = 0; i < taille; i++)
                 {
-                    Console.Write($"{noeuds[i]}  ");
+                    output += $"{noeuds[i]}  ";
 
                     for (int j = 0; j < taille; j++)
                     {
-                        Console.Write($"Poids : {this.matriceAdjacence[i, j]:0.##}  ");
+                        output += $"Poids : {this.matriceAdjacence[i, j]:0.##}  ";
                     }
-                    Console.WriteLine();
+                    output += "\n";
                 }
+
+                Debug.Log(output);
             }
             else
             {
-                Console.WriteLine("Liste d'adjacence null");
+                Debug.Log("Matrice d'adjacence null");
             }
         }
 
+
+        public List<Noeud<T>> GetVoisins(Noeud<T> noeud)
+        {
+            List<Noeud<T>> voisins = new List<Noeud<T>>();
+            if (this.ListeAdjacence != null && this.ListeAdjacence.ContainsKey(noeud))
+            {
+                foreach (var voisin in this.ListeAdjacence[noeud])
+                {
+                    voisins.Add(voisin.Item1);
+                }
+            }
+            return voisins;
+        }
 
         #endregion
     }

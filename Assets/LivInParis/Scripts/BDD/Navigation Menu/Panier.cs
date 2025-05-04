@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public class Panier : MonoBehaviour
 {
@@ -11,9 +11,19 @@ public class Panier : MonoBehaviour
 
     private void Start()
     {
-        NU.text = DBManager.prenom;
+        if(DBManager.nomEntreprise != null && DBManager.nomEntreprise.Length > 0)
+        {
+            NU.text = DBManager.prenom;
+        }
+        else
+        {
+            NU.text = DBManager.nomEntreprise;
+        }
         fidelite.text = "Vous avez " + DBManager.fidelite + " points";
+
+
     }
+
     public void RetourPagePrecedente()
     {
         SceneManager.LoadScene(5);
@@ -23,5 +33,4 @@ public class Panier : MonoBehaviour
     {
         SceneManager.LoadScene(16);
     }
-
 }

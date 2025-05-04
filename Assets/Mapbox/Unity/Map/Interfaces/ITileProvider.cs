@@ -4,39 +4,39 @@ using Mapbox.Unity.Map.TileProviders;
 
 namespace Mapbox.Unity.Map.Interfaces
 {
-	public interface ITileProvider
-	{
-		event EventHandler<ExtentArgs> ExtentChanged;
-		ITileProviderOptions Options { get; }
+    public interface ITileProvider
+    {
+        event EventHandler<ExtentArgs> ExtentChanged;
+        ITileProviderOptions Options { get; }
 
-		// TODO: add cancel event?
-		// Alternatively, give mapvisualizer an object recycling strategy that can separately determine when to change gameobjects.
-		// This removal would essentially lead to a cancel request and nothing more.
+        // TODO: add cancel event?
+        // Alternatively, give mapvisualizer an object recycling strategy that can separately determine when to change gameobjects.
+        // This removal would essentially lead to a cancel request and nothing more.
 
-		void Initialize(IMap map);
-		// TODO: Maybe combine both these methods.
-		void SetOptions(ITileProviderOptions options);
+        void Initialize(IMap map);
 
-		// TODO: add reset/clear method?
-	}
+        // TODO: Maybe combine both these methods.
+        void SetOptions(ITileProviderOptions options);
 
-	public interface IUnifiedTileProvider
-	{
-		event Action<UnwrappedTileId> OnTileAdded;
-		event Action<UnwrappedTileId> OnTileRemoved;
+        // TODO: add reset/clear method?
+    }
 
-		// TODO: add cancel event?
-		// Alternatively, give mapvisualizer an object recycling strategy that can separately determine when to change gameobjects.
-		// This removal would essentially lead to a cancel request and nothing more.
+    public interface IUnifiedTileProvider
+    {
+        event Action<UnwrappedTileId> OnTileAdded;
+        event Action<UnwrappedTileId> OnTileRemoved;
 
-		void Initialize(IUnifiedMap map);
+        // TODO: add cancel event?
+        // Alternatively, give mapvisualizer an object recycling strategy that can separately determine when to change gameobjects.
+        // This removal would essentially lead to a cancel request and nothing more.
 
-		// TODO: add reset/clear method?
-	}
-	public class TileStateChangedEventArgs : EventArgs
-	{
-		public UnwrappedTileId TileId;
-	}
+        void Initialize(IUnifiedMap map);
 
+        // TODO: add reset/clear method?
+    }
 
+    public class TileStateChangedEventArgs : EventArgs
+    {
+        public UnwrappedTileId TileId;
+    }
 }

@@ -4,7 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Mapbox.Geocoding {
+namespace Mapbox.Geocoding
+{
     using System;
     using Mapbox.Json;
     using Mapbox.Utils;
@@ -15,20 +16,21 @@ namespace Mapbox.Geocoding {
     //http://stackoverflow.com/a/12903628
     [Serializable]
 #endif
-	public class Geometry {
-		/// <summary>
-		///     Gets or sets type. Geocode results will always be type: point.
-		/// </summary>
-		/// <value>The GeoJSON geometry type.</value>
-		[JsonProperty("type")]
-		public string Type { get; set; }
+    public class Geometry
+    {
+        /// <summary>
+        ///     Gets or sets type. Geocode results will always be type: point.
+        /// </summary>
+        /// <value>The GeoJSON geometry type.</value>
+        [JsonProperty("type")]
+        public string Type { get; set; }
 
-		/// <summary>
-		///     Gets or sets coordinates. Because they are points, Geocode results will always be  a single Geocoordinate.
-		/// </summary>
-		/// <value>The coordinates.</value>
-		[JsonConverter(typeof(LonLatToVector2dConverter))]
-		[JsonProperty("coordinates")]
-		public Vector2d Coordinates { get; set; }
-	}
+        /// <summary>
+        ///     Gets or sets coordinates. Because they are points, Geocode results will always be  a single Geocoordinate.
+        /// </summary>
+        /// <value>The coordinates.</value>
+        [JsonConverter(typeof(LonLatToVector2dConverter))]
+        [JsonProperty("coordinates")]
+        public Vector2d Coordinates { get; set; }
+    }
 }

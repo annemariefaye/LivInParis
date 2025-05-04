@@ -1,20 +1,20 @@
 ﻿namespace Mapbox.Unity.Telemetry
 {
-	public static class TelemetryFactory
-	{
-		public static ITelemetryLibrary GetTelemetryInstance()
-		{
+    public static class TelemetryFactory
+    {
+        public static ITelemetryLibrary GetTelemetryInstance()
+        {
 #if UNITY_EDITOR
-			return TelemetryEditor.Instance;
+            return TelemetryEditor.Instance;
 #elif UNITY_IOS
-			return TelemetryIos.Instance;
+            return TelemetryIos.Instance;
 #elif UNITY_ANDROID
-			return TelemetryAndroid.Instance;
+            return TelemetryAndroid.Instance;
 #elif UNITY_WEBGL
-			return TelemetryWebgl.Instance;
+            return TelemetryWebgl.Instance;
 #else
-			return TelemetryFallback.Instance;
+            return TelemetryFallback.Instance;
 #endif
-		}
-	}
+        }
+    }
 }

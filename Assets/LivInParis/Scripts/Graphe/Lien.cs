@@ -1,11 +1,12 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace PbSI
 {
-    public class Lien<T> : IEquatable<Lien<T>> where T : notnull 
+    public class Lien<T> : IEquatable<Lien<T>>
+        where T : notnull
     {
         #region Attributs
 
@@ -88,7 +89,9 @@ namespace PbSI
 
         public bool Equals(Lien<T> other)
         {
-            return this.source.Equals(other.source) && this.destination.Equals(other.destination) && this.poids.Equals(other.poids);
+            return this.source.Equals(other.source)
+                && this.destination.Equals(other.destination)
+                && this.poids.Equals(other.poids);
         }
 
         public int GetHashCode(Lien<T> obj)
@@ -102,7 +105,6 @@ namespace PbSI
 
                 return hash;
             }
-
         }
     }
 }

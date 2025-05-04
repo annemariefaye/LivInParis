@@ -1,41 +1,41 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Data;
-using System.Collections.Generic;
-using System;
 using Mapbox.Unity.Utilities;
+using UnityEngine;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-	public class ModifierStackBase : ScriptableObject
-	{
-		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers = new List<MeshModifier>();
-		[NodeEditorElement("Game Object Modifiers")] public List<GameObjectModifier> GoModifiers = new List<GameObjectModifier>();
+    public class ModifierStackBase : ScriptableObject
+    {
+        [NodeEditorElement("Mesh Modifiers")]
+        public List<MeshModifier> MeshModifiers = new List<MeshModifier>();
 
-		public virtual GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
-		{
-			return null;
-		}
+        [NodeEditorElement("Game Object Modifiers")]
+        public List<GameObjectModifier> GoModifiers = new List<GameObjectModifier>();
 
-		public virtual void Initialize()
-		{
+        public virtual GameObject Execute(
+            UnityTile tile,
+            VectorFeatureUnity feature,
+            MeshData meshData,
+            GameObject parent = null,
+            string type = ""
+        )
+        {
+            return null;
+        }
 
-		}
+        public virtual void Initialize() { }
 
-		public void UnregisterTile(UnityTile tile)
-		{
-			OnUnregisterTile(tile);
-		}
+        public void UnregisterTile(UnityTile tile)
+        {
+            OnUnregisterTile(tile);
+        }
 
-		public virtual void OnUnregisterTile(UnityTile tile)
-		{
+        public virtual void OnUnregisterTile(UnityTile tile) { }
 
-		}
-
-		public virtual void Clear()
-		{
-
-		}
-	}
+        public virtual void Clear() { }
+    }
 }

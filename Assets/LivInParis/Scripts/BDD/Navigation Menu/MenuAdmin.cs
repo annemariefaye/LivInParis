@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MenuAdmin : MonoBehaviour
 {
@@ -34,6 +34,21 @@ public class MenuAdmin : MonoBehaviour
     public void Export()
     {
         //SceneManager.LoadScene(11);
-        Debug.Log("partie de valentin à intégrer");
+        Debug.Log("partie de valentin Ã  intÃ©grer");
+    }
+
+    public void Graphe2D()
+    {
+        SceneManager.LoadScene(21);
+    }
+
+    public void Graphe3D()
+    {
+        SceneManager.LoadScene(3);
+    }
+
+    public void GrapheColore()
+    {
+        SceneManager.LoadScene(22);
     }
 }

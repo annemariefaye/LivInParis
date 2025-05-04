@@ -1,11 +1,12 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace PbSI
 {
-    public class Noeud<T> : IEquatable<Noeud<T>> where T : notnull
+    public class Noeud<T> : IEquatable<Noeud<T>>
+        where T : notnull
     {
         #region Attributs
 
@@ -15,6 +16,8 @@ namespace PbSI
         private readonly int id;
 
         private readonly T contenu;
+
+        private string? couleur = "";
 
         #endregion
 
@@ -35,6 +38,13 @@ namespace PbSI
             this.id = id;
         }
 
+        public Noeud(int id, T contenu, string couleur)
+        {
+            this.id = id;
+            this.contenu = contenu;
+            this.couleur = couleur;
+        }
+
         #endregion
 
         #region Propriétés
@@ -50,6 +60,12 @@ namespace PbSI
         public T? Contenu
         {
             get { return this.contenu; }
+        }
+
+        public string? Couleur
+        {
+            get { return this.couleur; }
+            set { this.couleur = value; }
         }
 
         /// <summary>

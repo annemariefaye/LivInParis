@@ -20,7 +20,7 @@ public class AdminClientManager : MonoBehaviour
 
             if (!string.IsNullOrEmpty(www.error))
             {
-                Debug.LogError("Erreur de récupération : " + www.error);
+                Debug.LogError("Erreur de rÃ©cupÃ©ration : " + www.error);
                 yield break;
             }
 

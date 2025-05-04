@@ -1,218 +1,249 @@
 ﻿namespace Mapbox.Editor
 {
-	using UnityEngine;
-	using System.Collections;
-	using UnityEditor;
-	using Mapbox.Unity.Map;
-	using Mapbox.Unity.MeshGeneration.Modifiers;
+    using System.Collections;
+    using Mapbox.Unity.Map;
+    using Mapbox.Unity.MeshGeneration.Modifiers;
+    using UnityEditor;
+    using UnityEngine;
 
-	public class BehaviorModifiersSectionDrawer
-	{
-		string objectId = "";
+    public class BehaviorModifiersSectionDrawer
+    {
+        string objectId = "";
 
-		bool showGameplay
-		{
-			get
-			{
-				return EditorPrefs.GetBool(objectId + "VectorSubLayerProperties_showGameplay");
-			}
-			set
-			{
-				EditorPrefs.SetBool(objectId + "VectorSubLayerProperties_showGameplay", value);
-			}
-		}
+        bool showGameplay
+        {
+            get { return EditorPrefs.GetBool(objectId + "VectorSubLayerProperties_showGameplay"); }
+            set { EditorPrefs.SetBool(objectId + "VectorSubLayerProperties_showGameplay", value); }
+        }
 
-		public void DrawUI(SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp, VectorSourceType sourceType)
-		{
+        public void DrawUI(
+            SerializedProperty layerProperty,
+            VectorPrimitiveType primitiveTypeProp,
+            VectorSourceType sourceType
+        )
+        {
+            showGameplay = EditorGUILayout.Foldout(showGameplay, "Behavior Modifiers");
+            if (showGameplay)
+            {
+                bool isPrimitiveTypeValidForBuidingIds = (
+                    primitiveTypeProp == VectorPrimitiveType.Polygon
+                    || primitiveTypeProp == VectorPrimitiveType.Custom
+                );
+                bool isSourceValidForBuildingIds = sourceType != VectorSourceType.MapboxStreets;
 
-			showGameplay = EditorGUILayout.Foldout(showGameplay, "Behavior Modifiers");
-			if (showGameplay)
-			{
+                layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue =
+                    isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
 
-				bool isPrimitiveTypeValidForBuidingIds = (primitiveTypeProp == VectorPrimitiveType.Polygon || primitiveTypeProp == VectorPrimitiveType.Custom);
-				bool isSourceValidForBuildingIds = sourceType != VectorSourceType.MapboxStreets;
+                if (layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue == true)
+                {
+                    EditorGUI.BeginChangeCheck();
+                    EditorGUILayout.PropertyField(
+                        layerProperty.FindPropertyRelative("buildingsWithUniqueIds"),
+                        new GUIContent
+                        {
+                            text = "Buildings With Unique Ids",
+                            tooltip =
+                                "Turn on this setting only when rendering 3D buildings from the Mapbox Streets with Building Ids tileset. Using this setting with any other polygon layers or source will result in visual artifacts. ",
+                        }
+                    );
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        EditorHelper.CheckForModifiedProperty(layerProperty);
+                    }
+                }
 
-				layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
+                var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
+                var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative(
+                    "combineMeshes"
+                );
 
-				if (layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue == true)
-				{
-					EditorGUI.BeginChangeCheck();
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("buildingsWithUniqueIds"), new GUIContent
-					{
-						text = "Buildings With Unique Ids",
-						tooltip =
-							"Turn on this setting only when rendering 3D buildings from the Mapbox Streets with Building Ids tileset. Using this setting with any other polygon layers or source will result in visual artifacts. "
-					});
-					if (EditorGUI.EndChangeCheck())
-					{
-						EditorHelper.CheckForModifiedProperty(layerProperty);
-					}
-				}
+                EditorGUILayout.BeginHorizontal();
+                if (combineMeshesProperty.boolValue == false)
+                {
+                    var featurePositionProperty = layerProperty.FindPropertyRelative(
+                        "moveFeaturePositionTo"
+                    );
+                    GUIContent dropDownLabel = new GUIContent
+                    {
+                        text = "Feature Position",
+                        tooltip = "Position to place feature in the tile. ",
+                    };
 
-				var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
-				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
+                    GUIContent[] dropDownItems = new GUIContent[
+                        featurePositionProperty.enumDisplayNames.Length
+                    ];
 
-				EditorGUILayout.BeginHorizontal();
-				if (combineMeshesProperty.boolValue == false)
-				{
-					var featurePositionProperty = layerProperty.FindPropertyRelative("moveFeaturePositionTo");
-					GUIContent dropDownLabel = new GUIContent
-					{
-						text = "Feature Position",
-						tooltip = "Position to place feature in the tile. "
-					};
+                    for (int i = 0; i < featurePositionProperty.enumDisplayNames.Length; i++)
+                    {
+                        dropDownItems[i] = new GUIContent
+                        {
+                            text = featurePositionProperty.enumDisplayNames[i],
+                        };
+                    }
+                    EditorGUI.BeginChangeCheck();
+                    featurePositionProperty.enumValueIndex = EditorGUILayout.Popup(
+                        dropDownLabel,
+                        featurePositionProperty.enumValueIndex,
+                        dropDownItems
+                    );
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        EditorHelper.CheckForModifiedProperty(layerProperty);
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
+                DrawMeshModifiers(layerProperty);
+                DrawGoModifiers(layerProperty);
+            }
+        }
 
-					GUIContent[] dropDownItems = new GUIContent[featurePositionProperty.enumDisplayNames.Length];
+        private void DrawMeshModifiers(SerializedProperty property)
+        {
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.LabelField(
+                new GUIContent
+                {
+                    text = "Mesh Modifiers",
+                    tooltip = "Modifiers that manipulate the features mesh. ",
+                }
+            );
 
-					for (int i = 0; i < featurePositionProperty.enumDisplayNames.Length; i++)
-					{
-						dropDownItems[i] = new GUIContent
-						{
-							text = featurePositionProperty.enumDisplayNames[i]
-						};
-					}
-					EditorGUI.BeginChangeCheck();
-					featurePositionProperty.enumValueIndex = EditorGUILayout.Popup(dropDownLabel, featurePositionProperty.enumValueIndex, dropDownItems);
-					if (EditorGUI.EndChangeCheck())
-					{
-						EditorHelper.CheckForModifiedProperty(layerProperty);
-					}
-				}
-				EditorGUILayout.EndHorizontal();
-				DrawMeshModifiers(layerProperty);
-				DrawGoModifiers(layerProperty);
-			}
-		}
+            var meshfac = property.FindPropertyRelative("MeshModifiers");
 
-		private void DrawMeshModifiers(SerializedProperty property)
-		{
+            for (int i = 0; i < meshfac.arraySize; i++)
+            {
+                var ind = i;
+                EditorGUILayout.BeginHorizontal();
 
-			EditorGUILayout.BeginVertical();
-			EditorGUILayout.LabelField(new GUIContent
-			{
-				text = "Mesh Modifiers",
-				tooltip = "Modifiers that manipulate the features mesh. "
-			});
+                EditorGUILayout.BeginVertical();
+                meshfac.GetArrayElementAtIndex(ind).objectReferenceValue =
+                    EditorGUILayout.ObjectField(
+                        meshfac.GetArrayElementAtIndex(i).objectReferenceValue,
+                        typeof(MeshModifier),
+                        false
+                    ) as ScriptableObject;
 
-			var meshfac = property.FindPropertyRelative("MeshModifiers");
+                EditorGUILayout.EndVertical();
 
-			for (int i = 0; i < meshfac.arraySize; i++)
-			{
-				var ind = i;
-				EditorGUILayout.BeginHorizontal();
+                if (
+                    GUILayout.Button(
+                        new GUIContent("x"),
+                        (GUIStyle)"minibuttonright",
+                        GUILayout.Width(30)
+                    )
+                )
+                {
+                    bool elementWasDeleted = false;
+                    if (meshfac.arraySize > 0)
+                    {
+                        meshfac.DeleteArrayElementAtIndex(ind);
+                        elementWasDeleted = true;
+                    }
+                    if (meshfac.arraySize > 0)
+                    {
+                        meshfac.DeleteArrayElementAtIndex(ind);
+                    }
+                    if (elementWasDeleted)
+                    {
+                        EditorHelper.CheckForModifiedProperty(property);
+                    }
+                }
 
-				EditorGUILayout.BeginVertical();
-				meshfac.GetArrayElementAtIndex(ind).objectReferenceValue =
-					EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false)
-						as ScriptableObject;
+                EditorGUILayout.EndHorizontal();
+            }
 
-				EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel++;
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(EditorGUI.indentLevel * 12);
+            Rect buttonRect = GUILayoutUtility.GetLastRect();
+            if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
+            {
+                PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(MeshModifier), meshfac));
+                if (Event.current.type == EventType.Repaint)
+                    buttonRect = GUILayoutUtility.GetLastRect();
+            }
 
-				if (GUILayout.Button(new GUIContent("x"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-				{
-					bool elementWasDeleted = false;
-					if (meshfac.arraySize > 0)
-					{
-						meshfac.DeleteArrayElementAtIndex(ind);
-						elementWasDeleted = true;
-					}
-					if (meshfac.arraySize > 0)
-					{
-						meshfac.DeleteArrayElementAtIndex(ind);
-					}
-					if (elementWasDeleted)
-					{
-						EditorHelper.CheckForModifiedProperty(property);
-					}
-				}
+            if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
+            {
+                ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, -1, null, property);
+            }
 
-				EditorGUILayout.EndHorizontal();
-			}
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel--;
+        }
 
-			EditorGUI.indentLevel++;
-			EditorGUILayout.BeginHorizontal();
-			GUILayout.Space(EditorGUI.indentLevel * 12);
-			Rect buttonRect = GUILayoutUtility.GetLastRect();
-			if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
-			{
-				PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(MeshModifier), meshfac));
-				if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
-			}
+        private void DrawGoModifiers(SerializedProperty property)
+        {
+            EditorGUILayout.BeginVertical();
 
-			if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
-			{
-				ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, -1, null, property);
-			}
+            EditorGUILayout.LabelField(
+                new GUIContent
+                {
+                    text = "Game Object Modifiers",
+                    tooltip = "Modifiers that manipulate the GameObject after mesh generation.",
+                }
+            );
+            var gofac = property.FindPropertyRelative("GoModifiers");
 
-			EditorGUILayout.EndHorizontal();
-			EditorGUILayout.EndVertical();
-			EditorGUI.indentLevel--;
-		}
+            for (int i = 0; i < gofac.arraySize; i++)
+            {
+                var ind = i;
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.BeginVertical();
+                GUILayout.Space(5);
+                gofac.GetArrayElementAtIndex(ind).objectReferenceValue =
+                    EditorGUILayout.ObjectField(
+                        gofac.GetArrayElementAtIndex(i).objectReferenceValue,
+                        typeof(GameObjectModifier),
+                        false
+                    ) as ScriptableObject;
+                EditorGUILayout.EndVertical();
 
-		private void DrawGoModifiers(SerializedProperty property)
-		{
+                if (GUILayout.Button(new GUIContent("x"), GUILayout.Width(30)))
+                {
+                    bool elementWasDeleted = false;
+                    if (gofac.arraySize > 0)
+                    {
+                        gofac.DeleteArrayElementAtIndex(ind);
+                        elementWasDeleted = true;
+                    }
+                    if (gofac.arraySize > 0)
+                    {
+                        gofac.DeleteArrayElementAtIndex(ind);
+                    }
+                    if (elementWasDeleted)
+                    {
+                        EditorHelper.CheckForModifiedProperty(property);
+                    }
+                }
 
-			EditorGUILayout.BeginVertical();
+                EditorGUILayout.EndHorizontal();
+            }
 
-			EditorGUILayout.LabelField(new GUIContent
-			{
-				text = "Game Object Modifiers",
-				tooltip = "Modifiers that manipulate the GameObject after mesh generation."
-			});
-			var gofac = property.FindPropertyRelative("GoModifiers");
+            EditorGUI.indentLevel++;
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(EditorGUI.indentLevel * 12);
+            Rect buttonRect = GUILayoutUtility.GetLastRect();
 
-			for (int i = 0; i < gofac.arraySize; i++)
-			{
-				var ind = i;
-				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.BeginVertical();
-				GUILayout.Space(5);
-				gofac.GetArrayElementAtIndex(ind).objectReferenceValue =
-					EditorGUILayout.ObjectField(gofac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier),
-						false) as ScriptableObject;
-				EditorGUILayout.EndVertical();
+            if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
+            {
+                PopupWindow.Show(
+                    buttonRect,
+                    new PopupSelectionMenu(typeof(GameObjectModifier), gofac)
+                );
+                if (Event.current.type == EventType.Repaint)
+                    buttonRect = GUILayoutUtility.GetLastRect();
+            }
 
-				if (GUILayout.Button(new GUIContent("x"), GUILayout.Width(30)))
-				{
-					bool elementWasDeleted = false;
-					if (gofac.arraySize > 0)
-					{
-						gofac.DeleteArrayElementAtIndex(ind);
-						elementWasDeleted = true;
-					}
-					if (gofac.arraySize > 0)
-					{
-						gofac.DeleteArrayElementAtIndex(ind);
-					}
-					if (elementWasDeleted)
-					{
-						EditorHelper.CheckForModifiedProperty(property);
-					}
-				}
+            if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
+            {
+                ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, -1, null, property);
+            }
 
-				EditorGUILayout.EndHorizontal();
-			}
-
-			EditorGUI.indentLevel++;
-			EditorGUILayout.BeginHorizontal();
-			GUILayout.Space(EditorGUI.indentLevel * 12);
-			Rect buttonRect = GUILayoutUtility.GetLastRect();
-
-			if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
-			{
-				PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(GameObjectModifier), gofac));
-				if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
-			}
-
-			if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
-			{
-
-				ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, -1, null, property);
-			}
-
-			EditorGUILayout.EndHorizontal();
-			EditorGUI.indentLevel--;
-			EditorGUILayout.EndVertical();
-		}
-	}
+            EditorGUILayout.EndHorizontal();
+            EditorGUI.indentLevel--;
+            EditorGUILayout.EndVertical();
+        }
+    }
 }

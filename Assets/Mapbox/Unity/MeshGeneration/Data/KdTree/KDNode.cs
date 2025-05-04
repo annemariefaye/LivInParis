@@ -41,11 +41,14 @@ namespace KDTree
         /// <summary>
         /// The left and right children.
         /// </summary>
-        protected internal KDNode<T> pLeft, pRight;
+        protected internal KDNode<T> pLeft,
+            pRight;
+
         /// <summary>
         /// The split dimension.
         /// </summary>
         protected internal int iSplitDimension;
+
         /// <summary>
         /// The split value (larger go into the right, smaller go into left)
         /// </summary>
@@ -55,7 +58,8 @@ namespace KDTree
         /// <summary>
         /// The min and max bound for this node.  All dimensions.
         /// </summary>
-        protected internal double[] tMinBound, tMaxBound;
+        protected internal double[] tMinBound,
+            tMaxBound;
 
         /// <summary>
         /// Does this node represent only one point.
@@ -76,8 +80,8 @@ namespace KDTree
             this.bSinglePoint = true;
 
             // Setup leaf elements.
-            this.tPoints = new double[iBucketCapacity+1][];
-            this.tData = new T[iBucketCapacity+1];
+            this.tPoints = new double[iBucketCapacity + 1][];
+            this.tData = new T[iBucketCapacity + 1];
         }
         #endregion
 
@@ -90,7 +94,10 @@ namespace KDTree
         /// <summary>
         /// Is this KDNode a leaf or not?
         /// </summary>
-        public bool IsLeaf { get { return tPoints != null; } }
+        public bool IsLeaf
+        {
+            get { return tPoints != null; }
+        }
 
         /// <summary>
         /// Insert a new point into this leaf node.
@@ -163,8 +170,10 @@ namespace KDTree
         {
             for (int i = 0; i < iDimensions; ++i)
             {
-                if (tPoint[i] > tMaxBound[i]) return false;
-                if (tPoint[i] < tMinBound[i]) return false;
+                if (tPoint[i] > tMaxBound[i])
+                    return false;
+                if (tPoint[i] < tMinBound[i])
+                    return false;
             }
             return true;
         }
@@ -176,7 +185,7 @@ namespace KDTree
         private void ExtendBounds(double[] tPoint)
         {
             // If we don't have bounds, create them using the new point then bail.
-            if (tMinBound == null) 
+            if (tMinBound == null)
             {
                 tMinBound = new double[iDimensions];
                 tMaxBound = new double[iDimensions];
@@ -192,7 +201,7 @@ namespace KDTree
                 {
                     if (!Double.IsNaN(tMinBound[i]) || !Double.IsNaN(tMaxBound[i]))
                         bSinglePoint = false;
-                    
+
                     tMinBound[i] = Double.NaN;
                     tMaxBound[i] = Double.NaN;
                 }
@@ -213,7 +222,7 @@ namespace KDTree
         /// Double the capacity of this leaf.
         /// </summary>
         private void IncreaseLeafCapacity()
-        {   
+        {
             Array.Resize<double[]>(ref tPoints, tPoints.Length * 2);
             Array.Resize<T>(ref tData, tData.Length * 2);
         }
@@ -256,7 +265,7 @@ namespace KDTree
                 fSplitValue = Double.MaxValue;
             else if (fSplitValue == Double.NegativeInfinity)
                 fSplitValue = Double.MinValue;
-            
+
             // Don't let the split value be the same as the upper value as
             // can happen due to rounding errors!
             if (fSplitValue == tMaxBound[iSplitDimension])
@@ -274,7 +283,7 @@ namespace KDTree
         {
             // Create the new children.
             pRight = new KDNode<T>(iDimensions, iBucketCapacity);
-            pLeft  = new KDNode<T>(iDimensions, iBucketCapacity);
+            pLeft = new KDNode<T>(iDimensions, iBucketCapacity);
 
             // Move each item in this leaf into the children.
             for (int i = 0; i < Size; ++i)
@@ -286,7 +295,6 @@ namespace KDTree
                 // If larger, put it in the right.
                 if (tOldPoint[iSplitDimension] > fSplitValue)
                     pRight.AddLeafPoint(tOldPoint, kOldData);
-
                 // If smaller, put it in the left.
                 else
                     pLeft.AddLeafPoint(tOldPoint, kOldData);

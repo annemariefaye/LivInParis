@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Mapbox.Unity.Map;
+using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -23,7 +23,7 @@ public class PlayerMovement : MonoBehaviour
         if (cheminSousGraphe.Count > 1 && !estEnDeplacement)
         {
             StartCoroutine(SuivreChemin());
-        }  
+        }
     }
 
     IEnumerator SuivreChemin()
@@ -32,7 +32,6 @@ public class PlayerMovement : MonoBehaviour
         transform.position = cheminSousGraphe[indexPosition];
         while (indexPosition < cheminSousGraphe.Count)
         {
-
             Vector3 targetPosition = cheminSousGraphe[indexPosition];
             float step = vitesse * Time.deltaTime;
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);

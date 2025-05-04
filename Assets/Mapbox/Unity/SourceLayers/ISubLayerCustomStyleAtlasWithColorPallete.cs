@@ -1,14 +1,18 @@
 ﻿namespace Mapbox.Unity.Map
 {
-	using UnityEngine;
-	using Mapbox.Unity.MeshGeneration.Data;
+    using Mapbox.Unity.MeshGeneration.Data;
+    using UnityEngine;
 
-	public interface ISubLayerCustomStyleAtlasWithColorPallete : ISubLayerCustomStyleOptions, ISubLayerStyle
-	{
-		ScriptablePalette ColorPalette { get; set; }
-		void SetAsStyle(Material TopMaterial, Material SideMaterial, AtlasInfo uvAtlas, ScriptablePalette palette);
-	}
-
+    public interface ISubLayerCustomStyleAtlasWithColorPallete
+        : ISubLayerCustomStyleOptions,
+            ISubLayerStyle
+    {
+        ScriptablePalette ColorPalette { get; set; }
+        void SetAsStyle(
+            Material TopMaterial,
+            Material SideMaterial,
+            AtlasInfo uvAtlas,
+            ScriptablePalette palette
+        );
+    }
 }
-
-

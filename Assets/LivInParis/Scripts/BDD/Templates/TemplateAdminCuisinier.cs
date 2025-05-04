@@ -1,9 +1,9 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-public class TemplateAdminCuisinier: MonoBehaviour
+public class TemplateAdminCuisinier : MonoBehaviour
 {
     public TMP_Text Nom;
     public TMP_Text PlatDuJour;
@@ -22,18 +22,18 @@ public class TemplateAdminCuisinier: MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("nomutilisateur", NomUtilisateur);
 
-        using (WWW www = new WWW("http://localhost/livinparis/supprimer_client.php", form))
+        using (WWW www = new WWW("http://localhost/livinparis/supprimer_cuisinier.php", form))
         {
             yield return www;
 
             if (www.text == "0")
             {
                 Destroy(gameObject);
-                Debug.Log("Cuisinier supprimé avec succès");
+                Debug.Log("Cuisinier supprimÃ© avec succÃ¨s");
             }
             else
             {
-                Debug.LogError("Erreur lors de la suppression : " + www.text);
+                Debug.Log("Erreur lors de la suppression : " + www.text);
             }
         }
     }

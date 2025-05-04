@@ -14,24 +14,31 @@ namespace KDTree
     {
         /// <summary>The point from which are searching in n-dimensional space.</summary>
         private double[] tSearchPoint;
+
         /// <summary>A distance function which is used to compare nodes and value positions.</summary>
         private DistanceFunctions kDistanceFunction;
+
         /// <summary>The tree nodes which have yet to be evaluated.</summary>
         private MinHeap<KDNode<T>> pPending;
+
         /// <summary>The values which have been evaluated and selected.</summary>
         private IntervalHeap<T> pEvaluated;
+
         /// <summary>The root of the kd tree to begin searching from.</summary>
         private KDNode<T> pRoot = null;
 
         /// <summary>The max number of points we can return through this iterator.</summary>
         private int iMaxPointsReturned = 0;
+
         /// <summary>The number of points we can still test before conclusion.</summary>
         private int iPointsRemaining;
+
         /// <summary>Threshold to apply to tree iteration.  Negative numbers mean no threshold applied.</summary>
         private double fThreshold;
 
         /// <summary>Current value distance.</summary>
         private double _CurrentDistance = -1;
+
         /// <summary>Current value reference.</summary>
         private T _Current = default(T);
 
@@ -43,7 +50,13 @@ namespace KDTree
         /// <param name="kDistance">The distance function used to evaluate the points.</param>
         /// <param name="iMaxPoints">The max number of points which can be returned by this iterator.  Capped to max in tree.</param>
         /// <param name="fThreshold">Threshold to apply to the search space.  Negative numbers indicate that no threshold is applied.</param>
-        public NearestNeighbour(KDNode<T> pRoot, double[] tSearchPoint, DistanceFunctions kDistance, int iMaxPoints, double fThreshold)
+        public NearestNeighbour(
+            KDNode<T> pRoot,
+            double[] tSearchPoint,
+            DistanceFunctions kDistance,
+            int iMaxPoints,
+            double fThreshold
+        )
         {
             // Check the dimensionality of the search point.
             if (tSearchPoint.Length != pRoot.iDimensions)
@@ -83,7 +96,9 @@ namespace KDTree
             }
 
             // While we still have paths to evaluate.
-            while (pPending.Size > 0 && (pEvaluated.Size == 0 || (pPending.MinKey < pEvaluated.MinKey)))
+            while (
+                pPending.Size > 0 && (pEvaluated.Size == 0 || (pPending.MinKey < pEvaluated.MinKey))
+            )
             {
                 // If there are pending paths possibly closer than the nearest evaluated point, check it out
                 KDNode<T> pCursor = pPending.Min;
@@ -107,7 +122,11 @@ namespace KDTree
                     }
 
                     // Calculate the shortest distance between the search point and the min and max bounds of the kd-node.
-                    double fDistance = kDistanceFunction.DistanceToRectangle(tSearchPoint, pNotTaken.tMinBound, pNotTaken.tMaxBound);
+                    double fDistance = kDistanceFunction.DistanceToRectangle(
+                        tSearchPoint,
+                        pNotTaken.tMinBound,
+                        pNotTaken.tMaxBound
+                    );
 
                     // If it is greater than the threshold, skip.
                     if (fThreshold >= 0 && fDistance > fThreshold)
@@ -141,14 +160,12 @@ namespace KDTree
                             // If we don't need any more, replace max
                             if (pEvaluated.Size == iPointsRemaining)
                                 pEvaluated.ReplaceMax(fDistance, pCursor.tData[i]);
-
                             // Otherwise insert.
                             else
                                 pEvaluated.Insert(fDistance, pCursor.tData[i]);
                         }
                     }
                 }
-
                 // If the points in the KD node are spread out.
                 else
                 {
@@ -156,7 +173,10 @@ namespace KDTree
                     for (int i = 0; i < pCursor.Size; ++i)
                     {
                         // Compute the distance between the points.
-                        double fDistance = kDistanceFunction.Distance(pCursor.tPoints[i], tSearchPoint);
+                        double fDistance = kDistanceFunction.Distance(
+                            pCursor.tPoints[i],
+                            tSearchPoint
+                        );
 
                         // Skip if it exceeds the threshold.
                         if (fThreshold >= 0 && fDistance >= fThreshold)
@@ -165,7 +185,6 @@ namespace KDTree
                         // Insert the point if we have more to take.
                         if (pEvaluated.Size < iPointsRemaining)
                             pEvaluated.Insert(fDistance, pCursor.tData[i]);
-
                         // Otherwise replace the max.
                         else if (fDistance < pEvaluated.MaxKey)
                             pEvaluated.ReplaceMax(fDistance, pCursor.tData[i]);
@@ -201,10 +220,10 @@ namespace KDTree
             this.pPending.Insert(0, pRoot);
         }
 
-		public T Current
-		{
-			get { return _Current; }
-		}
+        public T Current
+        {
+            get { return _Current; }
+        }
 
         /// <summary>
         /// Return the distance of the current value to the search point.
@@ -221,7 +240,7 @@ namespace KDTree
         {
             get { return _Current; }
         }
-  
+
         /// <summary>
         /// Return the current value referenced by the iterator.
         /// </summary>
@@ -230,9 +249,7 @@ namespace KDTree
             get { return _Current; }
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
         IEnumerator IEnumerable.GetEnumerator()
         {

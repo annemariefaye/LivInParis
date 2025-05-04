@@ -58,8 +58,9 @@ public class CommandeCuisinierManager : MonoBehaviour
                 script.Init(plat.IdPlat);
 
                 script.titreText.text = plat.Nom;
-                script.prixText.text = plat.Prix + "€";
-                script.descriptionText.text = plat.Type + " - " + plat.Regime + " - " + plat.Nationalite;
+                script.prixText.text = plat.Prix + "â‚¬";
+                script.descriptionText.text =
+                    plat.Type + " - " + plat.Regime + " - " + plat.Nationalite;
                 script.noteText.text = plat.NoteMoyenne.ToString("0.0");
 
                 Sprite img = Resources.Load<Sprite>(plat.CheminAccesPhoto);
@@ -69,7 +70,6 @@ public class CommandeCuisinierManager : MonoBehaviour
                 }
             }
         }
-
         else
         {
             Debug.Log("Erreur pour afficher les plats : " + www.text);

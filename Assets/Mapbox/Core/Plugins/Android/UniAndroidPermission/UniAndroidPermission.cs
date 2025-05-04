@@ -19,14 +19,22 @@ public class UniAndroidPermission : MonoBehaviour
 #if !UNITY_EDITOR && UNITY_ANDROID
         using (var permissionManager = new AndroidJavaClass(PackageName))
         {
-            return permissionManager.CallStatic<bool>("hasPermission", GetPermittionStr(permission));
+            return permissionManager.CallStatic<bool>(
+                "hasPermission",
+                GetPermittionStr(permission)
+            );
         }
 #else
         return true;
 #endif
     }
 
-    public static void RequestPermission(AndroidPermission permission, Action onAllow = null, Action onDeny = null, Action onDenyAndNeverAskAgain = null)
+    public static void RequestPermission(
+        AndroidPermission permission,
+        Action onAllow = null,
+        Action onDeny = null,
+        Action onDenyAndNeverAskAgain = null
+    )
     {
 #if !UNITY_EDITOR && UNITY_ANDROID
         using (var permissionManager = new AndroidJavaClass(PackageName))
@@ -73,7 +81,8 @@ public class UniAndroidPermission : MonoBehaviour
         ResetAllCallBacks();
     }
 
-    private void ResetAllCallBacks(){
+    private void ResetAllCallBacks()
+    {
         onAllowCallback = null;
         onDenyCallback = null;
         onDenyAndNeverAskAgainCallback = null;
@@ -107,5 +116,5 @@ public enum AndroidPermission
     WRITE_CALENDAR,
     WRITE_CALL_LOG,
     WRITE_CONTACTS,
-    WRITE_EXTERNAL_STORAGE
+    WRITE_EXTERNAL_STORAGE,
 }

@@ -9,7 +9,7 @@ public class StatistiquesPage : MonoBehaviour
     public GameObject client;
     public GameObject commandeOverview;
     public GameObject commandesClient;
-    
+
     public void RetourPagePrecedente()
     {
         SceneManager.LoadScene(12);
@@ -24,8 +24,8 @@ public class StatistiquesPage : MonoBehaviour
             client.SetActive(false);
             commandesClient.SetActive(false);
         }
-
     }
+
     public void CommandeOverview()
     {
         if (!commandeOverview.activeSelf)
@@ -45,7 +45,7 @@ public class StatistiquesPage : MonoBehaviour
             cuisinier.SetActive(false);
             commandeOverview.SetActive(false);
             commandesClient.SetActive(false);
-        }    
+        }
     }
 
     public void CommandesClient()
@@ -57,6 +57,5 @@ public class StatistiquesPage : MonoBehaviour
             client.SetActive(false);
             commandeOverview.SetActive(false);
         }
-
     }
 }

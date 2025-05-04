@@ -11,7 +11,6 @@ public class DeplacementCamera : MonoBehaviour
 
     void Update()
     {
-        // Déplacement de la caméra avec la souris
         if (Input.GetMouseButtonDown(0))
         {
             dernierePosition = Input.mousePosition;
@@ -23,7 +22,8 @@ public class DeplacementCamera : MonoBehaviour
             Vector3 delta = Input.mousePosition - dernierePosition;
             dernierePosition = Input.mousePosition;
 
-            Vector3 mouvement = new Vector3(-delta.x, 0, -delta.y) * vitesseDeplacement * Time.deltaTime;
+            Vector3 mouvement =
+                new Vector3(-delta.x, 0, -delta.y) * vitesseDeplacement * Time.deltaTime;
             transform.Translate(mouvement, Space.World);
         }
 
@@ -32,12 +32,15 @@ public class DeplacementCamera : MonoBehaviour
             estEnTrainDeGlisser = false;
         }
 
-        // Zoom avec la molette de la souris
         float zoom = Input.GetAxis("Mouse ScrollWheel") * vitesseZoom;
         if (zoom != 0)
         {
             Camera camera = GetComponent<Camera>();
-            camera.fieldOfView = Mathf.Clamp(camera.fieldOfView - zoom, limiteZoomMin, limiteZoomMax);
+            camera.fieldOfView = Mathf.Clamp(
+                camera.fieldOfView - zoom,
+                limiteZoomMin,
+                limiteZoomMax
+            );
         }
     }
 }

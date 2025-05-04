@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+
 namespace PbSI
 {
     public class ReseauMetro
@@ -91,7 +92,10 @@ namespace PbSI
                         var relation1 = (idStation, idStationSuivante);
                         var relation2 = (idStationSuivante, idStation);
 
-                        if (!relationsAjoutees.Contains(relation1) && !relationsAjoutees.Contains(relation2))
+                        if (
+                            !relationsAjoutees.Contains(relation1)
+                            && !relationsAjoutees.Contains(relation2)
+                        )
                         {
                             graphe.AjouterRelation(stationCurrent, stationSuivante, temps);
                             graphe.AjouterRelation(stationSuivante, stationCurrent, temps);
@@ -138,11 +142,17 @@ namespace PbSI
                             if (idCorrespondance != idStation)
                             {
                                 var stationCurrent = graphe.TrouverNoeudParId(idStation);
-                                var stationCorrespondance = graphe.TrouverNoeudParId(idCorrespondance);
+                                var stationCorrespondance = graphe.TrouverNoeudParId(
+                                    idCorrespondance
+                                );
 
                                 if (stationCurrent != null && stationCorrespondance != null)
                                 {
-                                    graphe.AjouterRelation(stationCurrent, stationCorrespondance, temps);
+                                    graphe.AjouterRelation(
+                                        stationCurrent,
+                                        stationCorrespondance,
+                                        temps
+                                    );
                                 }
                             }
                         }
@@ -150,8 +160,6 @@ namespace PbSI
                 }
             }
         }
-
-
     }
-    #endregion
+        #endregion
 }

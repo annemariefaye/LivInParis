@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GrapheSimuManager : MonoBehaviour
 {
@@ -20,12 +21,17 @@ public class GrapheSimuManager : MonoBehaviour
         CallAdresses();
     }
 
-    public void CallAdresses()
+    public void Noter()
     {
-        StartCoroutine(RÈcupÈrerAdresses());
+        SceneManager.LoadScene(20);
     }
 
-    IEnumerator RÈcupÈrerAdresses()
+    public void CallAdresses()
+    {
+        StartCoroutine(RecupererAdresses());
+    }
+
+    IEnumerator RecupererAdresses()
     {
         WWWForm form = new WWWForm();
         form.AddField("nomutilisateur", DBManager.nomutilisateur);
@@ -39,20 +45,52 @@ public class GrapheSimuManager : MonoBehaviour
 
             if (adresses.Length > 0)
             {
-                adresseDepart.text = "Adresse de dÈpart: " + adresses[1];
+                adresseDepart.text = "Adresse de d√©part: " + adresses[1];
                 depart = adresses[1];
-                adresseArrivee.text = "Adresse d'arrivÈe: " + adresses[2];
+                adresseArrivee.text = "Adresse d'arriv√©e: " + adresses[2];
                 arrivee = adresses[2];
                 visuelScript.InitialiserRechercheStations(depart, arrivee);
+                DBManager.idCuisinierNote = int.Parse(adresses[3]);
+
+                if (!string.IsNullOrEmpty(adresses[4]))
+                {
+                    string nomMusique = adresses[4].ToLower();
+                    AudioClip clip = Resources.Load<AudioClip>("Musique/" + nomMusique);
+
+                    if (clip != null)
+                    {
+                        AudioSource audioSource = GetComponent<AudioSource>();
+                        audioSource.clip = clip;
+                        audioSource.Play();
+                    }
+                    else
+                    {
+                        Debug.LogError("Musique introuvable dans Resources/Musique : " + nomMusique);
+                    }
+                }
+                else
+                {
+                    AudioClip clip = Resources.Load<AudioClip>("Musique/default");
+                    if (clip != null)
+                    {
+                        AudioSource audioSource = GetComponent<AudioSource>();
+                        audioSource.clip = clip;
+                        audioSource.Play();
+                    }
+                    else
+                    {
+                        Debug.LogError("Musique par d√©faut introuvable !");
+                    }
+                }
             }
             else
             {
-                Debug.Log("Aucune adresse trouvÈe.");
+                Debug.Log("Aucune adresse trouv√©e.");
             }
         }
         else
         {
-            Debug.Log("Echec de la rÈcupÈration des adresses. Erreur#" + www.text);
+            Debug.Log("Echec de la r√©cup√©ration des adresses. Erreur#" + www.text);
         }
     }
 

@@ -29,9 +29,8 @@ namespace KDTree
         /// <summary>
         /// Create a new min heap with the default capacity.
         /// </summary>
-        public MinHeap() : this(DEFAULT_SIZE)
-        {
-        }
+        public MinHeap()
+            : this(DEFAULT_SIZE) { }
 
         /// <summary>
         /// Create a new min heap with a given capacity.
@@ -136,9 +135,11 @@ namespace KDTree
         private void SiftUp(int iChild)
         {
             // For each parent above the child, if the parent is smaller then bubble it up.
-            for (int iParent = (iChild - 1) / 2; 
-                iChild != 0 && tKeys[iChild] < tKeys[iParent]; 
-                iChild = iParent, iParent = (iChild - 1) / 2)
+            for (
+                int iParent = (iChild - 1) / 2;
+                iChild != 0 && tKeys[iChild] < tKeys[iParent];
+                iChild = iParent, iParent = (iChild - 1) / 2
+            )
             {
                 T kData = tData[iParent];
                 double dDist = tKeys[iParent];
@@ -158,7 +159,11 @@ namespace KDTree
         private void SiftDown(int iParent)
         {
             // For each child.
-            for (int iChild = iParent * 2 + 1; iChild < Size; iParent = iChild, iChild = iParent * 2 + 1)
+            for (
+                int iChild = iParent * 2 + 1;
+                iChild < Size;
+                iParent = iChild, iChild = iParent * 2 + 1
+            )
             {
                 // If the child is larger, select the next child.
                 if (iChild + 1 < Size && tKeys[iChild] > tKeys[iChild + 1])
@@ -177,7 +182,6 @@ namespace KDTree
                     tData[iChild] = pData;
                     tKeys[iChild] = pDist;
                 }
-
                 // TODO: REMOVE THE BREAK
                 else
                 {

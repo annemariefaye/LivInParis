@@ -569,7 +569,7 @@ GameObject:
   - component: {fileID: 119761558}
   - component: {fileID: 119761557}
   m_Layer: 0
-  m_Name: Text (TMP) (3)
+  m_Name: Text chemin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7125,6 +7125,14 @@ MonoBehaviour:
   regimeInput: {fileID: 1420192688}
   idPlat: 0
   modifierButton: {fileID: 973810677}
+  erreurNom: {fileID: 1664276323}
+  erreurPrix: {fileID: 627010254}
+  erreurPersonnes: {fileID: 218820903}
+  erreurDateFab: {fileID: 1013992347}
+  erreurDatePer: {fileID: 953844701}
+  erreurNationalite: {fileID: 2044181973}
+  erreurProteines: {fileID: 2071549508}
+  erreurChemin: {fileID: 119761555}
 --- !u!1 &1369207148
 GameObject:
   m_ObjectHideFlags: 0

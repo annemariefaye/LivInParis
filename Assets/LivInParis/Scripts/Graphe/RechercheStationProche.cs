@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
-using System.Linq;
 
 namespace PbSI
 {
@@ -12,10 +12,13 @@ namespace PbSI
     {
         private readonly string adresse;
         private readonly Graphe<StationMetro> graphe;
-        private List<int> idStationsProches = new List<int> { -1};
-        private float tempsDeplacement = 0.0f; ///en minutes
+        private List<int> idStationsProches = new List<int> { -1 };
+        private float tempsDeplacement = 0.0f;
+
+        ///en minutes
         private const double RayonTerre = 6371000.0;
         private string coordonneesString = "";
+
         public RechercheStationProche(string adresse, Graphe<StationMetro> graphe)
         {
             this.adresse = adresse;
@@ -28,10 +31,14 @@ namespace PbSI
 
             if (coordonnees.HasValue)
             {
-                coordonneesString = coordonnees.Value.lat.ToString(System.Globalization.CultureInfo.InvariantCulture) + ", " +
-                                           coordonnees.Value.lon.ToString(System.Globalization.CultureInfo.InvariantCulture);
-
-                
+                coordonneesString =
+                    coordonnees.Value.lat.ToString(
+                        System.Globalization.CultureInfo.InvariantCulture
+                    )
+                    + ", "
+                    + coordonnees.Value.lon.ToString(
+                        System.Globalization.CultureInfo.InvariantCulture
+                    );
 
                 RechercherStationsProches(coordonnees);
             }
@@ -59,9 +66,12 @@ namespace PbSI
             }
         }
 
-        public static async Task<(double lon, double lat)?> ConvertirAdresseEnCoordonnees(string adresse)
+        public static async Task<(double lon, double lat)?> ConvertirAdresseEnCoordonnees(
+            string adresse
+        )
         {
-            string url = $"https://nominatim.openstreetmap.org/search?format=json&q={Uri.EscapeDataString(adresse)}";
+            string url =
+                $"https://nominatim.openstreetmap.org/search?format=json&q={Uri.EscapeDataString(adresse)}";
 
             using HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "C# App");
@@ -84,7 +94,6 @@ namespace PbSI
                         return (lon, lat);
                     }
                 }
-                
             }
             catch (Exception ex)
             {
@@ -95,7 +104,8 @@ namespace PbSI
 
         public void RechercherStationsProches((double lon, double lat)? coordonneesOriginelles)
         {
-            if (coordonneesOriginelles == null) return;
+            if (coordonneesOriginelles == null)
+                return;
 
             Debug.Log("Recherche des stations les plus proches...");
 
@@ -106,19 +116,26 @@ namespace PbSI
             {
                 if (noeud is Noeud<StationMetro> station && station.Contenu != null)
                 {
-                    (double lon, double lat) coordonneesStation = (station.Contenu.Longitude, station.Contenu.Latitude);
-                    double distance = CalculerDistance(coordonneesOriginelles.Value, coordonneesStation);
+                    (double lon, double lat) coordonneesStation = (
+                        station.Contenu.Longitude,
+                        station.Contenu.Latitude
+                    );
+                    double distance = CalculerDistance(
+                        coordonneesOriginelles.Value,
+                        coordonneesStation
+                    );
 
                     //Debug.Log("La distance est : " + distance);
 
                     if (distance < distanceMin)
                     {
                         distanceMin = distance;
-                        this.tempsDeplacement = (float)distance / 83.3f; /// Vitesse moyenne de marche en m/min
+                        this.tempsDeplacement = (float)distance / 83.3f;
+                        /// Vitesse moyenne de marche en m/min
                         stationsProches.Clear();
                         stationsProches.Add(station.Id);
                     }
-                    else if (Math.Abs(distance - distanceMin) < 1e-6) 
+                    else if (Math.Abs(distance - distanceMin) < 1e-6)
                     {
                         stationsProches.Add(station.Id);
                     }
@@ -129,7 +146,10 @@ namespace PbSI
             Debug.Log("Stations les plus proches : " + string.Join(", ", stationsProches));
         }
 
-        public double CalculerDistance((double lon, double lat) origine, (double lon, double lat) destination)
+        public double CalculerDistance(
+            (double lon, double lat) origine,
+            (double lon, double lat) destination
+        )
         {
             double lon1 = DegresVersRadians(origine.lon);
             double lat1 = DegresVersRadians(origine.lat);
@@ -139,14 +159,14 @@ namespace PbSI
             double deltaLat = lat2 - lat1;
             double deltaLon = lon2 - lon1;
 
-            double a = Math.Pow(Math.Sin(deltaLat / 2), 2) +
-                       Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(deltaLon / 2), 2);
+            double a =
+                Math.Pow(Math.Sin(deltaLat / 2), 2)
+                + Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(deltaLon / 2), 2);
 
             double c = 2 * Math.Asin(Math.Sqrt(a));
 
             return RayonTerre * c;
         }
-
 
         private double DegresVersRadians(double degres)
         {
@@ -155,7 +175,7 @@ namespace PbSI
 
         public string CoordonneesString
         {
-            get{ return coordonneesString; }
+            get { return coordonneesString; }
         }
     }
 }

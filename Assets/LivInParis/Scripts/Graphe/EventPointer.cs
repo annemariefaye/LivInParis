@@ -1,21 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Mapbox.Examples;
 using Mapbox.Utils;
-using UnityEngine.UI;
 using PbSI;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class EventPointer : MonoBehaviour
 {
-    public static GameObject panneauActif;  
+    public static GameObject panneauActif;
 
-    [SerializeField] float rotationSpeed = 50f;
-    [SerializeField] float amplitude = 2.0f;
-    [SerializeField] float frequency = 0.50f;
+    [SerializeField]
+    float rotationSpeed = 50f;
+
+    [SerializeField]
+    float amplitude = 2.0f;
+
+    [SerializeField]
+    float frequency = 0.50f;
 
     LocationStatus playerLocation;
-    [SerializeField] public Vector2d eventPos;
+
+    [SerializeField]
+    public Vector2d eventPos;
 
     public Noeud<StationMetro> noeud;
 
@@ -36,19 +43,26 @@ public class EventPointer : MonoBehaviour
 
     void Update()
     {
-        FloatAndRotatePointer(); 
+        FloatAndRotatePointer();
     }
 
     void FloatAndRotatePointer()
     {
         transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
-        transform.position = new Vector3(transform.position.x, Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude + 15, transform.position.z);
+        transform.position = new Vector3(
+            transform.position.x,
+            Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude + 15,
+            transform.position.z
+        );
     }
 
     private void OnMouseDown()
     {
         playerLocation = GameObject.Find("Canvas").GetComponent<LocationStatus>();
-        var currentPlayerLocation = new GeoCoordinatePortable.GeoCoordinate(playerLocation.GetLocationLat(), playerLocation.GetLocationLong());
+        var currentPlayerLocation = new GeoCoordinatePortable.GeoCoordinate(
+            playerLocation.GetLocationLat(),
+            playerLocation.GetLocationLong()
+        );
         var eventLocation = new GeoCoordinatePortable.GeoCoordinate(eventPos[0], eventPos[1]);
 
         var distance = currentPlayerLocation.GetDistanceTo(eventLocation);
@@ -60,8 +74,11 @@ public class EventPointer : MonoBehaviour
 
         panneauActif = infoPanel;
         infoPanel.SetActive(true);
-        uiText.text = "Libellé : " + noeud.Contenu.Libelle + "\nDistance : " + ((int)distance) + " m";
-        infoPanel.transform.position = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0, 10, 0));
+        uiText.text =
+            "LibellÃ© : " + noeud.Contenu.Libelle + "\nDistance : " + ((int)distance) + " m";
+        infoPanel.transform.position = Camera.main.WorldToScreenPoint(
+            transform.position + new Vector3(0, 10, 0)
+        );
 
         StartCoroutine(FadeIn(canvasGroup));
     }
@@ -100,5 +117,3 @@ public class EventPointer : MonoBehaviour
         canvasGroup.alpha = 1f;
     }
 }
-
-

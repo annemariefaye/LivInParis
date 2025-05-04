@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class PlatData
@@ -35,6 +35,7 @@ public class MenuPlatManager : MonoBehaviour
     public GameObject supp_button;
 
     private List<GameObject> platsAffiches = new List<GameObject>();
+
     [HideInInspector]
     public List<PlatData> tousLesPlats = new List<PlatData>();
 
@@ -62,6 +63,7 @@ public class MenuPlatManager : MonoBehaviour
     {
         SceneManager.LoadScene(15);
     }
+
     IEnumerator GetPlats()
     {
         WWWForm form = new WWWForm();
@@ -95,13 +97,23 @@ public class MenuPlatManager : MonoBehaviour
             GameObject go = Instantiate(templatePlatPrefab, parentContainer);
             TemplateMenuPlat script = go.GetComponent<TemplateMenuPlat>();
 
-            int quantite = DBManager.quantitesDansPanier.ContainsKey(plat.IdPlat) ? DBManager.quantitesDansPanier[plat.IdPlat] : 0;
+            int quantite = DBManager.quantitesDansPanier.ContainsKey(plat.IdPlat)
+                ? DBManager.quantitesDansPanier[plat.IdPlat]
+                : 0;
             script.Init(plat.IdPlat, quantite);
 
             script.Titre.text = plat.Nom;
             script.Cuisinier.text = plat.NomCuisinier;
-            script.Prix.text = plat.Prix + "€";
-            script.Description.text = plat.Type + " - " + plat.Nationalite + " - " + plat.Regime + " - " + plat.Proteines + "g protéines";
+            script.Prix.text = plat.Prix + "â‚¬";
+            script.Description.text =
+                plat.Type
+                + " - "
+                + plat.Nationalite
+                + " - "
+                + plat.Regime
+                + " - "
+                + plat.Proteines
+                + "g protÃ©ines";
             script.Adresse.text = plat.Adresse;
             script.Note.text = plat.NoteMoyenne.ToString("0.0");
 

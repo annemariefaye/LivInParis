@@ -12,40 +12,40 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MMEEventsManager : NSObject
 
 /*! @brief events manager delegate */
-@property (nonatomic, weak) id<MMEEventsManagerDelegate> delegate;
+@property(nonatomic, weak) id<MMEEventsManagerDelegate> delegate;
 
 /*! @brief YES if metrics collection is enabled */
-@property (nonatomic, getter=isMetricsEnabled) BOOL metricsEnabled;
+@property(nonatomic, getter=isMetricsEnabled) BOOL metricsEnabled;
 
 /*! @brief YES if metrics collection is enabled in the simulator */
-@property (nonatomic, getter=isMetricsEnabledInSimulator) BOOL metricsEnabledInSimulator;
+@property(nonatomic, getter=isMetricsEnabledInSimulator) BOOL metricsEnabledInSimulator;
 
 /*! @brief YES if metrics collection is enabled when the app is in use */
-@property (nonatomic, getter=isMetricsEnabledForInUsePermissions) BOOL metricsEnabledForInUsePermissions;
+@property(nonatomic, getter=isMetricsEnabledForInUsePermissions) BOOL metricsEnabledForInUsePermissions;
 
 /*! @brief YES if debug logging is enabled */
-@property (nonatomic, getter=isDebugLoggingEnabled) BOOL debugLoggingEnabled;
+@property(nonatomic, getter=isDebugLoggingEnabled) BOOL debugLoggingEnabled;
 
 /*! @brief UserAgent base string, in RFC 2616 format
     @link https://www.ietf.org/rfc/rfc2616.txt */
-@property (nonatomic, readonly) NSString *userAgentBase;
+@property(nonatomic, readonly) NSString *userAgentBase;
 
 /*! @brief SDK version, in Semantic Versioning 2.0.0 format
     @link https://semver.org */
-@property (nonatomic, readonly) NSString *hostSDKVersion;
+@property(nonatomic, readonly) NSString *hostSDKVersion;
 
 /*! @brief SKU Identifier */
-@property (nonatomic, copy) NSString *skuId;
+@property(nonatomic, copy) NSString *skuId;
 
 /*! @brief Mapbox Access Token
     @link https://account.mapbox.com */
-@property (nonatomic, copy) NSString *accessToken;
+@property(nonatomic, copy) NSString *accessToken;
 
 /*! @brief baseURL */
-@property (nonatomic, null_resettable) NSURL *baseURL;
+@property(nonatomic, null_resettable) NSURL *baseURL;
 
 /*! @brief accountType */
-@property (nonatomic) NSInteger accountType;
+@property(nonatomic) NSInteger accountType;
 
 #pragma mark -
 
@@ -102,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
     @param filePaths array of file paths
     @param completionHandler completion handler block
 */
-- (void)postMetadata:(NSArray *)metadata filePaths:(NSArray *)filePaths completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler;
+- (void)postMetadata:(NSArray *)metadata filePaths:(NSArray *)filePaths completionHandler:(nullable void (^)(NSError *_Nullable error))completionHandler;
 
 - (void)displayLogFileFromDate:(NSDate *)logDate MME_DEPRECATED;
 

@@ -6,16 +6,16 @@ NS_ASSUME_NONNULL_BEGIN
 @class MMECommonEventData;
 
 /*! @brief represents a telemetry event, with a name, date and attributes */
-@interface MMEEvent : NSObject <NSCopying,NSSecureCoding>
+@interface MMEEvent : NSObject <NSCopying, NSSecureCoding>
 
 /*! @brief date on which the event occured - MMEEventKeyDateCreated */
-@property (nonatomic, readonly, copy) NSDate *date;
+@property(nonatomic, readonly, copy) NSDate *date;
 
 /*! @brief name of the event, from MMEConstants.h - MMEEventKeyEvent */
-@property (nonatomic, readonly, copy) NSString *name;
+@property(nonatomic, readonly, copy) NSString *name;
 
 /*! @brief attributes of the event, a dictionary for which [NSJSONSerialization isValidJSONObject:] returns YES */
-@property (nonatomic, readonly, copy) NSDictionary *attributes;
+@property(nonatomic, readonly, copy) NSDictionary *attributes;
 
 /*! @brief Designated Initilizer for events
     @param eventAttributes attributes of the event

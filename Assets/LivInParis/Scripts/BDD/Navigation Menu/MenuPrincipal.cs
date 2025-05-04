@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public class MenuPrincipal : MonoBehaviour
 {
@@ -11,8 +11,17 @@ public class MenuPrincipal : MonoBehaviour
 
     private void Start()
     {
-        NU.text = "Bonjour " + DBManager.prenom;
         fidelite.text = "Vous avez " + DBManager.fidelite + " points";
+
+        if (DBManager.nomEntreprise != null && DBManager.nomEntreprise.Length > 0)
+        {
+            NU.text = "Bonjour " + DBManager.prenom;
+            fidelite.text = "Vous avez " + DBManager.fidelite + " points";
+        }
+        else
+        {
+            NU.text = "Bonjour " + DBManager.nomEntreprise;
+        }
     }
 
     public void Deconnexion()

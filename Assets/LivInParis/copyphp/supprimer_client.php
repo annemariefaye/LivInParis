@@ -3,7 +3,8 @@
 $con = mysqli_connect("localhost", "root", "root", "livinparis");
 
 if (!$con) {
-    die("Erreur de connexion MySQL : " . mysqli_connect_error());
+    echo "Erreur de connexion MySQL : " . mysqli_connect_error();
+    exit();
 }
 
 $nomUtilisateur = $_POST['nomutilisateur'];
@@ -16,6 +17,11 @@ if (empty($nomUtilisateur)) {
 $getUserQuery = "SELECT * FROM Utilisateur WHERE NomUtilisateur = '$nomUtilisateur'";
 $result = mysqli_query($con, $getUserQuery);
 
+if (!$result) {
+    echo "Erreur lors de la requête SELECT : " . mysqli_error($con);
+    exit();
+}
+
 if (mysqli_num_rows($result) == 0) {
     echo "Utilisateur introuvable.";
     exit();
@@ -25,13 +31,18 @@ $userData = mysqli_fetch_assoc($result);
 $idClient = $userData['IdClient'];
 
 $updateUserQuery = "UPDATE Utilisateur SET IdClient = NULL WHERE NomUtilisateur = '$nomUtilisateur'";
-mysqli_query($con, $updateUserQuery) or die("Erreur de mise à jour de l'utilisateur");
+if (!mysqli_query($con, $updateUserQuery)) {
+    echo "Erreur de mise à jour de l'utilisateur : " . mysqli_error($con);
+    exit();
+}
 
 $deleteClientQuery = "DELETE FROM Client WHERE IdClient = $idClient";
-mysqli_query($con, $deleteClientQuery) or die("Erreur lors de la suppression du client");
+if (!mysqli_query($con, $deleteClientQuery)) {
+    echo "Erreur lors de la suppression du client : " . mysqli_error($con);
+    exit();
+}
 
 echo "0";
 
 mysqli_close($con);
-
 ?>

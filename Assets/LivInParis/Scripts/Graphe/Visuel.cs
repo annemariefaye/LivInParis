@@ -1,208 +1,226 @@
-using System.Collections.Generic;
-using UnityEngine;
-using PbSI;
-using Mapbox.Utils;
 using System;
+using System.Collections.Generic;
 using Mapbox.Unity.Location;
+using Mapbox.Utils;
+using PbSI;
+using UnityEngine;
 
 public class Visuel : MonoBehaviour
 {
-	ReseauMetro reseau;
-	Graphe<StationMetro> graphe;
+    ReseauMetro reseau;
+    Graphe<StationMetro> graphe;
 
-	[SerializeField] SpawnOnMapGraphe spawnOnMap;
-	public Material materialLigne;
+    [SerializeField]
+    SpawnOnMapGraphe spawnOnMap;
+    public Material materialLigne;
 
-	private Dictionary<(int, int), LineRenderer> lignes = new Dictionary<(int, int), LineRenderer>();
+    private Dictionary<(int, int), LineRenderer> lignes =
+        new Dictionary<(int, int), LineRenderer>();
 
-	[SerializeField] float amplitude = 2.0f;
-	[SerializeField] float frequency = 0.50f;
+    [SerializeField]
+    float amplitude = 2.0f;
 
-	List<Vector3> positionsSousGraphe = new List<Vector3>();
+    [SerializeField]
+    float frequency = 0.50f;
 
-	string departStringCoords;
-	string arriveeStringCoords;
+    List<Vector3> positionsSousGraphe = new List<Vector3>();
 
-	[SerializeField]
-	[Range(0, 359)]
-	float _heading;
+    string departStringCoords;
+    string arriveeStringCoords;
 
-	async void Start()
-	{
-		reseau = new ReseauMetro();
-		graphe = reseau.Graphe;
+    [SerializeField]
+    [Range(0, 359)]
+    float _heading;
 
-		string[] localisations = new string[graphe.Noeuds.Count];
+    async void Start()
+    {
+        reseau = new ReseauMetro();
+        graphe = reseau.Graphe;
 
-		for (int i = 0; i < graphe.Noeuds.Count; i++)
-		{
-			StationMetro station = graphe.Noeuds[i].Contenu;
-			localisations[i] = station.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)
-							 + ", "
-							 + station.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
-		}
+        string[] localisations = new string[graphe.Noeuds.Count];
 
-		/// Setup du grand graphe
-		spawnOnMap.SetLocationStrings(localisations, graphe.Noeuds);
+        for (int i = 0; i < graphe.Noeuds.Count; i++)
+        {
+            StationMetro station = graphe.Noeuds[i].Contenu;
+            localisations[i] =
+                station.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                + ", "
+                + station.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
 
-		foreach (Lien<StationMetro> lien in graphe.Liens)
-		{
-			GameObject ligneObj = TracerLiens(Vector3.zero, Vector3.zero, materialLigne);
-			lignes[(lien.Source.Id, lien.Destination.Id)] = ligneObj.GetComponent<LineRenderer>();
-		}
+        /// Setup du grand graphe
+        spawnOnMap.SetLocationStrings(localisations, graphe.Noeuds);
 
-		RechercheStationProche recherche = new RechercheStationProche(" 33 Av. du Maine, 75015 Paris", graphe);
-		RechercheStationProche recherche2 = new RechercheStationProche("75 rue des Martyrs, 75018 Paris", graphe);
-		await recherche.InitialiserAsync();
-		await recherche2.InitialiserAsync();
+        foreach (Lien<StationMetro> lien in graphe.Liens)
+        {
+            GameObject ligneObj = TracerLiens(Vector3.zero, Vector3.zero, materialLigne);
+            lignes[(lien.Source.Id, lien.Destination.Id)] = ligneObj.GetComponent<LineRenderer>();
+        }
 
-		departStringCoords = recherche.CoordonneesString;
-		arriveeStringCoords = recherche2.CoordonneesString;
+        RechercheStationProche recherche = new RechercheStationProche(
+            " 33 Av. du Maine, 75015 Paris",
+            graphe
+        );
+        RechercheStationProche recherche2 = new RechercheStationProche(
+            "75 rue des Martyrs, 75018 Paris",
+            graphe
+        );
+        await recherche.InitialiserAsync();
+        await recherche2.InitialiserAsync();
 
-		try
-		{
-			List<int> depart = recherche.IdStationsProches;
-			List<int> arrivee = recherche2.IdStationsProches;
+        departStringCoords = recherche.CoordonneesString;
+        arriveeStringCoords = recherche2.CoordonneesString;
 
+        try
+        {
+            List<int> depart = recherche.IdStationsProches;
+            List<int> arrivee = recherche2.IdStationsProches;
 
-			float tempsDeplacementDepart = recherche.TempsDeplacement;
-			float tempsDeplacementArrivee = recherche2.TempsDeplacement;
+            float tempsDeplacementDepart = recherche.TempsDeplacement;
+            float tempsDeplacementArrivee = recherche2.TempsDeplacement;
 
-			var resultat = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
+            var resultat = RechercheChemin<StationMetro>.DijkstraListe(graphe, depart, arrivee);
 
-			if (resultat != null)
-			{
-				double tempsTotal = tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
-				Debug.Log("Temps total de déplacement : " + (int)tempsTotal + " minutes");
-			}
-			else
-			{
-				Debug.Log("Aucun chemin trouvé.");
-			}
+            if (resultat != null)
+            {
+                double tempsTotal =
+                    tempsDeplacementDepart + tempsDeplacementArrivee + resultat.PoidsTotal;
+                Debug.Log("Temps total de dÃ©placement : " + (int)tempsTotal + " minutes");
+            }
+            else
+            {
+                Debug.Log("Aucun chemin trouvÃ©.");
+            }
 
-			List<Vector3> positions = spawnOnMap.ObtenirPositionsSpawn();
+            List<Vector3> positions = spawnOnMap.ObtenirPositionsSpawn();
 
-			foreach (int id in resultat.Chemin)
-			{
-				positionsSousGraphe.Add(positions[id]);
-			}
+            foreach (int id in resultat.Chemin)
+            {
+                positionsSousGraphe.Add(positions[id]);
+            }
 
-			DessinerChemin(positionsSousGraphe, materialLigne);
-		}
-		catch (Exception e)
-		{
-			Debug.LogError($"Erreur : {e.Message}");
-		}
+            //DessinerChemin(positionsSousGraphe, materialLigne);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Erreur : {e.Message}");
+        }
+    }
 
+    void Update()
+    {
+        UpdateGraphComplet();
+        //UpdateSousGraphe();
+    }
 
+    void UpdateGraphComplet()
+    {
+        List<Vector3> positions = spawnOnMap.ObtenirPositionsSpawn();
 
-	}
+        foreach (Lien<StationMetro> lien in graphe.Liens)
+        {
+            Vector3 posDebut = positions[lien.Source.Id];
+            Vector3 posFin = positions[lien.Destination.Id];
 
-	void Update()
-	{
-		UpdateGraphComplet();
-		UpdateSousGraphe();
-	}
+            posDebut = AppliquerFlottement(posDebut);
+            posFin = AppliquerFlottement(posFin);
 
-	void UpdateGraphComplet()
-	{
-		List<Vector3> positions = spawnOnMap.ObtenirPositionsSpawn();
+            if (lignes.TryGetValue((lien.Source.Id, lien.Destination.Id), out LineRenderer ligne))
+            {
+                ligne.SetPosition(0, posDebut);
+                ligne.SetPosition(1, posFin);
+            }
+        }
+    }
 
-		foreach (Lien<StationMetro> lien in graphe.Liens)
-		{
-			Vector3 posDebut = positions[lien.Source.Id];
-			Vector3 posFin = positions[lien.Destination.Id];
+    private void UpdateSousGraphe()
+    {
+        GameObject cheminSousGraphe = GameObject.Find("CheminSousGraphe");
 
-			posDebut = AppliquerFlottement(posDebut);
-			posFin = AppliquerFlottement(posFin);
+        if (cheminSousGraphe != null)
+        {
+            LineRenderer ligne = cheminSousGraphe.GetComponent<LineRenderer>();
 
-			if (lignes.TryGetValue((lien.Source.Id, lien.Destination.Id), out LineRenderer ligne))
-			{
-				ligne.SetPosition(0, posDebut);
-				ligne.SetPosition(1, posFin);
-			}
-		}
-	}
+            if (ligne != null && positionsSousGraphe.Count > 0)
+            {
+                for (int i = 0; i < positionsSousGraphe.Count; i++)
+                {
+                    Vector3 position = positionsSousGraphe[i];
+                    position = AppliquerFlottement(position);
 
-	private void UpdateSousGraphe()
-	{
-		GameObject cheminSousGraphe = GameObject.Find("CheminSousGraphe");
+                    ligne.SetPosition(i, position);
+                }
+            }
+        }
+    }
 
-		if (cheminSousGraphe != null)
-		{
-			LineRenderer ligne = cheminSousGraphe.GetComponent<LineRenderer>();
+    Vector3 AppliquerFlottement(Vector3 position)
+    {
+        position.y =
+            (Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude) + 15 + position.y;
+        return position;
+    }
 
-			if (ligne != null && positionsSousGraphe.Count > 0)
-			{
-				for (int i = 0; i < positionsSousGraphe.Count; i++)
-				{
-					Vector3 position = positionsSousGraphe[i];
-					position = AppliquerFlottement(position);
+    public GameObject TracerLiens(
+        Vector3 positionDebut,
+        Vector3 positionFin,
+        Material materiauLigne,
+        float largeur = 1f
+    )
+    {
+        GameObject objetLigne = new GameObject("Lien");
+        LineRenderer ligne = objetLigne.AddComponent<LineRenderer>();
 
-					ligne.SetPosition(i, position);
-				}
-			}
-		}
-	}
+        ligne.material = materiauLigne;
+        ligne.startWidth = largeur;
+        ligne.endWidth = largeur;
+        ligne.positionCount = 2;
+        ligne.useWorldSpace = true;
 
+        ligne.SetPosition(0, positionDebut);
+        ligne.SetPosition(1, positionFin);
 
+        return objetLigne;
+    }
 
-	Vector3 AppliquerFlottement(Vector3 position)
-	{
-		position.y = (Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude) + 15 + position.y;
-		return position;
-	}
+    public GameObject DessinerChemin(
+        List<Vector3> positionsNoeuds,
+        Material materiauLigne,
+        float largeur = 1f
+    )
+    {
+        GameObject objetChemin = new GameObject("CheminSousGraphe");
+        LineRenderer ligne = objetChemin.AddComponent<LineRenderer>();
 
-	public GameObject TracerLiens(Vector3 positionDebut, Vector3 positionFin, Material materiauLigne, float largeur = 1f)
-	{
-		GameObject objetLigne = new GameObject("Lien");
-		LineRenderer ligne = objetLigne.AddComponent<LineRenderer>();
+        ligne.material = materiauLigne;
+        ligne.startWidth = largeur;
+        ligne.endWidth = largeur;
+        ligne.positionCount = positionsNoeuds.Count;
+        ligne.useWorldSpace = true;
 
-		ligne.material = materiauLigne;
-		ligne.startWidth = largeur;
-		ligne.endWidth = largeur;
-		ligne.positionCount = 2;
-		ligne.useWorldSpace = true;
+        for (int i = 0; i < positionsNoeuds.Count; i++)
+        {
+            ligne.SetPosition(i, positionsNoeuds[i]);
+        }
 
-		ligne.SetPosition(0, positionDebut);
-		ligne.SetPosition(1, positionFin);
+        return objetChemin;
+    }
 
-		return objetLigne;
-	}
+    public List<Vector3> GetPosSousGraphe()
+    {
+        if (positionsSousGraphe != null)
+        {
+            List<Vector3> temp = new List<Vector3>(positionsSousGraphe);
+            temp.Add(spawnOnMap.ConvertCoordsToPos(arriveeStringCoords));
+            return temp;
+        }
+        return null;
+    }
 
-	public GameObject DessinerChemin(List<Vector3> positionsNoeuds, Material materiauLigne, float largeur = 1f)
-	{
-		GameObject objetChemin = new GameObject("CheminSousGraphe");
-		LineRenderer ligne = objetChemin.AddComponent<LineRenderer>();
-
-		ligne.material = materiauLigne;
-		ligne.startWidth = largeur;
-		ligne.endWidth = largeur;
-		ligne.positionCount = positionsNoeuds.Count;
-		ligne.useWorldSpace = true;
-
-		for (int i = 0; i < positionsNoeuds.Count; i++)
-		{
-			ligne.SetPosition(i, positionsNoeuds[i]);
-		}
-
-		return objetChemin;
-	}
-
-	public List<Vector3> GetPosSousGraphe()
-	{
-		if (positionsSousGraphe != null)
-		{
-			List<Vector3> temp = new List<Vector3>(positionsSousGraphe);
-			temp.Add(spawnOnMap.ConvertCoordsToPos(arriveeStringCoords));
-			return temp;
-		}
-		return null;
-	}
-
-
-	/// Servira peut etre dans un futur + - proche
-	public Vector3 DepartCoords { get{ return spawnOnMap.ConvertCoordsToPos(departStringCoords); }}
-	/*public Vector3 ArriveeCoords { get{ return spawnOnMap.ConvertCoordsToPos(arriveeStringCoords); }}*/
-
+    /// Servira peut etre dans un futur + - proche
+    public Vector3 DepartCoords
+    {
+        get { return spawnOnMap.ConvertCoordsToPos(departStringCoords); }
+    }
+    /*public Vector3 ArriveeCoords { get{ return spawnOnMap.ConvertCoordsToPos(arriveeStringCoords); }}*/
 }

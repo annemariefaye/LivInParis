@@ -1,12 +1,12 @@
+using System;
+using System.Collections;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Net.Http;
 using System.Threading.Tasks;
-using PbSI;
-using System;
 using Newtonsoft.Json.Linq;
-using System.Collections;
+using PbSI;
+using UnityEngine;
 
 public static class DBManager
 {
@@ -19,12 +19,20 @@ public static class DBManager
     public static string? platDuJour;
     public static string? nomEntreprise;
     public static int fidelite;
+    public static int? idClient;
+    public static int? idCuisinier;
+
 
     public static int idPlatModif;
+    public static int idPlatOffert;
+    public static int idCuisinierNote;
+
+    public static bool fideliteActivee = false;
 
     public static Dictionary<int, int> quantitesDansPanier = new Dictionary<int, int>();
 
-    private static Dictionary<int, List<int>> commandesStationsProches = new Dictionary<int, List<int>>();
+    private static Dictionary<int, List<int>> commandesStationsProches =
+        new Dictionary<int, List<int>>();
 
     public static bool Connecte
     {
@@ -34,6 +42,21 @@ public static class DBManager
     public static void Deconnexion()
     {
         nomutilisateur = null;
+        email = null;
+        nom = null;
+        prenom = null;
+        adresse = null;
+        telephone = null;
+        platDuJour = null;
+        nomEntreprise = null;
+        fidelite = 0;
+
+        idPlatModif = 0;
+        idPlatOffert = 0;
+        idCuisinierNote = 0;
+
+        quantitesDansPanier.Clear();
+        commandesStationsProches.Clear();
     }
 
     public static IEnumerator MettreAJourFidelite()
@@ -48,11 +71,11 @@ public static class DBManager
 
             if (www.text == "0")
             {
-                Debug.Log("Fidélité mise à jour avec succès !");
+                Debug.Log("FidÃ©litÃ© mise Ã  jour avec succÃ¨s !");
             }
             else
             {
-                Debug.LogError("Erreur lors de la mise à jour de la fidélité : " + www.text);
+                Debug.LogError("Erreur lors de la mise Ã  jour de la fidÃ©litÃ© : " + www.text);
             }
         }
     }
@@ -64,7 +87,8 @@ public static class DBManager
             return false;
         }
 
-        string url = $"https://nominatim.openstreetmap.org/search?format=json&q={Uri.EscapeDataString(adresse)}";
+        string url =
+            $"https://nominatim.openstreetmap.org/search?format=json&q={Uri.EscapeDataString(adresse)}";
 
         using (HttpClient client = new HttpClient())
         {
@@ -86,11 +110,10 @@ public static class DBManager
             }
             catch (Exception e)
             {
-                Debug.Log($"Erreur lors de la vérification d'adresse : {e.Message}");
+                Debug.Log($"Erreur lors de la vÃ©rification d'adresse : {e.Message}");
             }
         }
 
         return false;
     }
-
 }

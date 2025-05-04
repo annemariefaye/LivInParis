@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public class AdminCuisinierManager : MonoBehaviour
 {
@@ -21,7 +21,7 @@ public class AdminCuisinierManager : MonoBehaviour
 
             if (!string.IsNullOrEmpty(www.error))
             {
-                Debug.LogError("Erreur de récupération : " + www.error);
+                Debug.LogError("Erreur de rÃ©cupÃ©ration : " + www.error);
                 yield break;
             }
 

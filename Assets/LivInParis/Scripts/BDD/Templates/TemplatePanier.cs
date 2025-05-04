@@ -1,13 +1,12 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+using System;
 using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
-using PbSI;
-using System;
 using Newtonsoft.Json.Linq;
-
+using PbSI;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class TemplatePanier : MonoBehaviour
 {
@@ -75,18 +74,21 @@ public class TemplatePanier : MonoBehaviour
     }
 
     public int GetIdPlat() => idPlat;
+
     public int GetQuantite() => quantite;
 
     public void EstValide()
     {
         dateValide = DateTime.TryParseExact(
-                        dateLivraisonInput.text.Trim(),
-                        "dd/MM/yyyy",CultureInfo.InvariantCulture,DateTimeStyles.None,out _);
+            dateLivraisonInput.text.Trim(),
+            "dd/MM/yyyy",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out _
+        );
         adresseValide = !string.IsNullOrWhiteSpace(adresseLivraisonInput.text);
 
         inputIncorrectDate.SetActive(!dateValide);
         inputIncorrectAdresse.SetActive(!adresseValide);
     }
-
-   
 }

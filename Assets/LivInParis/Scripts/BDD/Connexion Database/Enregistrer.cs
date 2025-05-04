@@ -1,9 +1,9 @@
 using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Enregistrer : MonoBehaviour
 {
@@ -17,6 +17,17 @@ public class Enregistrer : MonoBehaviour
     public TMP_InputField clientField;
     public TMP_InputField cuisinierField;
 
+    public GameObject nomUtilisateurErreur;
+    public GameObject mdpErreur;
+    public GameObject emailErreur;
+    public GameObject nomErreur;
+    public GameObject prenomErreur;
+    public GameObject adresseErreur;
+    public GameObject telErreur;
+    public GameObject clientErreur;
+    public GameObject cuisinierErreur;
+
+
     public bool estCuisinier = false;
     public bool estClient = false;
 
@@ -27,6 +38,7 @@ public class Enregistrer : MonoBehaviour
     {
         SceneManager.LoadScene(11);
     }
+
     public void CallRegister()
     {
         StartCoroutine(Register());
@@ -37,7 +49,7 @@ public class Enregistrer : MonoBehaviour
         estCuisinier = !estCuisinier;
         ///Debug.Log("je suis cuisto : " + estCuisinier);
     }
-    
+
     public void ToggleClient()
     {
         estClient = !estClient;
@@ -58,13 +70,13 @@ public class Enregistrer : MonoBehaviour
         WWW www = new WWW("http://localhost/livinparis/enregistrer.php", form);
         yield return www;
 
-        if(www.text == "0")
+        if (www.text == "0")
         {
-            Debug.Log("Utilisateur créé avec succès");
+            Debug.Log("Utilisateur crÃ©Ã© avec succÃ¨s");
         }
         else
         {
-            Debug.Log("Erreur dans la création de l'utilisateur. Erreur # " + www.text);
+            Debug.Log("Erreur dans la crÃ©ation de l'utilisateur. Erreur # " + www.text);
         }
 
         if (estCuisinier)
@@ -78,7 +90,6 @@ public class Enregistrer : MonoBehaviour
         }
 
         SceneManager.LoadScene(11);
-
     }
 
     public void VerifyInputs()
@@ -97,16 +108,25 @@ public class Enregistrer : MonoBehaviour
             cuistoValid = false;
         }
 
+        nomUtilisateurErreur.SetActive(!isNomUtilisateurValid);
+        mdpErreur.SetActive(!isMDPValid);
+        emailErreur.SetActive(!isEmailValid);
+        nomErreur.SetActive(!isNomValid);
+        prenomErreur.SetActive(!isPrenomValid);
+        adresseErreur.SetActive(!isAdresseValid);
+        telErreur.SetActive(!isTelValid);
+        cuisinierErreur.SetActive(!cuistoValid);
+
         submitButton.interactable = (
-            isNomUtilisateurValid &&
-            isMDPValid &&
-            isEmailValid &&
-            isNomValid &&
-            isPrenomValid &&
-            isAdresseValid &&
-            isTelValid &&
-            cuistoValid && 
-            (estCuisinier||estClient)
+            isNomUtilisateurValid
+            && isMDPValid
+            && isEmailValid
+            && isNomValid
+            && isPrenomValid
+            && isAdresseValid
+            && isTelValid
+            && cuistoValid
+            && (estCuisinier || estClient)
         );
     }
 }

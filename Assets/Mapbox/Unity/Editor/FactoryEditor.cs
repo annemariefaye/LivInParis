@@ -1,13 +1,11 @@
 namespace Mapbox.Editor
 {
-	using UnityEditor;
-	using Mapbox.Unity.MeshGeneration.Factories;
+    using Mapbox.Unity.MeshGeneration.Factories;
+    using UnityEditor;
 
-	[CustomEditor(typeof(AbstractTileFactory))]
-	public class FactoryEditor : Editor
-	{
-		public override void OnInspectorGUI()
-		{
-		}
-	}
+    [CustomEditor(typeof(AbstractTileFactory))]
+    public class FactoryEditor : Editor
+    {
+        public override void OnInspectorGUI() { }
+    }
 }

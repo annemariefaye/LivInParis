@@ -25,16 +25,15 @@ namespace KDTree
         private T[] tData;
 
         /// <summary>
-        /// The array of keys which 
+        /// The array of keys which
         /// </summary>
         private double[] tKeys;
 
         /// <summary>
         /// Construct a new interval heap with the default capacity.
         /// </summary>
-        public IntervalHeap() : this(DEFAULT_SIZE)
-        {
-        }
+        public IntervalHeap()
+            : this(DEFAULT_SIZE) { }
 
         /// <summary>
         /// Construct a new interval heap with a custom capacity.
@@ -150,8 +149,8 @@ namespace KDTree
 
             // Insert the new value at the end.
             Size++;
-            tData[Size-1] = value;
-            tKeys[Size-1] = key;
+            tData[Size - 1] = value;
+            tKeys[Size - 1] = key;
 
             // Ensure it is in the right place.
             SiftInsertedValueUp();
@@ -166,7 +165,7 @@ namespace KDTree
             if (Size == 0)
                 throw new Exception();
 
-            // Remove the item by 
+            // Remove the item by
             Size--;
             tData[0] = tData[Size];
             tKeys[0] = tKeys[Size];
@@ -209,7 +208,6 @@ namespace KDTree
             {
                 throw new Exception();
             }
-
             // If we have one item, remove the min.
             else if (Size == 1)
             {
@@ -245,12 +243,12 @@ namespace KDTree
             tData[1] = value;
             tKeys[1] = key;
             // Swap with pair if necessary
-            if (key < tKeys[0]) {
+            if (key < tKeys[0])
+            {
                 Swap(0, 1);
             }
             SiftDownMax(1);
         }
-
 
         /// <summary>
         /// Internal helper method which swaps two values in the arrays.
@@ -293,33 +291,29 @@ namespace KDTree
         private void SiftInsertedValueUp()
         {
             // Work out where the element was inserted.
-            int u = Size-1;
+            int u = Size - 1;
 
             // If it is the only element, nothing to do.
-            if (u == 0)
-            {
-            }
-
+            if (u == 0) { }
             // If it is the second element, sort with it's pair.
             else if (u == 1)
             {
                 // Swap if less than paired item.
-                if  (tKeys[u] < tKeys[u-1])
-                    Swap(u, u-1);
+                if (tKeys[u] < tKeys[u - 1])
+                    Swap(u, u - 1);
             }
-
-            // If it is on the max side, 
+            // If it is on the max side,
             else if (u % 2 == 1)
             {
                 // Already paired. Ensure pair is ordered right
-                int p = (u/2-1)|1; // The larger value of the parent pair
-                if  (tKeys[u] < tKeys[u-1])
+                int p = (u / 2 - 1) | 1; // The larger value of the parent pair
+                if (tKeys[u] < tKeys[u - 1])
                 { // If less than it's pair
-                    u = Swap(u, u-1); // Swap with it's pair
-                    if (tKeys[u] < tKeys[p-1])
+                    u = Swap(u, u - 1); // Swap with it's pair
+                    if (tKeys[u] < tKeys[p - 1])
                     { // If smaller than smaller parent pair
                         // Swap into min-heap side
-                        u = Swap(u, p-1);
+                        u = Swap(u, p - 1);
                         SiftUpMin(u);
                     }
                 }
@@ -336,17 +330,17 @@ namespace KDTree
             else
             {
                 // Inserted in the lower-value slot without a partner
-                int p = (u/2-1)|1; // The larger value of the parent pair
+                int p = (u / 2 - 1) | 1; // The larger value of the parent pair
                 if (tKeys[u] > tKeys[p])
                 { // If larger that larger parent pair
                     // Swap into max-heap side
                     u = Swap(u, p);
                     SiftUpMax(u);
                 }
-                else if (tKeys[u] < tKeys[p-1])
+                else if (tKeys[u] < tKeys[p - 1])
                 { // If smaller than smaller parent pair
                     // Swap into min-heap side
-                    u = Swap(u, p-1);
+                    u = Swap(u, p - 1);
                     SiftUpMin(u);
                 }
             }
@@ -359,9 +353,11 @@ namespace KDTree
         private void SiftUpMin(int iChild)
         {
             // Min-side parent: (x/2-1)&~1
-            for (int iParent = (iChild/2-1)&~1; 
-                iParent >= 0 && tKeys[iChild] < tKeys[iParent]; 
-                iChild = iParent, iParent = (iChild/2-1)&~1)
+            for (
+                int iParent = (iChild / 2 - 1) & ~1;
+                iParent >= 0 && tKeys[iChild] < tKeys[iParent];
+                iChild = iParent, iParent = (iChild / 2 - 1) & ~1
+            )
             {
                 Swap(iChild, iParent);
             }
@@ -374,9 +370,11 @@ namespace KDTree
         private void SiftUpMax(int iChild)
         {
             // Max-side parent: (x/2-1)|1
-            for (int iParent = (iChild/2-1)|1; 
-                iParent >= 0 && tKeys[iChild] > tKeys[iParent]; 
-                iChild = iParent, iParent = (iChild/2-1)|1)
+            for (
+                int iParent = (iChild / 2 - 1) | 1;
+                iParent >= 0 && tKeys[iChild] > tKeys[iParent];
+                iChild = iParent, iParent = (iChild / 2 - 1) | 1
+            )
             {
                 Swap(iChild, iParent);
             }
@@ -389,7 +387,11 @@ namespace KDTree
         private void SiftDownMin(int iParent)
         {
             // For each child of the parent.
-            for (int iChild = iParent * 2 + 2; iChild < Size; iParent = iChild, iChild = iParent * 2 + 2)
+            for (
+                int iChild = iParent * 2 + 2;
+                iChild < Size;
+                iParent = iChild, iChild = iParent * 2 + 2
+            )
             {
                 // If the next child is less than the current child, select the next one.
                 if (iChild + 2 < Size && tKeys[iChild + 2] < tKeys[iChild])
@@ -403,9 +405,9 @@ namespace KDTree
                     Swap(iParent, iChild);
 
                     // Swap the pair if necessary.
-                    if (iChild+1 < Size && tKeys[iChild+1] < tKeys[iChild])
+                    if (iChild + 1 < Size && tKeys[iChild + 1] < tKeys[iChild])
                     {
-                        Swap(iChild, iChild+1);
+                        Swap(iChild, iChild + 1);
                     }
                 }
                 else
@@ -422,7 +424,11 @@ namespace KDTree
         private void SiftDownMax(int iParent)
         {
             // For each child on the max side of the tree.
-            for (int iChild = iParent * 2 + 1; iChild <= Size; iParent = iChild, iChild = iParent * 2 + 1)
+            for (
+                int iChild = iParent * 2 + 1;
+                iChild <= Size;
+                iParent = iChild, iChild = iParent * 2 + 1
+            )
             {
                 // If the child is the last one (and only has half a pair).
                 if (iChild == Size)
@@ -432,7 +438,6 @@ namespace KDTree
                         Swap(iParent, iChild - 1);
                     break;
                 }
-
                 // If there is only room for a right child lower pair.
                 else if (iChild + 2 == Size)
                 {
@@ -441,12 +446,11 @@ namespace KDTree
                     {
                         // Swap with the parent.
                         if (tKeys[iChild + 1] > tKeys[iParent])
-                           Swap(iParent, iChild + 1);
+                            Swap(iParent, iChild + 1);
                         break;
                     }
                 }
-
-                // 
+                //
                 else if (iChild + 2 < Size)
                 {
                     // If there is room for a right child upper pair
@@ -459,9 +463,9 @@ namespace KDTree
                 {
                     Swap(iParent, iChild);
                     // Swap with pair if necessary
-                    if (tKeys[iChild-1] > tKeys[iChild])
+                    if (tKeys[iChild - 1] > tKeys[iChild])
                     {
-                        Swap(iChild, iChild-1);
+                        Swap(iChild, iChild - 1);
                     }
                 }
                 else

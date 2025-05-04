@@ -13,7 +13,15 @@ public class ItemStationData
     public string commune;
     public int codeInsee;
 
-    public ItemStationData(int id, string ligne, string libelle, double longitude, double latitude, string commune, int codeInsee)
+    public ItemStationData(
+        int id,
+        string ligne,
+        string libelle,
+        double longitude,
+        double latitude,
+        string commune,
+        int codeInsee
+    )
     {
         this.id = id;
         this.ligne = ligne;

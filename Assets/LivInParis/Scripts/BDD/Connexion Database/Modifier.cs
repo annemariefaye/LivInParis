@@ -1,9 +1,9 @@
 using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Modifier : MonoBehaviour
 {
@@ -16,6 +16,17 @@ public class Modifier : MonoBehaviour
     public TMP_InputField telField;
     public TMP_InputField clientField;
     public TMP_InputField cuisinierField;
+
+    public GameObject nomUtilisateurErreur;
+    public GameObject mdpErreur;
+    public GameObject emailErreur;
+    public GameObject nomErreur;
+    public GameObject prenomErreur;
+    public GameObject adresseErreur;
+    public GameObject telErreur;
+    public GameObject clientErreur;
+    public GameObject cuisinierErreur;
+
 
     public TextMeshProUGUI affichageUtilisateur;
 
@@ -49,13 +60,11 @@ public class Modifier : MonoBehaviour
     public void ToggleCuisinier()
     {
         estCuisinier = !estCuisinier;
-        ///Debug.Log("je suis cuisto : " + estCuisinier);
     }
-    
+
     public void ToggleClient()
     {
         estClient = !estClient;
-        ///Debug.Log("je suis client : " + estClient);
     }
 
     public void CallEdit()
@@ -91,7 +100,6 @@ public class Modifier : MonoBehaviour
             clientField.text = DBManager.nomEntreprise;
             etaitClient = true;
         }
-
     }
 
     IEnumerator Edit()
@@ -109,17 +117,18 @@ public class Modifier : MonoBehaviour
         form.AddField("pdj", cuisinierField.text);
         form.AddField("nomentreprise", clientField.text);
 
-
         WWW www = new WWW("http://localhost/livinparis/modifier_utilisateur.php", form);
         yield return www;
 
         if (www.text == "0")
         {
-            Debug.Log("Utilisateur modifié avec succès");
+            Debug.Log("Utilisateur modifiÃ© avec succÃ¨s");
 
             if (!etaitCuisinier && estCuisinier)
             {
-                StartCoroutine(CreerCuisinier.Creation(cuisinierField.text, DBManager.nomutilisateur));
+                StartCoroutine(
+                    CreerCuisinier.Creation(cuisinierField.text, DBManager.nomutilisateur)
+                );
             }
 
             if (etaitCuisinier && !estCuisinier)
@@ -136,8 +145,6 @@ public class Modifier : MonoBehaviour
             {
                 StartCoroutine(SupprimerClient());
             }
-
-            //SceneManager.LoadScene(0);
         }
         else
         {
@@ -157,7 +164,7 @@ public class Modifier : MonoBehaviour
 
             if (www.text == "0")
             {
-                Debug.Log("Cuisinier supprimé avec succès");
+                Debug.Log("Cuisinier supprimÃ© avec succÃ¨s");
             }
             else
             {
@@ -178,7 +185,7 @@ public class Modifier : MonoBehaviour
 
             if (www.text == "0")
             {
-                Debug.Log("Client supprimé avec succès");
+                Debug.Log("Client supprimÃ© avec succÃ¨s");
             }
             else
             {
@@ -202,7 +209,7 @@ public class Modifier : MonoBehaviour
 
         if (www.text == "0")
         {
-            Debug.Log("Utilisateur supprimé avec succès");
+            Debug.Log("Utilisateur supprimÃ© avec succÃ¨s");
             SceneManager.LoadScene(0);
         }
         else
@@ -227,17 +234,25 @@ public class Modifier : MonoBehaviour
             cuistoValid = false;
         }
 
+        nomUtilisateurErreur.SetActive(!isNomUtilisateurValid);
+        mdpErreur.SetActive(!isMDPValid);
+        emailErreur.SetActive(!isEmailValid);
+        nomErreur.SetActive(!isNomValid);
+        prenomErreur.SetActive(!isPrenomValid);
+        adresseErreur.SetActive(!isAdresseValid);
+        telErreur.SetActive(!isTelValid);
+        cuisinierErreur.SetActive(!cuistoValid);
+
         submitButton.interactable = (
-            isNomUtilisateurValid &&
-            isMDPValid &&
-            isEmailValid &&
-            isNomValid &&
-            isPrenomValid &&
-            isAdresseValid &&
-            isTelValid &&
-            cuistoValid &&
-            (estCuisinier || estClient)
+            isNomUtilisateurValid
+            && isMDPValid
+            && isEmailValid
+            && isNomValid
+            && isPrenomValid
+            && isAdresseValid
+            && isTelValid
+            && cuistoValid
+            && (estCuisinier || estClient)
         );
     }
-
 }

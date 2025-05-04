@@ -1,223 +1,254 @@
 namespace Mapbox.Editor
 {
-	using UnityEngine;
-	using Mapbox.Unity.Map;
-	using UnityEditor;
-	using System;
-	using System.Collections.Generic;
-	using Mapbox.VectorTile.ExtensionMethods;
+    using System;
+    using System.Collections.Generic;
+    using Mapbox.Unity.Map;
+    using Mapbox.VectorTile.ExtensionMethods;
+    using UnityEditor;
+    using UnityEngine;
 
-	[CustomPropertyDrawer(typeof(PrefabItemOptions))]
-	public class PrefabItemOptionsDrawer : PropertyDrawer
-	{
+    [CustomPropertyDrawer(typeof(PrefabItemOptions))]
+    public class PrefabItemOptionsDrawer : PropertyDrawer
+    {
+        static float _lineHeight = EditorGUIUtility.singleLineHeight;
+        const string searchButtonContent = "Search";
 
-		static float _lineHeight = EditorGUIUtility.singleLineHeight;
-		const string searchButtonContent = "Search";
+        private GUIContent prefabLocationsTitle = new GUIContent
+        {
+            text = "Prefab Locations",
+            tooltip = "Where on the map to spawn the selected prefab",
+        };
 
-		private GUIContent prefabLocationsTitle = new GUIContent
-		{
-			text = "Prefab Locations",
-			tooltip = "Where on the map to spawn the selected prefab"
-		};
+        private GUIContent findByDropDown = new GUIContent
+        {
+            text = "Find by",
+            tooltip = "Find points-of-interest by category, name, or address",
+        };
 
+        private GUIContent categoriesDropDown = new GUIContent
+        {
+            text = "Category",
+            tooltip = "Spawn at locations in the categories selected",
+        };
 
-		private GUIContent findByDropDown = new GUIContent
-		{
-			text = "Find by",
-			tooltip = "Find points-of-interest by category, name, or address"
-		};
+        private GUIContent densitySlider = new GUIContent
+        {
+            text = "Density",
+            tooltip =
+                "The number of prefabs to spawn per-tile; try a lower number if the map is cluttered",
+        };
 
-		private GUIContent categoriesDropDown = new GUIContent
-		{
-			text = "Category",
-			tooltip = "Spawn at locations in the categories selected"
-		};
+        private GUIContent nameField = new GUIContent
+        {
+            text = "Name",
+            tooltip = "Spawn at locations containing this name string",
+        };
 
-		private GUIContent densitySlider = new GUIContent
-		{
-			text = "Density",
-			tooltip = "The number of prefabs to spawn per-tile; try a lower number if the map is cluttered"
-		};
+        GUIContent[] findByPropContent;
+        bool isGUIContentSet = false;
 
-		private GUIContent nameField = new GUIContent
-		{
-			text = "Name",
-			tooltip = "Spawn at locations containing this name string"
-		};
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            GUILayout.Space(-_lineHeight);
+            var prefabItemCoreOptions = property.FindPropertyRelative("coreOptions");
+            GUILayout.Label(
+                prefabItemCoreOptions.FindPropertyRelative("sublayerName").stringValue
+                    + " Properties"
+            );
 
-		GUIContent[] findByPropContent;
-		bool isGUIContentSet = false;
+            //Prefab Game Object
+            EditorGUI.indentLevel++;
+            var spawnPrefabOptions = property.FindPropertyRelative("spawnPrefabOptions");
 
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		{
-			GUILayout.Space(-_lineHeight);
-			var prefabItemCoreOptions = property.FindPropertyRelative("coreOptions");
-			GUILayout.Label(prefabItemCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
+            EditorGUILayout.PropertyField(spawnPrefabOptions);
 
-			//Prefab Game Object
-			EditorGUI.indentLevel++;
-			var spawnPrefabOptions = property.FindPropertyRelative("spawnPrefabOptions");
+            GUILayout.Space(1);
+            EditorGUI.indentLevel--;
 
-			EditorGUILayout.PropertyField(spawnPrefabOptions);
+            //Prefab Locations title
+            GUILayout.Label(prefabLocationsTitle);
 
-			GUILayout.Space(1);
-			EditorGUI.indentLevel--;
+            //FindBy drop down
+            EditorGUILayout.BeginHorizontal();
 
-			//Prefab Locations title
-			GUILayout.Label(prefabLocationsTitle);
+            var findByProp = property.FindPropertyRelative("findByType");
 
-			//FindBy drop down
-			EditorGUILayout.BeginHorizontal();
+            var displayNames = findByProp.enumDisplayNames;
+            int count = findByProp.enumDisplayNames.Length;
+            if (!isGUIContentSet)
+            {
+                findByPropContent = new GUIContent[count];
+                for (int extIdx = 0; extIdx < count; extIdx++)
+                {
+                    findByPropContent[extIdx] = new GUIContent
+                    {
+                        text = displayNames[extIdx],
+                        tooltip = ((LocationPrefabFindBy)extIdx).Description(),
+                    };
+                }
+                isGUIContentSet = true;
+            }
 
-			var findByProp = property.FindPropertyRelative("findByType");
+            EditorGUI.indentLevel++;
 
-			var displayNames = findByProp.enumDisplayNames;
-			int count = findByProp.enumDisplayNames.Length;
-			if (!isGUIContentSet)
-			{
-				findByPropContent = new GUIContent[count];
-				for (int extIdx = 0; extIdx < count; extIdx++)
-				{
-					findByPropContent[extIdx] = new GUIContent
-					{
-						text = displayNames[extIdx],
-						tooltip = ((LocationPrefabFindBy)extIdx).Description(),
-					};
-				}
-				isGUIContentSet = true;
-			}
+            EditorGUI.BeginChangeCheck();
+            findByProp.enumValueIndex = EditorGUILayout.Popup(
+                findByDropDown,
+                findByProp.enumValueIndex,
+                findByPropContent
+            );
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorHelper.CheckForModifiedProperty(property);
+            }
 
-			EditorGUI.indentLevel++;
+            EditorGUILayout.EndHorizontal();
 
-			EditorGUI.BeginChangeCheck();
-			findByProp.enumValueIndex = EditorGUILayout.Popup(findByDropDown, findByProp.enumValueIndex, findByPropContent);
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(property);
-			}
+            switch ((LocationPrefabFindBy)findByProp.enumValueIndex)
+            {
+                case (LocationPrefabFindBy.MapboxCategory):
+                    ShowCategoryOptions(property);
+                    break;
+                case (LocationPrefabFindBy.AddressOrLatLon):
+                    ShowAddressOrLatLonUI(property);
+                    break;
+                case (LocationPrefabFindBy.POIName):
+                    ShowPOINames(property);
+                    break;
+                default:
+                    break;
+            }
+            EditorGUI.indentLevel--;
+        }
 
-			EditorGUILayout.EndHorizontal();
+        private void ShowCategoryOptions(SerializedProperty property)
+        {
+            //Category drop down
+            EditorGUI.BeginChangeCheck();
+            var categoryProp = property.FindPropertyRelative("categories");
+            categoryProp.intValue = (int)
+                (LocationPrefabCategories)(
+                    EditorGUILayout.EnumFlagsField(
+                        categoriesDropDown,
+                        (LocationPrefabCategories)categoryProp.intValue
+                    )
+                );
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorHelper.CheckForModifiedProperty(property);
+            }
+            ShowDensitySlider(property);
+        }
 
-			switch ((LocationPrefabFindBy)findByProp.enumValueIndex)
-			{
-				case (LocationPrefabFindBy.MapboxCategory):
-					ShowCategoryOptions(property);
-					break;
-				case (LocationPrefabFindBy.AddressOrLatLon):
-					ShowAddressOrLatLonUI(property);
-					break;
-				case (LocationPrefabFindBy.POIName):
-					ShowPOINames(property);
-					break;
-				default:
-					break;
-			}
-			EditorGUI.indentLevel--;
-		}
+        private void ShowAddressOrLatLonUI(SerializedProperty property)
+        {
+            //EditorGUILayout.BeginVertical();
+            var coordinateProperties = property.FindPropertyRelative("coordinates");
 
-		private void ShowCategoryOptions(SerializedProperty property)
-		{
-			//Category drop down
-			EditorGUI.BeginChangeCheck();
-			var categoryProp = property.FindPropertyRelative("categories");
-			categoryProp.intValue = (int)(LocationPrefabCategories)(EditorGUILayout.EnumFlagsField(categoriesDropDown, (LocationPrefabCategories)categoryProp.intValue));
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(property);
-			}
-			ShowDensitySlider(property);
-		}
+            for (int i = 0; i < coordinateProperties.arraySize; i++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                //get the element to draw
+                var coordinate = coordinateProperties.GetArrayElementAtIndex(i);
 
-		private void ShowAddressOrLatLonUI(SerializedProperty property)
-		{
-			//EditorGUILayout.BeginVertical();
-			var coordinateProperties = property.FindPropertyRelative("coordinates");
+                //label for each location.
+                var coordinateLabel = String.Format("Location {0}", i);
 
-			for (int i = 0; i < coordinateProperties.arraySize; i++)
-			{
-				EditorGUILayout.BeginHorizontal();
-				//get the element to draw
-				var coordinate = coordinateProperties.GetArrayElementAtIndex(i);
+                // draw coordinate string.
+                EditorGUI.BeginChangeCheck();
+                coordinate.stringValue = EditorGUILayout.TextField(
+                    coordinateLabel,
+                    coordinate.stringValue
+                );
 
-				//label for each location.
-				var coordinateLabel = String.Format("Location {0}", i);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EditorHelper.CheckForModifiedProperty(property, true);
+                }
+                // draw search button.
+                if (
+                    GUILayout.Button(
+                        new GUIContent(searchButtonContent),
+                        (GUIStyle)"minibuttonleft",
+                        GUILayout.MaxWidth(100)
+                    )
+                )
+                {
+                    object propertyObject = EditorHelper.GetTargetObjectOfProperty(property);
+                    GeocodeAttributeSearchWindow.Open(coordinate, propertyObject);
+                }
 
-				// draw coordinate string.
-				EditorGUI.BeginChangeCheck();
-				coordinate.stringValue = EditorGUILayout.TextField(coordinateLabel, coordinate.stringValue);
+                //include a remove button in the row
+                if (
+                    GUILayout.Button(
+                        new GUIContent(" X "),
+                        (GUIStyle)"minibuttonright",
+                        GUILayout.MaxWidth(30)
+                    )
+                )
+                {
+                    coordinateProperties.DeleteArrayElementAtIndex(i);
+                    EditorHelper.CheckForModifiedProperty(property);
+                }
+                EditorGUILayout.EndHorizontal();
+            }
 
-				if(EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(property, true);
-				}
-				// draw search button.
-				if (GUILayout.Button(new GUIContent(searchButtonContent), (GUIStyle)"minibuttonleft", GUILayout.MaxWidth(100)))
-				{
-					object propertyObject = EditorHelper.GetTargetObjectOfProperty(property);
-					GeocodeAttributeSearchWindow.Open(coordinate, propertyObject);
-				}
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(EditorGUIUtility.labelWidth - 3);
 
-				//include a remove button in the row
-				if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.MaxWidth(30)))
-				{
-					coordinateProperties.DeleteArrayElementAtIndex(i);
-					EditorHelper.CheckForModifiedProperty(property);
-				}
-				EditorGUILayout.EndHorizontal();
-			}
+            if (GUILayout.Button(new GUIContent("Add Location"), (GUIStyle)"minibutton"))
+            {
+                coordinateProperties.arraySize++;
+                var newElement = coordinateProperties.GetArrayElementAtIndex(
+                    coordinateProperties.arraySize - 1
+                );
+                newElement.stringValue = "";
+                EditorHelper.CheckForModifiedProperty(property);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
 
-			EditorGUILayout.BeginHorizontal();
-			GUILayout.Space(EditorGUIUtility.labelWidth - 3);
+        private void ShowPOINames(SerializedProperty property)
+        {
+            //Name field
+            var categoryProp = property.FindPropertyRelative("nameString");
 
-			if (GUILayout.Button(new GUIContent("Add Location"), (GUIStyle)"minibutton"))
-			{
-				coordinateProperties.arraySize++;
-				var newElement = coordinateProperties.GetArrayElementAtIndex(coordinateProperties.arraySize - 1);
-				newElement.stringValue = "";
-				EditorHelper.CheckForModifiedProperty(property);
-			}
-			EditorGUILayout.EndHorizontal();
-		}
+            EditorGUI.BeginChangeCheck();
+            categoryProp.stringValue = EditorGUILayout.TextField(
+                nameField,
+                categoryProp.stringValue
+            );
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorHelper.CheckForModifiedProperty(property);
+            }
 
+            ShowDensitySlider(property);
+        }
 
-		private void ShowPOINames(SerializedProperty property)
-		{
-			//Name field
-			var categoryProp = property.FindPropertyRelative("nameString");
+        private void ShowDensitySlider(SerializedProperty property)
+        {
+            //Density slider
+            var densityProp = property.FindPropertyRelative("density");
 
-			EditorGUI.BeginChangeCheck();
-			categoryProp.stringValue = EditorGUILayout.TextField(nameField, categoryProp.stringValue);
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(property);
-			}
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(densityProp, densitySlider);
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorHelper.CheckForModifiedProperty(property);
+            }
+            GUI.enabled = true;
+            densityProp.serializedObject.ApplyModifiedProperties();
+        }
 
-			ShowDensitySlider(property);
-		}
+        private Rect GetNewRect(Rect position)
+        {
+            return new Rect(position.x, position.y, position.width, _lineHeight);
+        }
 
-		private void ShowDensitySlider(SerializedProperty property)
-		{
-			//Density slider
-			var densityProp = property.FindPropertyRelative("density");
-
-			EditorGUI.BeginChangeCheck();
-			EditorGUILayout.PropertyField(densityProp, densitySlider);
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(property);
-			}
-			GUI.enabled = true;
-			densityProp.serializedObject.ApplyModifiedProperties();
-		}
-
-		private Rect GetNewRect(Rect position)
-		{
-			return new Rect(position.x, position.y, position.width, _lineHeight);
-		}
-
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			return _lineHeight;
-		}
-	}
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            return _lineHeight;
+        }
+    }
 }

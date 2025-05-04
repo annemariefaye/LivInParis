@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using System;
-using TMPro;
 
 public class CuisinierCommandesManager : MonoBehaviour
 {
@@ -20,13 +20,15 @@ public class CuisinierCommandesManager : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("nomutilisateur", DBManager.nomutilisateur);
 
-        using (WWW www = new WWW("http://localhost/livinparis/recuperer_commandes_cuisinier.php", form))
+        using (
+            WWW www = new WWW("http://localhost/livinparis/recuperer_commandes_cuisinier.php", form)
+        )
         {
             yield return www;
 
             if (!string.IsNullOrEmpty(www.error))
             {
-                Debug.LogError("Erreur lors de la récupération des plats : " + www.error);
+                Debug.LogError("Erreur lors de la rÃ©cupÃ©ration des plats : " + www.error);
                 yield break;
             }
 
@@ -47,7 +49,8 @@ public class CuisinierCommandesManager : MonoBehaviour
                 }
 
                 GameObject newCommande = Instantiate(templateCommandePrefab, contentPanel);
-                TemplateCommandeCuisinier template = newCommande.GetComponent<TemplateCommandeCuisinier>();
+                TemplateCommandeCuisinier template =
+                    newCommande.GetComponent<TemplateCommandeCuisinier>();
 
                 template.Titre.text = donnees[0];
                 DateTime date = DateTime.Parse(donnees[1]);

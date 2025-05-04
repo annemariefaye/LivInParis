@@ -1,8 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
-using System;
+using UnityEngine;
 
 public class CommandeNationaliteClientManager : MonoBehaviour
 {
@@ -26,13 +26,18 @@ public class CommandeNationaliteClientManager : MonoBehaviour
         form.AddField("nationalite", nationalite.text);
         form.AddField("nomutilisateur", nomutilisateur.text);
 
-        using (WWW www = new WWW("http://localhost/livinparis/recuperer_commandes_par_nationalite_nu.php", form))
+        using (
+            WWW www = new WWW(
+                "http://localhost/livinparis/recuperer_commandes_par_nationalite_nu.php",
+                form
+            )
+        )
         {
             yield return www;
 
             if (!string.IsNullOrEmpty(www.error))
             {
-                Debug.LogError("Erreur lors de la récupération des plats : " + www.error);
+                Debug.LogError("Erreur lors de la rÃ©cupÃ©ration des plats : " + www.error);
                 yield break;
             }
 

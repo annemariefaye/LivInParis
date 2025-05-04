@@ -6,7 +6,6 @@ using System.Text;
 
 namespace KDTree
 {
-
     /// <summary>
     /// A KDTree class represents the root of a variable-dimension KD-Tree.
     /// </summary>
@@ -19,9 +18,7 @@ namespace KDTree
         /// </summary>
         /// <param name="iDimensions">The number of data sorting dimensions. i.e. 3 for a 3D point.</param>
         public KDTree(int iDimensions)
-            : base(iDimensions, 24)
-        {
-        }
+            : base(iDimensions, 24) { }
 
         /// <summary>
         /// Create a new KD-Tree given a number of dimensions and initial bucket capacity.
@@ -29,9 +26,7 @@ namespace KDTree
         /// <param name="iDimensions">The number of data sorting dimensions. i.e. 3 for a 3D point.</param>
         /// <param name="iBucketCapacity">The default number of items that can be stored in each node.</param>
         public KDTree(int iDimensions, int iBucketCapacity)
-            : base(iDimensions, iBucketCapacity)
-        {
-        }
+            : base(iDimensions, iBucketCapacity) { }
 
         /// <summary>
         /// Get the nearest neighbours to a point in the kd tree using a square euclidean distance function.
@@ -40,7 +35,11 @@ namespace KDTree
         /// <param name="iMaxReturned">The maximum number of points which can be returned by the iterator.</param>
         /// <param name="fDistance">A threshold distance to apply.  Optional.  Negative values mean that it is not applied.</param>
         /// <returns>A new nearest neighbour iterator with the given parameters.</returns>
-        public NearestNeighbour<T> NearestNeighbors(double[] tSearchPoint, int iMaxReturned, double fDistance = -1)
+        public NearestNeighbour<T> NearestNeighbors(
+            double[] tSearchPoint,
+            int iMaxReturned,
+            double fDistance = -1
+        )
         {
             DistanceFunctions distanceFunction = new SquareEuclideanDistanceFunction();
             return NearestNeighbors(tSearchPoint, distanceFunction, iMaxReturned, fDistance);
@@ -54,9 +53,20 @@ namespace KDTree
         /// <param name="kDistanceFunction">The distance function to use.</param>
         /// <param name="fDistance">A threshold distance to apply.  Optional.  Negative values mean that it is not applied.</param>
         /// <returns>A new nearest neighbour iterator with the given parameters.</returns>
-        public NearestNeighbour<T> NearestNeighbors(double[] tSearchPoint, DistanceFunctions kDistanceFunction, int iMaxReturned, double fDistance)
+        public NearestNeighbour<T> NearestNeighbors(
+            double[] tSearchPoint,
+            DistanceFunctions kDistanceFunction,
+            int iMaxReturned,
+            double fDistance
+        )
         {
-            return new NearestNeighbour<T>(this, tSearchPoint, kDistanceFunction, iMaxReturned, fDistance);
+            return new NearestNeighbour<T>(
+                this,
+                tSearchPoint,
+                kDistanceFunction,
+                iMaxReturned,
+                fDistance
+            );
         }
     }
 }

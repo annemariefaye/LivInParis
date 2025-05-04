@@ -13,7 +13,15 @@ public class ItemStationGraphe
     public int tempsDeChangement;
     public string sensUnique;
 
-    public ItemStationGraphe(int stationId, string stationNom, string precedentId, string suivantId, int tempsEntreDeuxStations, int tempsDeChangement, string sensUnique)
+    public ItemStationGraphe(
+        int stationId,
+        string stationNom,
+        string precedentId,
+        string suivantId,
+        int tempsEntreDeuxStations,
+        int tempsDeChangement,
+        string sensUnique
+    )
     {
         this.stationId = stationId;
         this.stationNom = stationNom;

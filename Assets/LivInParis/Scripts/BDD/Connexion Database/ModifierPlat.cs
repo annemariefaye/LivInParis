@@ -1,11 +1,11 @@
+using System;
 using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
-using System;
-using System.Linq;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ModifierPlat : MonoBehaviour
 {
@@ -24,6 +24,15 @@ public class ModifierPlat : MonoBehaviour
 
     public Button modifierButton;
 
+    public GameObject erreurNom;
+    public GameObject erreurPrix;
+    public GameObject erreurPersonnes;
+    public GameObject erreurDateFab;
+    public GameObject erreurDatePer;
+    public GameObject erreurNationalite;
+    public GameObject erreurProteines;
+    public GameObject erreurChemin;
+
     void Start()
     {
         idPlat = DBManager.idPlatModif;
@@ -40,6 +49,7 @@ public class ModifierPlat : MonoBehaviour
     {
         SceneManager.LoadScene(15);
     }
+
     IEnumerator FillRecetteDropdown()
     {
         WWW www = new WWW("http://localhost/livinparis/recuperer_recettes.php");
@@ -47,13 +57,16 @@ public class ModifierPlat : MonoBehaviour
 
         if (www.text[0] == '0')
         {
-            string[] recettes = www.text.Split('\t').Where(r => !string.IsNullOrEmpty(r) && r != "0").ToArray();
+            string[] recettes = www
+                .text.Split('\t')
+                .Where(r => !string.IsNullOrEmpty(r) && r != "0")
+                .ToArray();
             recetteInput.ClearOptions();
             recetteInput.AddOptions(recettes.ToList());
         }
         else
         {
-            Debug.LogError("Erreur lors de la récupération des recettes : " + www.text);
+            Debug.LogError("Erreur lors de la rÃ©cupÃ©ration des recettes : " + www.text);
         }
     }
 
@@ -78,18 +91,17 @@ public class ModifierPlat : MonoBehaviour
 
         if (www.text == "0")
         {
-            Debug.Log("Plat mis à jour avec succès");
+            Debug.Log("Plat mis Ã  jour avec succÃ¨s");
         }
         else
         {
-            Debug.LogError("Erreur lors de la mise à jour du plat : " + www.text);
+            Debug.LogError("Erreur lors de la mise Ã  jour du plat : " + www.text);
         }
     }
 
     public void SupprimerPlatAction()
     {
         StartCoroutine(SupprimerPlat());
-
     }
 
     IEnumerator SupprimerPlat()
@@ -102,18 +114,20 @@ public class ModifierPlat : MonoBehaviour
 
         if (www.text == "0")
         {
-            Debug.Log("Plat supprimé avec succès");
+            Debug.Log("Plat supprimÃ© avec succÃ¨s");
         }
         else
         {
             Debug.LogError("Erreur lors de la suppression du plat : " + www.text);
         }
     }
+
     bool ValidateNumeric(string input)
     {
         decimal result;
         return decimal.TryParse(input, out result) && result >= 0;
     }
+
     public void VerifyInputs()
     {
         bool isNomValid = nomInput.text.Length > 0;
@@ -125,15 +139,24 @@ public class ModifierPlat : MonoBehaviour
         bool isDatePerValid = DateTime.TryParse(datePeremptionInput.text.Trim(), out _);
         bool isNationaliteValid = nationaliteInput.text.Length > 0;
 
+        erreurNom.SetActive(!isNomValid);
+        erreurPrix.SetActive(!isPrixValid);
+        erreurPersonnes.SetActive(!isPersonnesValid);
+        erreurDateFab.SetActive(!isDateFabValid);
+        erreurDatePer.SetActive(!isDatePerValid);
+        erreurNationalite.SetActive(!isNationaliteValid);
+        erreurProteines.SetActive(!isProteinesValid);
+        erreurChemin.SetActive(!isCheminValid);
+
         modifierButton.interactable = (
-             isNomValid &&
-             isPrixValid &&
-             isPersonnesValid &&
-             isProteinesValid &&
-             isDateFabValid &&
-             isDatePerValid &&
-             isNationaliteValid &&
-             isCheminValid
+            isNomValid
+            && isPrixValid
+            && isPersonnesValid
+            && isProteinesValid
+            && isDateFabValid
+            && isDatePerValid
+            && isNationaliteValid
+            && isCheminValid
         );
     }
 }

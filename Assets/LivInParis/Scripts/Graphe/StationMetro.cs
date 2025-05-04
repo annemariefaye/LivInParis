@@ -1,27 +1,33 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace PbSI
 {
     public class StationMetro
     {
         #region Attributs spécifiques
 
-        private readonly string libelle;  
-        private readonly string ligne;         
-        private readonly double longitude;  
-        private readonly double latitude;  
-        private readonly string commune;    
-        private readonly int codeInsee;     
+        private readonly string libelle;
+        private readonly string ligne;
+        private readonly double longitude;
+        private readonly double latitude;
+        private readonly string commune;
+        private readonly int codeInsee;
 
         #endregion
 
         #region Constructeur
 
-        public StationMetro(string ligne, string libelle, double longitude, double latitude, string commune, int codeInsee)
+        public StationMetro(
+            string ligne,
+            string libelle,
+            double longitude,
+            double latitude,
+            string commune,
+            int codeInsee
+        )
         {
-            this.libelle = libelle;  
+            this.libelle = libelle;
             this.ligne = ligne;
             this.longitude = longitude;
             this.latitude = latitude;
@@ -34,7 +40,7 @@ namespace PbSI
         #region Propriétés
 
         /// <summary>
-        /// Retourne le libellé de la station  
+        /// Retourne le libellé de la station
         /// </summary>
         public string Libelle
         {
@@ -102,7 +108,6 @@ namespace PbSI
             return new StationMetro(ligne, libelle, longitude, latitude, commune, codeInsee);
         }
 
-
-    #endregion
+        #endregion
     }
 }

@@ -17,7 +17,7 @@ if(mysqli_connect_errno()) {
 $nomutilisateur = $_POST['nomutilisateur'];
 $password = $_POST['mdp'];
 
-$nomutilisateurcheckquerry = "SELECT NomUtilisateur, Salt, Hashing, Email, Nom, Prenom, Adresse, Telephone, PointFidelite FROM Utilisateur WHERE NomUtilisateur = '$nomutilisateur';";
+$nomutilisateurcheckquerry = "SELECT NomUtilisateur, Salt, Hashing, Email, Nom, Prenom, Adresse, Telephone, PointFidelite, IdClient, IdCuisinier FROM Utilisateur WHERE NomUtilisateur = '$nomutilisateur';";
 $nomutilisateurcheck = mysqli_query($con, $nomutilisateurcheckquerry) or die("2 : Echec de la requête nom utilisateur");
 
 if (mysqli_num_rows($nomutilisateurcheck) != 1) {
@@ -36,16 +36,19 @@ if ($loginhash != $hash) {
     exit();
 }
 
-$clientQuery = "SELECT nomEntreprise FROM client WHERE idClient = (SELECT IdClient FROM Utilisateur WHERE NomUtilisateur = '$nomutilisateur');";
+$idClient = $existinginfo['IdClient'] !== null ? $existinginfo['IdClient'] : "null";
+$idCuisinier = $existinginfo['IdCuisinier'] !== null ? $existinginfo['IdCuisinier'] : "null";
+
+$clientQuery = "SELECT nomEntreprise FROM client WHERE idClient = '$idClient';";
 $clientResult = mysqli_query($con, $clientQuery);
 $clientInfo = mysqli_fetch_assoc($clientResult);
-$nomEntreprise = $clientInfo['nomEntreprise'] ?? '';
+$nomEntreprise = $clientInfo['nomEntreprise'] ?? "null";
 
-$cuisinierQuery = "SELECT platDuJour FROM cuisinier WHERE idCuisinier = (SELECT IdCuisinier FROM Utilisateur WHERE NomUtilisateur = '$nomutilisateur');";
+$cuisinierQuery = "SELECT platDuJour FROM cuisinier WHERE idCuisinier = '$idCuisinier';";
 $cuisinierResult = mysqli_query($con, $cuisinierQuery);
 $cuisinierInfo = mysqli_fetch_assoc($cuisinierResult);
-$platDuJour = $cuisinierInfo['platDuJour'] ?? '';
+$platDuJour = $cuisinierInfo['platDuJour'] ?? "null";
 
-echo "0\t" . $existinginfo['Email'] . "\t" . $existinginfo['Nom'] . "\t" . $existinginfo['Prenom'] . "\t" . $existinginfo['Adresse'] . "\t" . $existinginfo['Telephone'] . "\t" . $existinginfo['PointFidelite'] . "\t" . $platDuJour . "\t" . $nomEntreprise . "\t";
+echo "0\t" . $existinginfo['Email'] . "\t" . $existinginfo['Nom'] . "\t" . $existinginfo['Prenom'] . "\t" . $existinginfo['Adresse'] . "\t" . $existinginfo['Telephone'] . "\t" . $existinginfo['PointFidelite'] . "\t" . $platDuJour . "\t" . $nomEntreprise . "\t" . $idClient . "\t" . $idCuisinier . "\t";
 
 ?>

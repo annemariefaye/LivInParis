@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Globalization;
+using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
 
 public class ModifierPanierManager : MonoBehaviour
 {
@@ -69,7 +68,7 @@ public class ModifierPanierManager : MonoBehaviour
 
     void AfficherPlatDansPanier(CommandePlatData platData)
     {
-        if(platData.Quantite > 0)
+        if (platData.Quantite > 0)
         {
             GameObject panierItem = Instantiate(templatePanierPrefab, parentContainer);
             TemplatePanier panierScript = panierItem.GetComponent<TemplatePanier>();
@@ -80,7 +79,7 @@ public class ModifierPanierManager : MonoBehaviour
             panierScript.synchroniserAvecDB = false;
 
             panierScript.titreText.text = platData.Nom;
-            panierScript.prixText.text = platData.Prix.ToString("0.00") + "€";
+            panierScript.prixText.text = platData.Prix.ToString("0.00") + "â‚¬";
             panierScript.quantiteText.text = platData.Quantite.ToString();
             panierScript.dateLivraisonInput.text = platData.DateLivraison;
             panierScript.adresseLivraisonInput.text = platData.AdresseLivraison;
@@ -93,7 +92,9 @@ public class ModifierPanierManager : MonoBehaviour
                 if (img != null)
                     panierScript.platImage.sprite = img;
                 else
-                    Debug.LogWarning("Image introuvable dans Resources : " + platData.CheminAccesPhoto);
+                    Debug.LogWarning(
+                        "Image introuvable dans Resources : " + platData.CheminAccesPhoto
+                    );
             }
 
             panierScript.plusButton.onClick.AddListener(() =>
@@ -119,7 +120,7 @@ public class ModifierPanierManager : MonoBehaviour
         foreach (var template in tousLesTemplates)
         {
             int quantite = int.Parse(template.quantiteText.text);
-            string prixString = template.prixText.text.Replace("€", "").Trim();
+            string prixString = template.prixText.text.Replace("â‚¬", "").Trim();
 
             if (!float.TryParse(prixString, out float prix))
             {
@@ -136,15 +137,21 @@ public class ModifierPanierManager : MonoBehaviour
 
         if (totalActuel > totalDeBase)
         {
-            boutonResteAPayerText.text = "Reste à payer : " + (totalActuel - totalDeBase).ToString("0.00", CultureInfo.InvariantCulture) + "€\nModifier commande";
+            boutonResteAPayerText.text =
+                "Reste Ã  payer : "
+                + (totalActuel - totalDeBase).ToString("0.00", CultureInfo.InvariantCulture)
+                + "â‚¬\nModifier commande";
         }
         else if (totalActuel < totalDeBase)
         {
-            boutonResteAPayerText.text = "À rembourser : " + (totalDeBase - totalActuel).ToString("0.00", CultureInfo.InvariantCulture) + "€\nModifier commande";
+            boutonResteAPayerText.text =
+                "Ã  rembourser : "
+                + (totalDeBase - totalActuel).ToString("0.00", CultureInfo.InvariantCulture)
+                + "â‚¬\nModifier commande";
         }
         else
         {
-            boutonResteAPayerText.text = "Reste à payer : 0.00€\nModifier commande";
+            boutonResteAPayerText.text = "Reste Ã  payer : 0.00â‚¬\nModifier commande";
         }
     }
 
@@ -154,7 +161,7 @@ public class ModifierPanierManager : MonoBehaviour
 
         foreach (TemplatePanier template in tousLesTemplates)
         {
-            if (!template.dateValide|| !template.adresseValide)
+            if (!template.dateValide || !template.adresseValide)
             {
                 toutEstValide = false;
             }
@@ -204,7 +211,7 @@ public class ModifierPanierManager : MonoBehaviour
 
         if (www.text == "0")
         {
-            Debug.Log("Commande envoyée avec succès");
+            Debug.Log("Commande envoyÃ©e avec succÃ¨s");
             CalculerTotal(false);
 
             int difference = (int)(totalActuel - totalDeBase);
@@ -229,5 +236,4 @@ public class ModifierPanierManager : MonoBehaviour
     {
         ActiverBouton();
     }
-
 }

@@ -15,5 +15,4 @@ public class LandingPage : MonoBehaviour
     {
         SceneManager.LoadScene(0);
     }
-
 }

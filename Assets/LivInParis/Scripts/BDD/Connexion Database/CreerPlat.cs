@@ -1,11 +1,11 @@
+using System;
 using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
-using System;
-using System.Linq;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CreerPlat : MonoBehaviour
 {
@@ -19,6 +19,14 @@ public class CreerPlat : MonoBehaviour
     public TMP_Dropdown recetteField;
     public TMP_InputField nationaliteField;
     public TMP_InputField proteinesField;
+
+    public GameObject nomerreur;
+    public GameObject prixerreur;
+    public GameObject personneserreur;
+    public GameObject dateFaberreur;
+    public GameObject datePererreur;
+    public GameObject nationaliteerreur;
+    public GameObject proteineserreur;
 
     public Button submitButton;
 
@@ -34,7 +42,6 @@ public class CreerPlat : MonoBehaviour
         StartCoroutine(FillRecetteDropdown());
     }
 
-
     IEnumerator FillRecetteDropdown()
     {
         WWW www = new WWW(apiUrl);
@@ -42,13 +49,16 @@ public class CreerPlat : MonoBehaviour
 
         if (www.text[0] == '0')
         {
-            string[] recettes = www.text.Split('\t').Where(r => !string.IsNullOrEmpty(r) && r != "0").ToArray();
+            string[] recettes = www
+                .text.Split('\t')
+                .Where(r => !string.IsNullOrEmpty(r) && r != "0")
+                .ToArray();
             recetteField.ClearOptions();
             recetteField.AddOptions(recettes.ToList());
         }
         else
         {
-            Debug.LogError("Erreur lors de la récupération des recettes : " + www.text);
+            Debug.LogError("Erreur lors de la rÃ©cupÃ©ration des recettes : " + www.text);
         }
     }
 
@@ -57,13 +67,16 @@ public class CreerPlat : MonoBehaviour
         StartCoroutine(Plat());
     }
 
-
     IEnumerator Plat()
     {
         WWWForm form = new WWWForm();
         form.AddField("nomutilisateur", DBManager.nomutilisateur);
         form.AddField("nom", nomField.text);
-        form.AddField("prix", prixField.text);
+
+        string prix = prixField.text;
+        prix = prix.Replace(',', '.');
+        form.AddField("prix", prix);
+
         form.AddField("type", typeField.options[typeField.value].text);
         form.AddField("personnes", personnesField.text);
         form.AddField("dateFabrication", dateFabField.text);
@@ -79,19 +92,20 @@ public class CreerPlat : MonoBehaviour
 
         if (www.text == "0")
         {
-            Debug.Log("Plat créé avec succès");
+            Debug.Log("Plat crÃ©Ã© avec succÃ¨s");
         }
         else
         {
-            Debug.Log("Erreur dans la création du plat. Erreur # " + www.text);
+            Debug.Log("Erreur dans la crÃ©ation du plat. Erreur # " + www.text);
         }
 
-        //SceneManager.LoadScene(0);
-
+        SceneManager.LoadScene(15);
     }
 
     bool ValidateNumeric(string input)
     {
+        input = input.Replace('.', ',');
+
         decimal result;
         return decimal.TryParse(input, out result) && result >= 0;
     }
@@ -106,14 +120,22 @@ public class CreerPlat : MonoBehaviour
         bool isDatePerValid = DateTime.TryParse(datePerField.text.Trim(), out _);
         bool isNationaliteValid = nationaliteField.text.Length > 0;
 
+        nomerreur.SetActive(!isNomValid);
+        prixerreur.SetActive(!isPrixValid);
+        personneserreur.SetActive(!isPersonnesValid);
+        proteineserreur.SetActive(!isProteinesValid);
+        dateFaberreur.SetActive(!isDateFabValid);
+        datePererreur.SetActive(!isDatePerValid);
+        nationaliteerreur.SetActive(!isNationaliteValid);
+
         submitButton.interactable = (
-             isNomValid &&
-             isPrixValid &&
-             isPersonnesValid &&
-             isProteinesValid &&
-             isDateFabValid &&
-             isDatePerValid &&
-             isNationaliteValid
+            isNomValid
+            && isPrixValid
+            && isPersonnesValid
+            && isProteinesValid
+            && isDateFabValid
+            && isDatePerValid
+            && isNationaliteValid
         );
     }
 }

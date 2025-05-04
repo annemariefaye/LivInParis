@@ -20,7 +20,7 @@ public class ClientStatManager : MonoBehaviour
 
             if (!string.IsNullOrEmpty(www.error))
             {
-                Debug.LogError("Erreur de récupération : " + www.error);
+                Debug.LogError("Erreur de rÃ©cupÃ©ration : " + www.error);
                 yield break;
             }
 
@@ -41,7 +41,7 @@ public class ClientStatManager : MonoBehaviour
                 TemplateClientStats template = obj.GetComponent<TemplateClientStats>();
 
                 template.Nom.text = donnees[0] + " " + donnees[1];
-                template.Commande.text = "Moyenne du prix des commandes : " + donnees[2] + "€";
+                template.Commande.text = "Moyenne du prix des commandes : " + donnees[2] + "â‚¬";
             }
         }
     }

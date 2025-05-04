@@ -20,9 +20,9 @@
 
 namespace Mapbox.Unity.Utilities
 {
-    using UnityEngine;
     using System.Collections;
     using System.Collections.Generic;
+    using UnityEngine;
 
     /// <summary>
     /// Helper class for running co-routines without having to inherit from MonoBehavior.
@@ -33,7 +33,10 @@ namespace Mapbox.Unity.Utilities
         /// <summary>
         /// Returns the Runnable instance.
         /// </summary>
-        public static Runnable Instance { get { return Singleton<Runnable>.Instance; } }
+        public static Runnable Instance
+        {
+            get { return Singleton<Runnable>.Instance; }
+        }
         #endregion
 
         #region Public Interface
@@ -83,6 +86,7 @@ namespace Mapbox.Unity.Utilities
                 UnityEditor.EditorApplication.update += UpdateRunnable;
             }
         }
+
         static void UpdateRunnable()
         {
             if (!Application.isPlaying)
@@ -119,12 +123,16 @@ namespace Mapbox.Unity.Utilities
 
                 Runnable.Instance.m_Routines[ID] = this;
 #if ENABLE_RUNNABLE_DEBUGGING
-                Debug.Log( string.Format("Coroutine {0} started.", ID ) ); 
+                Debug.Log(string.Format("Coroutine {0} started.", ID));
 #endif
             }
 
             #region IEnumerator Interface
-            public object Current { get { return m_Enumerator.Current; } }
+            public object Current
+            {
+                get { return m_Enumerator.Current; }
+            }
+
             public bool MoveNext()
             {
                 m_bMoveNext = m_Enumerator.MoveNext();
@@ -133,15 +141,19 @@ namespace Mapbox.Unity.Utilities
 
                 if (!m_bMoveNext)
                 {
-                    Runnable.Instance.m_Routines.Remove(ID);      // remove from the mapping
+                    Runnable.Instance.m_Routines.Remove(ID); // remove from the mapping
 #if ENABLE_RUNNABLE_DEBUGGING
-                    Debug.Log( string.Format("Coroutine {0} stopped.", ID ) );
+                    Debug.Log(string.Format("Coroutine {0} stopped.", ID));
 #endif
                 }
 
                 return m_bMoveNext;
             }
-            public void Reset() { m_Enumerator.Reset(); }
+
+            public void Reset()
+            {
+                m_Enumerator.Reset();
+            }
             #endregion
         }
         #endregion

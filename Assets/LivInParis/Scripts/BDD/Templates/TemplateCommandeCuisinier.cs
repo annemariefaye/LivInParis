@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TemplateCommandeCuisinier : MonoBehaviour
 {
@@ -18,7 +18,12 @@ public class TemplateCommandeCuisinier : MonoBehaviour
 
     private void Start()
     {
-        Options.onValueChanged.AddListener(delegate { OnStatutChanged(); });
+        Options.onValueChanged.AddListener(
+            delegate
+            {
+                OnStatutChanged();
+            }
+        );
     }
 
     void OnStatutChanged()
@@ -39,7 +44,7 @@ public class TemplateCommandeCuisinier : MonoBehaviour
 
             if (www.text != "0")
             {
-                Debug.LogError("Erreur lors de la mise à jour du statut : " + www.text);
+                Debug.LogError("Erreur lors de la mise Ã  jour du statut : " + www.text);
             }
         }
     }

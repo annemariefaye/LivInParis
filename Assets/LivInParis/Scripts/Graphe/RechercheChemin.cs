@@ -1,19 +1,14 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using UnityEngine;
 
 namespace PbSI
 {
-
     public class ResultatChemin
     {
-
         private readonly double poidsTotal;
         private readonly List<int> chemin;
-
-        
 
         public ResultatChemin(double poidsTotal, List<int> chemin)
         {
@@ -21,15 +16,19 @@ namespace PbSI
             this.chemin = chemin;
         }
 
-        public double PoidsTotal { get { return this.poidsTotal; } }
-        public List<int> Chemin { get { return this.chemin; } }
+        public double PoidsTotal
+        {
+            get { return this.poidsTotal; }
+        }
+        public List<int> Chemin
+        {
+            get { return this.chemin; }
+        }
     }
 
-
-    public static class RechercheChemin<T> where T : notnull
+    public static class RechercheChemin<T>
+        where T : notnull
     {
-
-
         #region Parcours
 
         /// <summary>
@@ -41,7 +40,7 @@ namespace PbSI
         public static void BFS_Matrice(Graphe<T> graphe, int depart)
         {
             int nbNodes = graphe.Noeuds.Count;
-          
+
             int[] distances = new int[nbNodes];
             bool[] dejaExplore = new bool[nbNodes];
 
@@ -54,7 +53,6 @@ namespace PbSI
             dejaExplore[depart] = true;
             distances[depart] = 0;
 
-
             Debug.Log($"On visite à partir du noeud {depart} :");
 
             Queue<int> queue = new Queue<int>();
@@ -64,7 +62,7 @@ namespace PbSI
 
             while (queue.Count > 0)
             {
-                int enCoursIndex = queue.Dequeue();    
+                int enCoursIndex = queue.Dequeue();
 
                 Debug.Log($"{enCoursIndex} ");
 
@@ -86,8 +84,6 @@ namespace PbSI
             Debug.Log($"Le graphe est fortement connexe ? : {connexe}");
         }
 
-
-
         /// <summary>
         /// Algorithme de BFS pour parcourir un graphe à partir d'une liste d'adjacence
         /// </summary>
@@ -97,39 +93,38 @@ namespace PbSI
         {
             int nbNodes = graphe.Noeuds.Count;
 
-
             int[] distances = new int[nbNodes];
             bool[] dejaExplore = new bool[nbNodes];
 
             for (int i = 0; i < nbNodes; i++)
             {
-                distances[i] = int.MaxValue; 
-                dejaExplore[i] = false; 
+                distances[i] = int.MaxValue;
+                dejaExplore[i] = false;
             }
 
-            dejaExplore[depart] = true; 
-            distances[depart] = 0; 
+            dejaExplore[depart] = true;
+            distances[depart] = 0;
 
             Debug.Log($"On visite à partir du noeud {depart} :");
 
             Queue<int> queue = new Queue<int>();
-            queue.Enqueue(depart); 
+            queue.Enqueue(depart);
 
             double[,] matriceAdjacente = graphe.MatriceAdjacence;
 
             while (queue.Count > 0)
             {
-                int enCoursIndex = queue.Dequeue();  
+                int enCoursIndex = queue.Dequeue();
 
-                Debug.Log($"{enCoursIndex} ");  
+                Debug.Log($"{enCoursIndex} ");
 
                 for (int i = 0; i < nbNodes; i++)
                 {
                     if (matriceAdjacente[enCoursIndex, i] != 0 && !dejaExplore[i])
                     {
-                        dejaExplore[i] = true; 
-                        distances[i] = distances[enCoursIndex] + 1; 
-                        queue.Enqueue(i); 
+                        dejaExplore[i] = true;
+                        distances[i] = distances[enCoursIndex] + 1;
+                        queue.Enqueue(i);
                     }
                 }
             }
@@ -194,7 +189,6 @@ namespace PbSI
             AfficherSolutionMatrice(distances);
         }
 
-
         /// <summary>
         /// Algorithme de DFS pour parcourir un graphe à partir d'une liste d'adjacence
         /// </summary>
@@ -225,7 +219,7 @@ namespace PbSI
             {
                 int nodeToVisitIndex = stack.Pop();
                 Noeud<T> nodeToVisit = graphe.Noeuds[nodeToVisitIndex];
-                int nodeToVisitId = nodeToVisit.Id; 
+                int nodeToVisitId = nodeToVisit.Id;
 
                 Debug.Log(nodeToVisitId + " ");
 
@@ -251,7 +245,6 @@ namespace PbSI
 
             AfficherSolutionListe(distances, graphe.ListeAdjacence);
         }
-
 
         #endregion
 
@@ -292,7 +285,8 @@ namespace PbSI
                 {
                     if (!dejaExplore[n] && matriceAdjacence[indexMinDistance, n] != 0)
                     {
-                        double newDist = distances[indexMinDistance] + matriceAdjacence[indexMinDistance, n];
+                        double newDist =
+                            distances[indexMinDistance] + matriceAdjacence[indexMinDistance, n];
 
                         if (newDist < distances[n])
                         {
@@ -304,12 +298,16 @@ namespace PbSI
             }
 
             List<int> chemin = ObtenirChemin(parents, departIndex, arriveeIndex);
-            // AfficherChemin(chemin, graphe);
+            //AfficherChemin(chemin, graphe);
 
             return new ResultatChemin(distances[arrivee], chemin);
         }
 
-        public static ResultatChemin DijkstraListe(Graphe<StationMetro> graphe, List<int> depart, List<int> arrivee)
+        public static ResultatChemin DijkstraListe(
+            Graphe<StationMetro> graphe,
+            List<int> depart,
+            List<int> arrivee
+        )
         {
             double distanceMin = double.MaxValue;
             List<int> cheminMin = new List<int>();
@@ -318,23 +316,23 @@ namespace PbSI
             {
                 foreach (int id2 in arrivee)
                 {
-                    ResultatChemin resultat = RechercheChemin<StationMetro>.Dijkstra(graphe, id, id2);
+                    ResultatChemin resultat = RechercheChemin<StationMetro>.Dijkstra(
+                        graphe,
+                        id,
+                        id2
+                    );
                     if (resultat.PoidsTotal < distanceMin)
                     {
                         distanceMin = resultat.PoidsTotal;
                         cheminMin = resultat.Chemin;
                     }
                 }
-
             }
 
             AfficherChemin(cheminMin, graphe);
             Debug.Log($"Poids total du chemin est de : " + distanceMin);
             return new ResultatChemin(distanceMin, cheminMin);
-
         }
-
-
 
         /// <summary>
         /// Retourne l'indice du noeud non exploré avec la distance minimale
@@ -368,7 +366,7 @@ namespace PbSI
             int nbNodes = graphe.Noeuds.Count;
             double[] distances = new double[nbNodes];
             int[] parents = new int[nbNodes];
-            // initialisation
+
             for (int i = 0; i < nbNodes; i++)
             {
                 distances[i] = double.MaxValue;
@@ -376,10 +374,8 @@ namespace PbSI
             }
             distances[departIndex] = 0;
 
-            
             for (int i = 0; i < nbNodes - 1; i++)
             {
-              
                 foreach (var lien in graphe.Liens)
                 {
                     int u = lien.Source.Id;
@@ -393,11 +389,10 @@ namespace PbSI
                     }
                 }
             }
-            
+
             /// verification de la presence de cycle negatif
             foreach (var lien in graphe.Liens)
             {
-
                 int u = lien.Source.Id;
                 int v = lien.Destination.Id;
                 double poids = lien.Poids;
@@ -409,24 +404,20 @@ namespace PbSI
                 }
             }
 
-            
             if (distances[arriveeIndex] == double.MaxValue)
             {
                 Debug.Log($"Aucun chemin trouvé entre {departIndex} et {arriveeIndex}.");
                 return;
             }
 
-            //Debug.Log($"Distance minimale entre {departIndex} et {arriveeIndex} : {distances[arriveeIndex]}");
-            /*List<int> chemin = new List<int>();
+            /*Debug.Log($"Distance minimale entre {departIndex} et {arriveeIndex} : {distances[arriveeIndex]}");
+            List<int> chemin = new List<int>();
             for (int v = arriveeIndex; v != -1; v = parents[v])
             {
                 chemin.Add(v);
             }
             chemin.Reverse();
             Debug.Log("Chemin le plus court : " + string.Join("->", chemin));*/
-
-
-
         }
 
         ///<summary>
@@ -440,7 +431,6 @@ namespace PbSI
             double[,] distances = new double[n, n];
             int?[,] predecesseurs = new int?[n, n];
 
-            // Initialisation
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
@@ -462,16 +452,17 @@ namespace PbSI
                 }
             }
 
-            // Floyd-Warshall
             for (int k = 0; k < n; k++)
             {
                 for (int i = 0; i < n; i++)
                 {
                     for (int j = 0; j < n; j++)
                     {
-                        if (distances[i, k] != double.MaxValue &&
-                            distances[k, j] != double.MaxValue &&
-                            distances[i, k] + distances[k, j] < distances[i, j])
+                        if (
+                            distances[i, k] != double.MaxValue
+                            && distances[k, j] != double.MaxValue
+                            && distances[i, k] + distances[k, j] < distances[i, j]
+                        )
                         {
                             distances[i, j] = distances[i, k] + distances[k, j];
                             predecesseurs[i, j] = predecesseurs[k, j];
@@ -480,7 +471,6 @@ namespace PbSI
                 }
             }
 
-            // Affichage
             /*if (distances[departIndex, arriveeIndex] == double.MaxValue)
             {
                 Debug.Log($"Aucun chemin trouvé entre {departIndex} et {arriveeIndex}.");
@@ -489,7 +479,6 @@ namespace PbSI
 
             Debug.Log($"Distance minimale entre {departIndex} et {arriveeIndex} : {distances[departIndex, arriveeIndex]}");
 
-            // Reconstruction du chemin
             List<int> chemin = new List<int>();
             int? courant = arriveeIndex;
             while (courant != null)
@@ -504,8 +493,6 @@ namespace PbSI
 
             Debug.Log("Chemin le plus court : " + string.Join(" -> ", chemin));*/
         }
-
-
 
         /*public static ResultatChemin AEtoile(Graphe<StationMetro> graphe, int depart, int arrivee)
         {
@@ -660,7 +647,7 @@ namespace PbSI
 
                         for (int j = 0; j < nbNodes; j++)
                         {
-                            if (mat[node, j] !=0 && j != parentNode)
+                            if (mat[node, j] != 0 && j != parentNode)
                             {
                                 stack.Push((j, node));
                             }
@@ -684,7 +671,7 @@ namespace PbSI
         {
             Debug.Log("Distances depuis le départ :");
 
-            for(int i=0; i < distances.Length; i++)
+            for (int i = 0; i < distances.Length; i++)
             {
                 Debug.Log($"Noeud {i}: {distances[i]}");
             }
@@ -695,18 +682,20 @@ namespace PbSI
         /// </summary>
         /// <param name="distances">Distances depuis le noeud de départ</param>
         /// <param name="graph">Graphe sous forme de liste d'adjacence</param>
-        private static void AfficherSolutionListe(int[] distances, Dictionary<Noeud<T>, List<(Noeud<T>, double poids)>> listeAdjacence)
+        private static void AfficherSolutionListe(
+            int[] distances,
+            Dictionary<Noeud<T>, List<(Noeud<T>, double poids)>> listeAdjacence
+        )
         {
             Debug.Log("Distances depuis le départ :");
 
             foreach (var kvp in listeAdjacence)
             {
                 Noeud<T> node = kvp.Key;
-                int nodeId = node.Id; 
+                int nodeId = node.Id;
 
-                string distance = distances[nodeId].ToString();  
-                Debug.Log($"Noeud {nodeId}: {distance}"); 
-                   
+                string distance = distances[nodeId].ToString();
+                Debug.Log($"Noeud {nodeId}: {distance}");
             }
         }
 
@@ -721,17 +710,15 @@ namespace PbSI
             return chemin;
         }
 
-
         private static void AfficherChemin(List<int> chemin, Graphe<StationMetro> graphe)
         {
-            
             Debug.Log("Le chemin à prendre est :");
             List<string> libelleChemin = new List<string>();
 
             foreach (int id in chemin)
             {
                 var contenu = graphe.TrouverNoeudParId(id).Contenu;
-                if(contenu != null)
+                if (contenu != null)
                 {
                     libelleChemin.Add(contenu.Libelle + " (Ligne " + contenu.Ligne + ")");
                 }
@@ -740,9 +727,6 @@ namespace PbSI
             Debug.Log(string.Join(" -> ", libelleChemin));
         }
 
-
         #endregion
-
-
     }
 }

@@ -1,4 +1,4 @@
-#location service enabled;location service intializing;location updated;userheading updated;location provider;location provider class;time device [utc];time location [utc];latitude;longitude;accuracy [m];user heading [�];device orientation [�];speed [km/h];has gps fix;satellites used;satellites in view
+#location service enabled;location service intializing;location updated;userheading updated;location provider;location provider class;time device [utc];time location [utc];latitude;longitude;accuracy [m];user heading [é];device orientation [é];speed [km/h];has gps fix;satellites used;satellites in view
 True;False;True;True;gps;DeviceLocationProviderAndroidNative;20180516-160022.128;20180516-160022.000;48.35731967;15.61056602;3.2;195.2;145.5;3.4;True;13;20
 True;False;False;False;gps;DeviceLocationProviderAndroidNative;20180516-160022.601;20180516-160022.000;48.35731967;15.61056602;3.2;195.2;146.0;3.4;True;13;20
 True;False;True;False;gps;DeviceLocationProviderAndroidNative;20180516-160023.104;20180516-160023.000;48.35730900;15.61056956;3.2;195.2;134.4;3.9;True;13;20

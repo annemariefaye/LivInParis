@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using Mapbox.Unity.MeshGeneration.Modifiers;
+﻿using Mapbox.Unity.MeshGeneration.Modifiers;
+using UnityEngine;
+
 namespace Mapbox.Unity.Map
 {
-	public abstract class LayerProperties : MapboxDataProperty
-	{
-	}
+    public abstract class LayerProperties : MapboxDataProperty { }
 }
