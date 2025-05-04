@@ -20,25 +20,28 @@ $nomUtilisateur = mysqli_real_escape_string($con, $nomUtilisateur);
 
 $query = "
     SELECT 
-        Plat.IdPlat,
-        Plat.Nom,
-        Plat.Prix,
-        Utilisateur.Nom AS NomCuisinier,
-        Plat.CheminAccesPhoto,
-        Plat.Regime,
-        Utilisateur.Adresse,
-        Plat.Type,
-        Plat.Nationalite,
-        Plat.Proteines,
-        GROUP_CONCAT(DISTINCT CategorieAmbiance.Nom) AS Categories,
-        ROUND(AVG(NotationCuisinier.Note), 2) AS NoteMoyenne
-    FROM Plat
-    INNER JOIN Utilisateur ON Plat.IdCuisinier = Utilisateur.Id
-    LEFT JOIN PlatCategorieAmbiance ON Plat.IdPlat = PlatCategorieAmbiance.IdPlat
-    LEFT JOIN CategorieAmbiance ON PlatCategorieAmbiance.IdCategorie = CategorieAmbiance.IdCategorie
-    LEFT JOIN NotationCuisinier ON Plat.IdCuisinier = NotationCuisinier.IdCuisinier
-    WHERE Utilisateur.NomUtilisateur = '$nomUtilisateur'
-    GROUP BY Plat.IdPlat
+    Plat.IdPlat,
+    Plat.Nom,
+    Plat.Prix,
+    Utilisateur.Nom AS NomCuisinier,
+    Plat.CheminAccesPhoto,
+    Plat.Regime,
+    Utilisateur.Adresse,
+    Plat.Type,
+    Plat.Nationalite,
+    Plat.Proteines,
+    GROUP_CONCAT(DISTINCT CategorieAmbiance.Nom) AS Categories,
+    ROUND(AVG(NotationCuisinier.Note), 2) AS NoteMoyenne,
+    COUNT(LigneDeCommande.IdLigneCommande) AS Frequence
+FROM Plat
+INNER JOIN Utilisateur ON Plat.IdCuisinier = Utilisateur.Id
+LEFT JOIN PlatCategorieAmbiance ON Plat.IdPlat = PlatCategorieAmbiance.IdPlat
+LEFT JOIN CategorieAmbiance ON PlatCategorieAmbiance.IdCategorie = CategorieAmbiance.IdCategorie
+LEFT JOIN NotationCuisinier ON Plat.IdCuisinier = NotationCuisinier.IdCuisinier
+LEFT JOIN LigneDeCommande ON Plat.IdPlat = LigneDeCommande.IdPlat
+WHERE Utilisateur.NomUtilisateur = '$nomUtilisateur'
+GROUP BY Plat.IdPlat
+ORDER BY Frequence DESC;
 ";
 
 $result = mysqli_query($con, $query);
@@ -63,7 +66,8 @@ while ($row = mysqli_fetch_assoc($result)) {
         'Nationalite' => $row['Nationalite'],
         'Proteines' => $row['Proteines'],
         'Categories' => explode(',', $row['Categories'] ?? ''),
-        'NoteMoyenne' => isset($row['NoteMoyenne']) ? (float)$row['NoteMoyenne'] : null
+        'NoteMoyenne' => isset($row['NoteMoyenne']) ? (float)$row['NoteMoyenne'] : null,
+        'Frequence' => (int)$row['Frequence']
     ];
 }
 
