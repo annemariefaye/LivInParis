@@ -102,6 +102,10 @@ Les tests ont été réalisés sur un réseau de métro simulé, et les temps d'
 | **A***          | `O((V + E) log V)` (similaire à Dijkstra) mais souvent plus rapide avec une bonne heuristique | Plus rapide que Dijkstra lorsque l'heuristique est bien choisie | Nécessite une heuristique adaptée pour de bonnes performances |
 
 
+### Analyse de la coloration du graphe client-cuisinier
+
+Si les utilisateurs étaient soit clients, soit cuisiniers, on aurait pu dire que le graphe était biparti. Or un utilisateur peut-être à la fois client et cuisinier et donc on ne peut pas considérer le graphe comme biparti. La coloration se fait donc en 3 couleurs. 
+
 ### Conclusion
 
 Pour notre solution, l'algorithme de Dijkstra est le meilleur choix car il offre un compromis optimal entre rapidité et efficacité. L'algorithme A* est également très performant, surtout lorsqu'il est associé à une heuristique appropriée, permettant des recherches plus ciblées et souvent plus rapides dans des graphes complexes. Bellman-Ford peut être utile dans certains cas si des retards doivent être gérés, mais son exécution est plus lente. Floyd-Warshall, bien que complet, est trop inefficace pour un grand réseau.
