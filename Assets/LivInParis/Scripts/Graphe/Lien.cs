@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace PbSI
 {
+
+    /// <summary>
+    /// Classe représentant un lien entre deux noeuds dans un graphe.
+    /// </summary>
     public class Lien<T> : IEquatable<Lien<T>>
         where T : notnull
     {
@@ -84,9 +88,11 @@ namespace PbSI
             return $"{source.Id} est connecte a {destination.Id}";
         }
 
-        #endregion
-
-
+        /// <summary>
+        /// Test si deux liens sont égaux
+        /// </summary>
+        /// <param name="other">Lien à comparer</param>
+        /// <returns>Vrai si les deux liens sont égaux, faux sinon</returns>
         public bool Equals(Lien<T> other)
         {
             return this.source.Equals(other.source)
@@ -94,6 +100,11 @@ namespace PbSI
                 && this.poids.Equals(other.poids);
         }
 
+        /// <summary>
+        /// Retourne un hash code pour le lien
+        /// </summary>
+        /// <param name="obj">Lien à hasher</param>
+        /// <returns>Hash code du lien</returns>
         public int GetHashCode(Lien<T> obj)
         {
             unchecked
@@ -106,5 +117,6 @@ namespace PbSI
                 return hash;
             }
         }
+        #endregion
     }
 }

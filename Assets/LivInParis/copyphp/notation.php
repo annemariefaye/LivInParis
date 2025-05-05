@@ -25,7 +25,7 @@ if (!$resultCheck || mysqli_num_rows($resultCheck) != 1) {
 }
 
 $row = mysqli_fetch_assoc($resultCheck);
-$idCuisinier = $row['IdCuisinier'];
+$idCuisinier = $_POST['idCuisinier'];
 
 $querry = "INSERT INTO NotationCuisinier (IdCuisinier, Note, Commentaire) VALUES ('$idCuisinier', '$note', '$commentaire');";
 $result = mysqli_query($con, $querry);

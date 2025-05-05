@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace PbSI
 {
+
+    /// <summary>
+    /// Classe représentant un noeud dans un graphe.
+    /// </summary>
     public class Noeud<T> : IEquatable<Noeud<T>>
         where T : notnull
     {
@@ -15,8 +19,14 @@ namespace PbSI
         /// </summary>
         private readonly int id;
 
+        /// <summary>
+        /// Contenu du noeud
+        /// </summary>
         private readonly T contenu;
 
+        /// <summary>
+        /// Couleur du noeud (pour l'affichage)
+        /// </summary>
         private string? couleur = "";
 
         #endregion
@@ -27,17 +37,28 @@ namespace PbSI
         /// Constructeur par défaut
         /// </summary>
         /// <param name="id">Identifiant du noeud</param>
+        /// <param name="contenu">Contenu du noeud</param>
         public Noeud(int id, T contenu)
         {
             this.id = id;
             this.contenu = contenu;
         }
 
+        /// <summary>
+        /// Constructeur avec identifiant
+        /// </summary>
+        /// <param name="id">Identifiant du noeud</param>
         public Noeud(int id)
         {
             this.id = id;
         }
 
+        /// <summary>
+        /// Constructeur avec identifiant, contenu et couleur
+        /// </summary>
+        /// <param name="id">Identifiant du noeud</param>
+        /// <param name="contenu">Contenu du noeud</param>
+        /// <param name="couleur">Couleur du noeud</param>
         public Noeud(int id, T contenu, string couleur)
         {
             this.id = id;
@@ -57,20 +78,22 @@ namespace PbSI
             get { return this.id; }
         }
 
+        /// <summary>
+        /// Retourne le contenu du noeud
+        /// </summary>
         public T? Contenu
         {
             get { return this.contenu; }
         }
 
+        /// <summary>
+        /// Retourne la couleur du noeud (pour l'affichage)
+        /// </summary>
         public string? Couleur
         {
             get { return this.couleur; }
             set { this.couleur = value; }
         }
-
-        /// <summary>
-        /// Retourne la liste des noeuds voisins
-        /// </summary>
 
         #endregion
 
@@ -85,11 +108,15 @@ namespace PbSI
             return $"Membre {Id}";
         }
 
-        #endregion
-
+        /// <summary>
+        /// Teste l'égalité entre deux noeuds
+        /// </summary>
+        /// <param name="other">Noeud à comparer</param>
+        /// <returns>true si les noeuds sont égaux, false sinon</returns>
         public bool Equals(Noeud<T> other)
         {
             return this.id.Equals(other.id);
         }
+        #endregion
     }
 }

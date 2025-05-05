@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace PbSI
 {
+
+    /// <summary>
+    /// Classe représentant une station de métro dans le graphe.
+    /// </summary>
     public class StationMetro
     {
         #region Attributs spécifiques

@@ -102,10 +102,6 @@ Les tests ont été réalisés sur un réseau de métro simulé, et les temps d'
 | **A***          | `O((V + E) log V)` (similaire à Dijkstra) mais souvent plus rapide avec une bonne heuristique | Plus rapide que Dijkstra lorsque l'heuristique est bien choisie | Nécessite une heuristique adaptée pour de bonnes performances |
 
 
-### Analyse de la coloration du graphe client-cuisinier
-
-Si les utilisateurs étaient soit clients, soit cuisiniers, on aurait pu dire que le graphe était biparti. Or un utilisateur peut-être à la fois client et cuisinier et donc on ne peut pas considérer le graphe comme biparti. La coloration se fait donc en 3 couleurs. 
-
 ### Conclusion
 
 Pour notre solution, l'algorithme de Dijkstra est le meilleur choix car il offre un compromis optimal entre rapidité et efficacité. L'algorithme A* est également très performant, surtout lorsqu'il est associé à une heuristique appropriée, permettant des recherches plus ciblées et souvent plus rapides dans des graphes complexes. Bellman-Ford peut être utile dans certains cas si des retards doivent être gérés, mais son exécution est plus lente. Floyd-Warshall, bien que complet, est trop inefficace pour un grand réseau.
@@ -145,66 +141,3 @@ Pour acceder a la base de données:
 3- Notation des cuisiniers
 4- Recommandation d'une musique par nationalité du plat
 5- Système de plat gratuit au bout de 100 points (1 point = 1 euro)
-
-
-
-# Unity
-
-## Description générale
-
-Nous avons décidés, pour le rendu 3, de réaliser l'interface sur Unity. Ce choix influe sur beaucoup de points de projet, notamment la connexion à la BDD. là où nous utilisions le langage C# pour se connecter à la BDD, nous devons maintenant utiliser du PHP pour afficher nos résultats dans Unity. Nous avons décidé  d'utiliser ce projet pour nous initier à mysqli, une alternative un peu plus complexe à PDO. 
-
-## fichiers PHP backend (Assets\LivInParis\copyphp)
-
-
-Il s'agit du folder gérant l'insertion, la modification et la suppression des données de la BDD. 
-notamment:
-- les clients
-- les commandes
-- les plats
-- les points de fidélité
-- les statistiques
-- les notes des cuisiniers
-- les cuisiniers
-
-## fichiers Unity frontend (Assets\LivInParis\Scenes)
-
-Ce dossier regroupe l'entièreté des interfaces utilisateur comme par exemple :
-- la connexion
-- l'interface client
-	- passage de commande
-	-  interface de commande
-	- visualisation du chemin pris par le livreur
-	- modification des données personnelles
-- interface cuisinier
-	- Création et modification de plat 
-	- Validation de commande
-- l'interface Admin de contrôle
-	- Graphe clients cuisiniers
-	- Graphe station de métro (2D et 3D)
-	- statistiques
-	- Entrée SQL libre
-	- Requêtes SQL prédéfinies (modification, contrôle, suppression)
-	- Export 
-
-## Images de l'interface utilisateur 
-
-contient l'ensemble des images utilisées pour rendre l'UI agréable à utiliser 
-
-Dans 2 dossiers séparés:
-##### Assets\LivInParis\Images
-Ensemble des icons et autres interfaces d'UI qui ne sont pas dépendants des produits
-##### Assets\LivInParis\Resources
-Ensemble des photos produits en lien avec la BDD
-
-## Musiques (Assets\LivInParis\Resources\Musique)
-
-Etant dans le folder Ressources, ces fichiers musicaux dépendent des produits. En commandant les plats de certaines nationalités, certaines musiques prédéfinies peuvent se lancer. Cela permet de rendre l'interface plus intéressante à utiliser tout en rajouter un côté plus fun à l'application.
-
-## Graphe
-
-Afin d'afficher les graphes, nous avons décidé d'utiliser le package Mapbox dans Unity.
-
-Pour vérifier que les adresse mises dans la BDD sont valide et qu'elles pourront être affichés dans la carte, 3D (Graphe 3D), nous utilisons un API d'openStreetMap convertissant les adresses en coordonnées. 
-
-

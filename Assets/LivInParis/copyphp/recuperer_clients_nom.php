@@ -18,8 +18,10 @@ SELECT
 FROM Utilisateur u
 JOIN Commande c ON u.Id = c.IdClient
 JOIN Transaction t ON c.IdCommande = t.IdCommande
+WHERE u.IdClient IS NOT NULL
 GROUP BY u.Id, u.NomUtilisateur, u.Nom, u.Prenom
-ORDER BY Nom;
+ORDER BY Nom
+;
 ";
 
 $result = mysqli_query($con, $query);

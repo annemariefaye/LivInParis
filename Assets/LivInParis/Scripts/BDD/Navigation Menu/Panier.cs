@@ -26,7 +26,13 @@ public class Panier : MonoBehaviour
 
     public void RetourPagePrecedente()
     {
+        if (DBManager.fideliteActivee)
+        {
+            DBManager.fidelite += 100;
+            DBManager.fideliteActivee = false;
+        }
         SceneManager.LoadScene(5);
+        
     }
 
     public void Modif()

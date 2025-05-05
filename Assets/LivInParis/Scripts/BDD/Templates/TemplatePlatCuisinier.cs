@@ -12,6 +12,7 @@ public class TemplatePlatCuisinier : MonoBehaviour
     public TMP_Text prixText;
     public TMP_Text descriptionText;
     public TMP_Text noteText;
+    public TMP_Text nombreServisText;
 
     public int idPlat;
 

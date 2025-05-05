@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class TemplateAdminClient : MonoBehaviour
 {
     public TMP_Text Nom;
+    public TMP_Text Adresse;
+    public TMP_Text Montant;
     public Button SupprimerButton;
 
     public string NomUtilisateur;

@@ -5,38 +5,69 @@ using UnityEngine;
 
 namespace PbSI
 {
+
+    /// <summary>
+    /// Classe représentant le résultat d'une recherche de chemin dans un graphe
+    /// </summary>
     public class ResultatChemin
     {
+        #region Attributs
+        /// <summary>
+        /// Poids total du chemin
+        /// </summary>
         private readonly double poidsTotal;
-        private readonly List<int> chemin;
 
+        /// <summary>
+        /// Liste des stations du chemin
+        /// </summary>
+        private readonly List<int> chemin;
+        #endregion
+
+        #region Constructeur
+        /// <summary>
+        /// Constructeur de la classe ResultatChemin
+        /// </summary>
+        /// <param name="poidsTotal">Poids total du chemin</param>
+        /// <param name="chemin">Liste des stations du chemin</param>
         public ResultatChemin(double poidsTotal, List<int> chemin)
         {
             this.poidsTotal = poidsTotal;
             this.chemin = chemin;
         }
+        #endregion
 
+        #region Propriétés
+        /// <summary>
+        /// Obtient le poids total du chemin
+        /// </summary>
         public double PoidsTotal
         {
             get { return this.poidsTotal; }
         }
+
+        /// <summary>
+        /// Obtiens la liste des stations du chemin
+        /// </summary>
         public List<int> Chemin
         {
             get { return this.chemin; }
         }
+        #endregion
     }
 
+    /// <summary>
+    /// Classe statique pour la recherche de chemin dans un graphe
+    /// </summary>
+    /// <typeparam name="T">Type de contenu des noeuds du graphe</typeparam>
     public static class RechercheChemin<T>
         where T : notnull
     {
         #region Parcours
-
         /// <summary>
         /// Algorithme de BFS pour parcourir un graphe
         /// </summary>
-        /// <param name="graph">Graphe sous forme de matrice d'adjacence</param>
+        /// <param name="graphe">Graphe sous forme de Graph</param>
         /// <param name="depart">Noeud de départ</param>
-        /// <param name="graphe">Graphe</param>
         public static void BFS_Matrice(Graphe<T> graphe, int depart)
         {
             int nbNodes = graphe.Noeuds.Count;
@@ -139,9 +170,8 @@ namespace PbSI
         /// <summary>
         /// Algorithme de DFS pour parcourir un graphe
         /// </summary>
-        /// <param name="graph">Graphe sous forme de matrice d'adjacence</param>
+        /// <param name="graphe">Graphe sous forme de Graph</param>
         /// <param name="depart">Noeud de départ</param>
-        /// <param name="graphe">Graphe</param>
         public static void DFS_Matrice(Graphe<T> graphe, int depart)
         {
             int nbNodes = graphe.Noeuds.Count;
@@ -192,7 +222,7 @@ namespace PbSI
         /// <summary>
         /// Algorithme de DFS pour parcourir un graphe à partir d'une liste d'adjacence
         /// </summary>
-        /// <param name="graph">Graphe sous forme de matrice d'adjacence</param>
+        /// <param name="graphe">Graphe sous forme de Graph</param>
         /// <param name="depart">Noeud de départ</param>
         public static void DFS_Liste(Graphe<T> graphe, int depart)
         {
@@ -251,10 +281,12 @@ namespace PbSI
         #region Plus court chemin
 
         /// <summary>
-        /// Algorithme de Dijkstra pour trouver le plus court chemin entre un noeud de départ et tous les autres noeuds
+        /// Algorithme de Dijkstra pour trouver le plus court chemin entre un noeud de départ et un noeud d'arrivée
         /// </summary>
-        /// <param name="graph">Graphe sous forme de matrice d'adjacence</param>
+        /// <param name="graphe">Graphe sous la forme de Graph</param>
         /// <param name="depart">Noeud de départ</param>
+        /// <param name="arrivee">Noeud d'arrivée</param>
+        /// <returns>Le résultat du chemin le plus court</returns>
         public static ResultatChemin Dijkstra(Graphe<StationMetro> graphe, int depart, int arrivee)
         {
             double[,] matriceAdjacence = graphe.MatriceAdjacence;
@@ -303,6 +335,13 @@ namespace PbSI
             return new ResultatChemin(distances[arrivee], chemin);
         }
 
+        /// <summary>
+        /// Algorithme de Dijkstra pour trouver le plus court chemin entre plusieurs noeuds de départ et d'arrivée
+        /// </summary>
+        /// <param name="graphe">Graphe sous la forme de Graph</param>
+        /// <param name="depart">Liste des noeuds de départ</param>
+        /// <param name="arrivee">Liste des noeuds d'arrivée</param>
+        /// <returns>Le résultat du chemin le plus court</returns>
         public static ResultatChemin DijkstraListe(
             Graphe<StationMetro> graphe,
             List<int> depart,
@@ -316,11 +355,7 @@ namespace PbSI
             {
                 foreach (int id2 in arrivee)
                 {
-                    ResultatChemin resultat = RechercheChemin<StationMetro>.Dijkstra(
-                        graphe,
-                        id,
-                        id2
-                    );
+                    ResultatChemin resultat = RechercheChemin<StationMetro>.Dijkstra(graphe, id, id2);
                     if (resultat.PoidsTotal < distanceMin)
                     {
                         distanceMin = resultat.PoidsTotal;
@@ -358,9 +393,12 @@ namespace PbSI
             return min_index;
         }
 
-        ///<summary>
-        ///Algorithme de Bellman-Ford pour trouver le chemin le plus court
-
+        /// <summary>
+        /// Algorithme de Bellman-Ford pour trouver le chemin le plus court
+        /// </summary>
+        /// <param name="graphe">Graphe sous forme de Graph</param>
+        /// <param name="departIndex">Noeud de départ</param>
+        /// <param name="arriveeIndex">Noeud d'arrivée</param>
         public static void BellmanFord(Graphe<T> graphe, int departIndex, int arriveeIndex)
         {
             int nbNodes = graphe.Noeuds.Count;
@@ -390,7 +428,6 @@ namespace PbSI
                 }
             }
 
-            /// verification de la presence de cycle negatif
             foreach (var lien in graphe.Liens)
             {
                 int u = lien.Source.Id;
@@ -420,10 +457,12 @@ namespace PbSI
             Debug.Log("Chemin le plus court : " + string.Join("->", chemin));*/
         }
 
-        ///<summary>
-        ///algorithme de Floyd Warshall
-        ///</summary>
-
+        /// <summary>
+        /// Algorithme de Floyd-Warshall pour trouver le chemin le plus court entre deux noeuds
+        /// </summary>
+        /// <param name="graphe">Graphe sous forme de Graph</param>
+        /// <param name="departIndex">Noeud de départ</param>
+        /// <param name="arriveeIndex">Noeud d'arrivée</param>
         public static void FloydWarshall(Graphe<T> graphe, int departIndex, int arriveeIndex)
         {
             int n = graphe.Noeuds.Count;
@@ -699,6 +738,13 @@ namespace PbSI
             }
         }
 
+        /// <summary>
+        /// Retourne le chemin à prendre entre deux stations
+        /// </summary>
+        /// <param name="parents">Tableau des parents de chaque noeud</param>
+        /// <param name="departIndex">Noeud de départ</param>
+        /// <param name="arriveeIndex">Noeud d'arrivée</param>
+        /// <returns>Liste des IDs des stations du chemin</returns>
         private static List<int> ObtenirChemin(int[] parents, int departIndex, int arriveeIndex)
         {
             List<int> chemin = new List<int>();
@@ -710,6 +756,11 @@ namespace PbSI
             return chemin;
         }
 
+        /// <summary>
+        /// Affiche le chemin à prendre entre deux stations
+        /// </summary>
+        /// <param name="chemin">Liste des IDs des stations du chemin</param>
+        /// <param name="graphe">Graphe contenant les stations</param>
         private static void AfficherChemin(List<int> chemin, Graphe<StationMetro> graphe)
         {
             Debug.Log("Le chemin à prendre est :");

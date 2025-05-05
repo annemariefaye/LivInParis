@@ -1,33 +1,45 @@
 using System.Collections;
 using UnityEngine;
 
-public class InfoPanelManager : MonoBehaviour
+namespace PbSI
 {
-    void Update()
+
+    /// <summary>
+    /// Classe permettant de gérer les informations affichées dans le panneau d'information.
+    /// </summary>
+    public class InfoPanelManager : MonoBehaviour
     {
-        if (Input.GetMouseButtonDown(0))
+        #region Méthodes
+        /// <summary>
+        /// Méthode appelée à chaque frame pour gérer les interactions avec le panneau d'information.
+        /// </summary>
+        void Update()
         {
-            GameObject hit = null;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hitInfo;
-
-            if (Physics.Raycast(ray, out hitInfo))
+            if (Input.GetMouseButtonDown(0))
             {
-                hit = hitInfo.collider.gameObject;
-            }
+                GameObject hit = null;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hitInfo;
 
-            if (hit == null || hit.GetComponent<EventPointer>() == null)
-            {
-                if (EventPointer.panneauActif != null)
+                if (Physics.Raycast(ray, out hitInfo))
                 {
-                    var canvasGroup = EventPointer.panneauActif.GetComponent<CanvasGroup>();
-                    if (canvasGroup != null)
+                    hit = hitInfo.collider.gameObject;
+                }
+
+                if (hit == null || hit.GetComponent<EventPointer>() == null)
+                {
+                    if (EventPointer.panneauActif != null)
                     {
-                        StartCoroutine(EventPointer.FadeOutStatic(canvasGroup));
-                        EventPointer.panneauActif = null;
+                        var canvasGroup = EventPointer.panneauActif.GetComponent<CanvasGroup>();
+                        if (canvasGroup != null)
+                        {
+                            StartCoroutine(EventPointer.FadeOutStatic(canvasGroup));
+                            EventPointer.panneauActif = null;
+                        }
                     }
                 }
             }
         }
+        #endregion
     }
 }

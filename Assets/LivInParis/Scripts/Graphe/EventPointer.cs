@@ -6,30 +6,68 @@ using PbSI;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Classe permettant de gérer les événements liés aux pointeurs dans le graphe.
+/// </summary>
 public class EventPointer : MonoBehaviour
 {
+    #region Attributs
+    /// <summary>
+    /// Panneau actuellement actif.
+    /// </summary>
     public static GameObject panneauActif;
 
+    /// <summary>
+    /// Vitesse de rotation du pointeur.
+    /// </summary>
     [SerializeField]
     float rotationSpeed = 50f;
 
+    /// <summary>
+    /// Amplitude du mouvement de flottement.
+    /// </summary>
     [SerializeField]
     float amplitude = 2.0f;
 
+    /// <summary>
+    /// Fréquence du mouvement de flottement.
+    /// </summary>
     [SerializeField]
     float frequency = 0.50f;
 
     LocationStatus playerLocation;
 
+    /// <summary>
+    /// Position de l'événement en coordonnées géographiques.
+    /// </summary>
     [SerializeField]
     public Vector2d eventPos;
 
+    /// <summary>
+    /// Noeud associé à l'événement.
+    /// </summary>
     public Noeud<StationMetro> noeud;
 
+    /// <summary>
+    /// Texte de l'interface utilisateur.
+    /// </summary>
     Text uiText;
-    GameObject infoPanel;
-    CanvasGroup canvasGroup;
 
+    /// <summary>
+    /// Panneau d'information.
+    /// </summary>
+    GameObject infoPanel;
+
+    /// <summary>
+    /// Groupe de canvas pour gérer la transparence.
+    /// </summary>
+    CanvasGroup canvasGroup;
+    #endregion
+
+    #region Méthodes
+    /// <summary>
+    /// Initialisation des composants.
+    /// </summary>
     void Start()
     {
         infoPanel = GameObject.Find("InfoPanel");
@@ -41,11 +79,17 @@ public class EventPointer : MonoBehaviour
         canvasGroup.blocksRaycasts = false;
     }
 
+    /// <summary>
+    /// Mise à jour des animations et interactions.
+    /// </summary>
     void Update()
     {
         FloatAndRotatePointer();
     }
 
+    /// <summary>
+    /// Fait flotter et tourner le pointeur.
+    /// </summary>
     void FloatAndRotatePointer()
     {
         transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
@@ -56,6 +100,9 @@ public class EventPointer : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// Gère le clic sur le pointeur.
+    /// </summary>
     private void OnMouseDown()
     {
         playerLocation = GameObject.Find("Canvas").GetComponent<LocationStatus>();
@@ -83,6 +130,11 @@ public class EventPointer : MonoBehaviour
         StartCoroutine(FadeIn(canvasGroup));
     }
 
+    /// <summary>
+    /// Fait disparaître un panneau avec une animation de fondu.
+    /// </summary>
+    /// <param name="canvasGroup">Groupe de canvas à faire disparaître.</param>
+    /// <returns>Coroutine.</returns>
     public static IEnumerator FadeOutStatic(CanvasGroup canvasGroup)
     {
         float duration = 1f;
@@ -99,6 +151,11 @@ public class EventPointer : MonoBehaviour
         canvasGroup.gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// Fait apparaître un panneau avec une animation de fondu.
+    /// </summary>
+    /// <param name="canvasGroup">Groupe de canvas à faire apparaître.</param>
+    /// <returns>Coroutine.</returns>
     public IEnumerator FadeIn(CanvasGroup canvasGroup)
     {
         float duration = 1f;
@@ -116,4 +173,5 @@ public class EventPointer : MonoBehaviour
 
         canvasGroup.alpha = 1f;
     }
+    #endregion
 }

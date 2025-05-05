@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace PbSI
 {
+
     public class RechercheStationProche
     {
         private readonly string adresse;
@@ -32,13 +33,9 @@ namespace PbSI
             if (coordonnees.HasValue)
             {
                 coordonneesString =
-                    coordonnees.Value.lat.ToString(
-                        System.Globalization.CultureInfo.InvariantCulture
-                    )
+                    coordonnees.Value.lat.ToString(System.Globalization.CultureInfo.InvariantCulture)
                     + ", "
-                    + coordonnees.Value.lon.ToString(
-                        System.Globalization.CultureInfo.InvariantCulture
-                    );
+                    + coordonnees.Value.lon.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
                 RechercherStationsProches(coordonnees);
             }

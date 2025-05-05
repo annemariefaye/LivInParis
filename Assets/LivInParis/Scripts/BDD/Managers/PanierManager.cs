@@ -36,7 +36,6 @@ public class PanierManager : MonoBehaviour
         else
         {
             fidelite.SetActive(false);
-            fideliteText.text = "Utiliser mes points";
         }
 
     }

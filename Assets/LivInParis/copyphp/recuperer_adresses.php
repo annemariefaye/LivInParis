@@ -26,7 +26,8 @@ $query = "
         lc.LieuLivraison, 
         p.IdCuisinier, 
         u.Adresse AS AdresseCuisinier, 
-        m.Titre AS TitreMusique
+        m.Titre AS TitreMusique,
+        c.IdCommande
     FROM Commande c
     JOIN LigneDeCommande lc ON c.IdCommande = lc.IdCommande
     JOIN Plat p ON lc.IdPlat = p.IdPlat
@@ -52,6 +53,7 @@ $adresseDepart = $row['AdresseCuisinier'];
 $adresseArrivee = $row['LieuLivraison'];
 $idCuisinier = $row['IdCuisinier'];
 $titreMusique = $row['TitreMusique'] ?? 'default';
+$idCommande = $row['IdCommande'] ?? '0';
 
-echo "0\t$adresseDepart\t$adresseArrivee\t$idCuisinier\t$titreMusique";
+echo "0\t$adresseDepart\t$adresseArrivee\t$idCuisinier\t$titreMusique\t$idCommande";
 ?>

@@ -17,6 +17,7 @@ public class Plat
     public string Proteines;
     public string[] Categories;
     public float NoteMoyenne;
+    public float Frequence;
 }
 
 [System.Serializable]
@@ -62,6 +63,7 @@ public class CommandeCuisinierManager : MonoBehaviour
                 script.descriptionText.text =
                     plat.Type + " - " + plat.Regime + " - " + plat.Nationalite;
                 script.noteText.text = plat.NoteMoyenne.ToString("0.0");
+                script.nombreServisText.text = "Plat servis "  + plat.Frequence + " fois";
 
                 Sprite img = Resources.Load<Sprite>(plat.CheminAccesPhoto);
                 if (img != null)

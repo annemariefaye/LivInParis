@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace PbSI
 {
+
     public class ReseauMetro
     {
         #region Attributs
@@ -142,9 +143,7 @@ namespace PbSI
                             if (idCorrespondance != idStation)
                             {
                                 var stationCurrent = graphe.TrouverNoeudParId(idStation);
-                                var stationCorrespondance = graphe.TrouverNoeudParId(
-                                    idCorrespondance
-                                );
+                                var stationCorrespondance = graphe.TrouverNoeudParId(idCorrespondance);
 
                                 if (stationCurrent != null && stationCorrespondance != null)
                                 {
@@ -161,5 +160,5 @@ namespace PbSI
             }
         }
     }
-        #endregion
+    #endregion
 }

@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace PbSI
 {
+
+    /// <summary>
+    /// Classe représentant un graphe orienté ou non orienté, pondéré ou non pondéré
+    /// </summary>
+    /// <typeparam name="T">Type des noeuds du graphe</typeparam>
     public class Graphe<T>
         where T : notnull
     {
@@ -83,9 +88,7 @@ namespace PbSI
         {
             if (contenus.Length != matriceAdjacence.GetLength(0))
             {
-                throw new ArgumentException(
-                    "Le nombre de contenus n'est pas égal au nombre de noeuds"
-                );
+                throw new ArgumentException("Le nombre de contenus n'est pas égal au nombre de noeuds");
             }
 
             noeuds = new List<Noeud<T>>();
@@ -149,16 +152,11 @@ namespace PbSI
         /// Constructeur avec liste d'adjacence
         /// </summary>
         /// <param name="listeAdjacence">Liste d'adjacence du graphe</param>
-        public Graphe(
-            Dictionary<Noeud<T>, List<(Noeud<T>, double poids)>> listeAdjacence,
-            T[] contenus
-        )
+        public Graphe(Dictionary<Noeud<T>, List<(Noeud<T>, double poids)>> listeAdjacence, T[] contenus)
         {
             if (contenus.Length != listeAdjacence.Count)
             {
-                throw new ArgumentException(
-                    "Le nombre de contenus n'est pas égal au nombre de noeuds"
-                );
+                throw new ArgumentException("Le nombre de contenus n'est pas égal au nombre de noeuds");
             }
 
             noeuds = new List<Noeud<T>>();
@@ -590,7 +588,6 @@ namespace PbSI
                 Debug.Log("Matrice d'adjacence null");
             }
         }
-
 
         public List<Noeud<T>> GetVoisins(Noeud<T> noeud)
         {

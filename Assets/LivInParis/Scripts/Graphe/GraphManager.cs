@@ -1,41 +1,67 @@
-using PbSI;
 using UnityEngine;
 
-public class GraphManager : MonoBehaviour
+namespace PbSI
 {
-    private static GraphManager _instance;
-    private Graphe<StationMetro> graphe;
-
-    public static GraphManager Instance
+    /// <summary>
+    /// Classe pour gérer le graphe principal de l'application.
+    /// </summary>
+    public class GraphManager : MonoBehaviour
     {
-        get
+        #region Attributs
+        /// <summary>
+        /// Instance unique de GraphManager.
+        /// </summary>
+        private static GraphManager _instance;
+
+        /// <summary>
+        /// Graphe principal de l'application.
+        /// </summary>
+        private Graphe<StationMetro> graphe;
+        #endregion
+
+        #region Méthodes
+        /// <summary>
+        /// Retourne l'instance unique de GraphManager.
+        /// </summary>
+        public static GraphManager Instance
         {
-            if (_instance == null)
+            get
             {
-                GameObject go = new GameObject("GraphManager");
-                _instance = go.AddComponent<GraphManager>();
-                DontDestroyOnLoad(go);
+                if (_instance == null)
+                {
+                    GameObject go = new GameObject("GraphManager");
+                    _instance = go.AddComponent<GraphManager>();
+                    DontDestroyOnLoad(go);
+                }
+                return _instance;
             }
-            return _instance;
         }
-    }
-    public Graphe<StationMetro> Graphe
-    {
-        get { return graphe; }
-    }
 
-    void Awake()
-    {
-        if (_instance != null && _instance != this)
+        /// <summary>
+        /// Retourne le graphe principal.
+        /// </summary>
+        public Graphe<StationMetro> Graphe
         {
-            Destroy(gameObject);
-            return;
+            get { return graphe; }
         }
 
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
+        /// <summary>
+        /// Méthode appelée lors de l'initialisation de l'objet.
+        /// </summary>
+        void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
 
-        ReseauMetro reseau = new ReseauMetro();
-        graphe = reseau.Graphe;
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            ReseauMetro reseau = new ReseauMetro();
+            graphe = reseau.Graphe;
+        }
+        #endregion
     }
 }

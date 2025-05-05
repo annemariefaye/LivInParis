@@ -7,34 +7,54 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PbSI
-{
+namespace PbSI 
+{ 
 
+    /// <summary>
+    /// Classe permettant de gérer la coloration d'un graphe.
+    /// </summary>
+    /// <typeparam name="T">Type des données contenues dans les noeuds du graphe.</typeparam>
     public class Coloration<T>
     {
         #region Attributs
+        /// <summary>
+        /// Graphe à colorier.
+        /// </summary>
         private Graphe<T> graphe;
-        private int nombreCouleurs;
 
+        /// <summary>
+        /// Nombre de couleurs utilisées pour colorier le graphe.
+        /// </summary>
+        private int nombreCouleurs;
         #endregion
+
         #region Constructeurs
+        /// <summary>
+        /// Constructeur de la classe Coloration.
+        /// </summary>
+        /// <param name="graphe">Graphe à colorier.</param>
         public Coloration(Graphe<T> graphe)
         {
             this.graphe = graphe;
             this.nombreCouleurs = 0;
         }
         #endregion
-        #region Methodes
+
+        #region Méthodes
+        /// <summary>
+        /// Applique l'algorithme de Welsh-Powell pour colorier le graphe.
+        /// </summary>
         public void WelshPowell()
         {
             List<Noeud<T>> noeudsTries = new List<Noeud<T>>(graphe.Noeuds);
             noeudsTries.Sort(
-                delegate (Noeud<T> a, Noeud<T> b)
+                delegate(Noeud<T> a, Noeud<T> b)
                 {
                     int degreA = graphe.GetVoisins(a).Count;
                     int degreB = graphe.GetVoisins(b).Count;
                     return degreB.CompareTo(degreA);
-                });
+                }
+            );
             int couleurActuelle = 0;
             List<string> couleurs = new List<string>();
             foreach (Noeud<T> noeud in noeudsTries)
@@ -70,14 +90,21 @@ namespace PbSI
                 couleurActuelle++;
             }
 
-
             this.nombreCouleurs = couleurActuelle - 1;
         }
+
+        /// <summary>
+        /// Retourne le nombre de couleurs utilisées pour colorier le graphe.
+        /// </summary>
+        /// <returns>Nombre de couleurs utilisées.</returns>
         public int GetNombreDeCouleurs()
         {
             return this.nombreCouleurs;
         }
 
+        /// <summary>
+        /// Affiche la coloration des noeuds du graphe dans la console.
+        /// </summary>
         public void AfficherColoration()
         {
             foreach (Noeud<T> noeud in graphe.Noeuds)
@@ -85,7 +112,11 @@ namespace PbSI
                 Debug.Log("Noeud" + noeud.Id + " : " + noeud.Couleur);
             }
         }
-        #endregion
+
+        /// <summary>
+        /// Vérifie si le graphe est biparti.
+        /// </summary>
+        /// <returns>True si le graphe est biparti, sinon False.</returns>
         public bool EstBiparti()
         {
             Dictionary<Noeud<T>, int> couleurs = new Dictionary<Noeud<T>, int>();
@@ -117,6 +148,10 @@ namespace PbSI
             return true;
         }
 
+        /// <summary>
+        /// Vérifie si le graphe est planaire.
+        /// </summary>
+        /// <returns>True si le graphe est planaire, sinon False.</returns>
         public bool EstPlanaire()
         {
             int n = graphe.Ordre;
@@ -127,6 +162,11 @@ namespace PbSI
             }
             return false;
         }
+
+        /// <summary>
+        /// Retourne les groupes indépendants de noeuds dans le graphe.
+        /// </summary>
+        /// <returns>Liste des groupes indépendants de noeuds.</returns>
         public List<List<Noeud<T>>> GetGroupesIndependants()
         {
             List<List<Noeud<T>>> groupes = new List<List<Noeud<T>>>();
@@ -163,5 +203,6 @@ namespace PbSI
             }
             return groupes;
         }
+        #endregion
     }
 }
