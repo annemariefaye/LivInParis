@@ -1,0 +1,668 @@
+USE LivInParis;
+SET FOREIGN_KEY_CHECKS = 0;
+INSERT INTO Client (IdClient, NomEntreprise) VALUES
+(1, 'Boulangerie Dupont'),
+(2, 'Fromagerie Martin'),
+(3, 'Pâtisserie Saint-Honoré'),
+(4, 'Marché Bio Valence'),
+(5, 'Café de la Paix'),
+(6, 'La Table des Gourmets'),
+(7, 'Épicerie du Coin'),
+(8, 'Restaurant L’Authentique'),
+(9, 'Brasserie du Canal'),
+(10, 'Le Petit Traiteur'),
+(11, 'Maison Gourmande'),
+(12, 'Boucherie Artisanale Lefèvre'),
+(13, 'Le Jardin de Paris'),
+(14, 'Cuisine du Monde SARL'),
+(15, 'Boulangerie Ronde des Pains'),
+(16, 'Café Montmartre'),
+(17, 'Ferme de la Vallée'),
+(18, 'L’Assiette Provençale'),
+(19, 'Poissonnerie Bleue Marine'),
+(20, 'Charcuterie Fine Parisienne'),
+(21, 'Salon de Thé Louise'),
+(22, 'Pizza Bella'),
+(23, 'Chez Gaston'),
+(24, 'Bistrot du Marché'),
+(25, 'La Crêperie Bretonne'),
+(26, 'Délices d’Orient'),
+(27, 'Tentation Sucrée'),
+(28, 'Gustave et Co.'),
+(29, 'Maison Violette'),
+(30, 'Restaurant Le Patio'),
+(31, 'L’Atelier du Chef'),
+(32, 'Le Pain Quotidien'),
+(33, 'Saveurs Italiennes'),
+(34, 'Aux Mille Saveurs'),
+(35, 'La Bonne Table'),
+(36, 'Café Littéraire Montaigne'),
+(37, 'Épicerie Fine Saint-Antoine'),
+(38, 'Les Délices de Camille'),
+(39, 'Fruits & Fraîcheur SARL'),
+(40, 'Le Régal des Papilles'),
+(41, 'Pâtes & Passion'),
+(42, 'Poivre & Sel SA'),
+(43, 'Le Goût du Sud'),
+(44, 'Boulangerie de la Gare'),
+(45, 'La Bonne Fourchette'),
+(46, 'Brunch & Bistrot'),
+(47, 'Maison Petitdéjeuner'),
+(48, 'L’Atelier Vegan'),
+(49, 'Boucherie de l’Est'),
+(50, 'Traiteur Saveurs du Liban');
+
+INSERT INTO Cuisinier (IdCuisinier, PlatDuJour) VALUES
+(1, 'Choucroute garnie'),
+(2, 'Empanadas'),
+(3, 'Feijoada'),
+(4, 'Canard laqué'),
+(5, 'Paella'),
+(6, 'Injera'),
+(7, 'Moussaka'),
+(8, 'Butter chicken'),
+(9, 'Pizza Margherita'),
+(10, 'Sushi saumon'),
+(11, 'Taboulé'),
+(12, 'Tajine poulet citron'),
+(13, 'Tacos'),
+(14, 'Bortsch'),
+(15, 'Veau aux olives'),
+(16, 'Fondue suisse'),
+(17, 'Pad thaï'),
+(18, 'Kebab'),
+(19, 'Burger classique'),
+(20, 'Phở'),
+(21, 'Mafé'),
+(22, 'Clafoutis cerise'),
+(23, 'Crème brûlée'),
+(24, 'Tiramisu'),
+(25, 'Flan pâtissier');
+
+INSERT INTO Station (IdStation, Nom, Latitude, Longitude) VALUES
+(1, 'Châtelet', 48.8581, 2.3470),
+(2, 'Gare de Lyon', 48.8443, 2.3744),
+(3, 'Bastille', 48.8530, 2.3690),
+(4, 'Nation', 48.8485, 2.3958),
+(5, 'Montparnasse-Bienvenüe', 48.8414, 2.3209),
+(6, 'Porte de Clignancourt', 48.8983, 2.3446),
+(7, 'République', 48.8674, 2.3632),
+(8, 'Opéra', 48.8704, 2.3320),
+(9, 'Place d’Italie', 48.8311, 2.3552),
+(10, 'Trocadéro', 48.8633, 2.2889),
+(11, 'Saint-Lazare', 48.8756, 2.3259),
+(12, 'La Motte-Picquet – Grenelle', 48.8492, 2.2986),
+(13, 'Denfert-Rochereau', 48.8331, 2.3321),
+(14, 'Alésia', 48.8283, 2.3266),
+(15, 'Porte d’Orléans', 48.8254, 2.3259),
+(16, 'Porte de Vincennes', 48.8489, 2.4164),
+(17, 'Porte de Bagnolet', 48.8671, 2.4091),
+(18, 'Gambetta', 48.8642, 2.3984),
+(19, 'Ménilmontant', 48.8662, 2.3897),
+(20, 'Père Lachaise', 48.8619, 2.3889),
+(21, 'Faidherbe – Chaligny', 48.8494, 2.3852),
+(22, 'Voltaire', 48.8573, 2.3807),
+(23, 'Richard-Lenoir', 48.8579, 2.3736),
+(24, 'Oberkampf', 48.8644, 2.3693),
+(25, 'Strasbourg – Saint-Denis', 48.8692, 2.3541),
+(26, 'Bonne Nouvelle', 48.8713, 2.3498),
+(27, 'Grands Boulevards', 48.8729, 2.3448),
+(28, 'Richelieu – Drouot', 48.8721, 2.3378),
+(29, 'Cadet', 48.8767, 2.3433),
+(30, 'Poissonnière', 48.8793, 2.3518),
+(31, 'Barbès – Rochechouart', 48.8822, 2.3495),
+(32, 'Château Rouge', 48.8846, 2.3445),
+(33, 'Abbesses', 48.8842, 2.3387),
+(34, 'Lamarck – Caulaincourt', 48.8896, 2.3375),
+(35, 'Jules Joffrin', 48.8927, 2.3416),
+(36, 'Simplon', 48.8952, 2.3445),
+(37, 'Marcadet – Poissonniers', 48.8921, 2.3498),
+(38, 'Marx Dormoy', 48.8922, 2.3594),
+(39, 'La Chapelle', 48.8843, 2.3625),
+(40, 'Stalingrad', 48.8842, 2.3707),
+(41, 'Jaurès', 48.8846, 2.3776),
+(42, 'Louis Blanc', 48.8833, 2.3761),
+(43, 'Château-Landon', 48.8796, 2.3697),
+(44, 'Gare de l’Est', 48.8763, 2.3594),
+(45, 'Jacques Bonsergent', 48.8708, 2.3629),
+(46, 'Arts et Métiers', 48.8663, 2.3561),
+(47, 'Temple', 48.8678, 2.3617),
+(48, 'Réaumur – Sébastopol', 48.8682, 2.3524),
+(49, 'Sentier', 48.8689, 2.3481),
+(50, 'Pigalle', 48.8820, 2.3371);
+
+INSERT INTO Utilisateur (Id, NomUtilisateur, Hashing, Salt, Nom, Prenom, Adresse, Telephone, Email, IdCuisinier, IdClient, IdStationProche, EstBanni, PointFidelite) VALUES
+(1, 'laurentnicole', '70141dc13ddd90b4eb55c7cfa77b49216775eeed4269500f48b3b170faf53ba4', '1d530e23cdf753d1c3862ca8f07dee95', 'Gallet', 'François', '2 Rue de la Coutellerie, 75004 Paris', '2654235116', 'chauveauceline@yahoo.fr', NULL, 2, 16, TRUE, 17),
+(2, 'jchevalier', '9af0f2a658106170bcf79f2354529b61d82b62822b8912ae824aeadcb4616a01', 'b81042ef0b46aedb1bba4820d9bd5dcf', 'Étienne', 'Hortense', '6 Rue du Ranelagh, 75016 Paris', '5534192832', 'zoe03@gomes.org', NULL, NULL, 38, FALSE, 4),
+(3, 'lecomtehelene', '9837aca8b60ae094041068ce73e89bade5e3763eef992e6fa0db9c899246600f', '1bbf3e79258bc46784ed70e19c3e7824', 'Bègue', 'Colette', '9 Rue Francis de Croisset, 75018 Paris', '1012269166', 'bazinmichelle@yahoo.fr', NULL, NULL, 33, TRUE, 71),
+(4, 'pauline51', '17c06b7c8b35e5a1bc59350f4bbd38f2d8ceaea1eb9e04ce03e340e3752d2a66', 'f0022c023925a824a92b10f294505dde', 'Bernard', 'Michelle', '19 Rue Corvisart, 75013 Paris', '1543039117', 'kdias@evrard.fr', 13, 15, 38, FALSE, 0),
+(5, 'elodiefaivre', 'e353922244207492722f15ba172bd3fcc732095d41c6837f0cd900afd5867423', 'c30acae1de9601001c5f5de7470a89e3', 'Langlois', 'Andrée', '14 Rue Crespin du Gast, 75011 Paris', '3105183473', 'sabinereynaud@noos.fr', NULL, 45, 22, FALSE, 19),
+(6, 'etiennepereira', '3acd87b37875d988d51f6176792ecbc36fbfbef607e0f54cf375dba217e769e8', '9677abf6d9ca10d2ad444e123e6ddbd8', 'Bouchet', 'Chantal', '12 Rue Claude Tillier, 75012 Paris', '3178108013', 'andreelopez@free.fr', 14, NULL, 25, TRUE, 45),
+(7, 'ybernard', '206813f36553af6c471b8b52d69649975505d8f049f93d6cbdf7db081a13248c', '410610ae35681c01b8380401175586e2', 'De Sousa', 'Sébastien', '8 Rue de l''Ermitage, 75020 Paris', '8121913619', 'humbertmargaux@bertin.net', 23, 3, 35, TRUE, 48),
+(8, 'olivier46', '0ae2d1dcc736162a8f962d9e9be64e7ff3bd37f38b8a6d34dd4affac1892eb66', '928c600deb417c2d6fe8e12d46d5c5ac', 'Albert', 'Thomas', '14 Rue de la Fontaine au Roi, 75011 Paris', '5427849808', 'gautiernoemi@laposte.net', 6, 41, 37, TRUE, 90),
+(9, 'roland93', 'ce9a588574674e0e04b212eeeeb95d0f7af041f87c85c1117057f3ab506317e8', 'a032cb1669de8e2c895cfad1b1acf571', 'Couturier', 'Dominique', '2 Rue de la Coutellerie, 75004 Paris', '1128059826', 'pelletiermarc@orange.fr', NULL, NULL, 50, FALSE, 10),
+(10, 'monnierrenee', '6c6aef9df4c47c2822ac0083423cdbefae3ada9d43b02f4621a43be0524c7a06', 'e1c2d5107a53ea99d2a0a146a56f05b2', 'Legendre', 'Océane', '6 Rue du Ranelagh, 75016 Paris', '3754330365', 'ipotier@dbmail.com', NULL, 25, 30, FALSE, 20),
+(11, 'celinedumont', 'f07a3c83111df79c26f91d683b0b1352434f865a5d5d4726852601c165f8b7d0', 'a1f23de9d9a945fb1d15c1b93b59f8c9', 'Dumont', 'Céline', '9 Rue Francis de Croisset, 75018 Paris', '0601234567', 'celine.dumont@email.com', NULL, 5, 12, FALSE, 12),
+(12, 'marcduval', '2b16745b1b67f6a6e44a9f1de6b0416ed04cb90b74b73854b0cf48fd0036d1a2', 'b2487d53d1a96cbbd8783e0a179ac1df', 'Duval', 'Marc', '19 Rue Corvisart, 75013 Paris', '0645678910', 'marc.duval@email.com', NULL, 6, 27, FALSE, 8),
+(13, 'juliebazin', '1c2e5ad7430e27444ecdb51074eb867ebfd13b71b490d0c07cb23b3efdc69aa1', 'cda72d91891ee51a36e5bb2f6f9e99f5', 'Bazin', 'Julie', '14 Rue Crespin du Gast, 75011 Paris', '0667843210', 'julie.bazin@email.com', NULL, 7, 3, TRUE, 23),
+(14, 'nicolasgauthier', 'e44fd15e7a1e253bb3a3f4169c53a929f27952f028d4ecf00d1e8ec0ccdb170b', 'f1e8cb5a6a2e4517d5dcd6d04eac802d', 'Gauthier', 'Nicolas', '12 Rue Claude Tillier, 75012 Paris', '0678901234', 'nicolas.gauthier@email.com', 12, NULL, 6, FALSE, 15),
+(15, 'paulineroger', '59e6acb9fd50ea8eab7deed9e93bd5ed285f22241a6b2f0c51dce2c0931e9019', 'c3b0911b27d64cf7a7d4c6d39c10aeec', 'Roger', 'Pauline', '8 Rue de l''Ermitage, 75020 Paris', '0612349876', 'pauline.roger@email.com', NULL, 8, 22, TRUE, 3),
+(16, 'jeanvaljean', 'c4050be4b61e6b7cda96dc7d1247c7e83197be0bcb243be186c89f26323f4f92', 'af3a790cc5646c67ba983a1d2be82320', 'Valjean', 'Jean', '14 Rue de la Fontaine au Roi, 75011 Paris', '0612345678', 'jean.valjean@email.com', 7, NULL, 17, FALSE, 60),
+(17, 'charlottedupuy', '9e5f3e2a8b8594fc2a8a7159919c27cc57a087b7df21551ab4cde15422ce6c6f', 'b6e0e0b60b9544a4ad8394fcb792dee5', 'Dupuy', 'Charlotte', '2 Rue de la Coutellerie, 75004 Paris', '0698765432', 'charlotte.dupuy@email.com', NULL, 9, 13, FALSE, 30),
+(18, 'patrickmorel', '23d715aa782267cd064d302fdf876a3c489a4192a0b065b52db60f47bb9fd5ef', 'e391f72f6dfc4569aebb75edbd003f49', 'Morel', 'Patrick', '6 Rue du Ranelagh, 75016 Paris', '0687654321', 'patrick.morel@email.com', 8, NULL, 28, TRUE, 42),
+(19, 'emiliebarre', 'd9f0a3be158c3c2d0bc2d97e750f3fd93a3fd404d5a7c51081eb1ef5de5f13f2', 'c508e8615694a73961ffac44a8165e2a', 'Barré', 'Émilie', '9 Rue Francis de Croisset, 75018 Paris', '0623456789', 'emilie.barre@email.com', NULL, 10, 5, FALSE, 17),
+(20, 'thomasleclerc', '3ff163041159b3ae037a07de334ef0a50c4fa98c3c148e64355e1609358cf676', 'd0949c8ea1c94d85adf253ae7c2b4b5e', 'Leclerc', 'Thomas', '19 Rue Corvisart, 75013 Paris', '0609876543', 'thomas.leclerc@email.com', 9, NULL, 11, FALSE, 28),
+(21, 'sabineperrin', '3e4d6473be1794c76b4b82c45a8ae15a7cb2e9e9534dc978f687f8a837dd24d9', 'ed738c9dca8e45b6b1dc7d6e9e06a3f8', 'Perrin', 'Sabine', '14 Rue Crespin du Gast, 75011 Paris', '0671122334', 'sabine.perrin@email.com', NULL, 11, 24, FALSE, 36),
+(22, 'bernardjulien', '7a1c9b0329732ccfbf97e1736e6dfebd8b249e1937c6e4b31fc57084db30cba1', 'fbc391b9d52744c08c5d3e1e027f7160', 'Julien', 'Bernard', '12 Rue Claude Tillier, 75012 Paris', '0678456212', 'bernard.julien@email.com', 10, NULL, 10, TRUE, 0),
+(23, 'luciecaron', 'fa2e741d05b0f3e24dcd9891b4abf18062a9d727a5cf4fef147b3c8e6b4a3ec1', '1d04ed2c19854cce8ec23f32793ed78f', 'Caron', 'Lucie', '8 Rue de l''Ermitage, 75020 Paris', '0655124738', 'lucie.caron@email.com', NULL, 12, 1, FALSE, 11),
+(24, 'thibaultlemaire', '79ed03b8e8e1d09d3f41e678d55e2bb441c4eb2c8d16d40b988c88f3e9f1c7d6', 'fd2f8d9f37c34de3bcff12bb4f249c4c', 'Lemaire', 'Thibault', '14 Rue de la Fontaine au Roi, 75011 Paris', '0688123489', 'thibault.lemaire@email.com', 15, NULL, 19, FALSE, 24),
+(25, 'anaisgarnier', 'e1d97d4d6a0f57efc1488c77d1bd7f3ed7de2ff80a9a1d0d4b0c456b95cfd20c', 'f1bda8aa55c6455698e246b2149fef32', 'Garnier', 'Anaïs', '2 Rue de la Coutellerie, 75004 Paris', '0620123456', 'anais.garnier@email.com', NULL, 13, 7, FALSE, 35),
+(26, 'maximebertrand', '4f7d408e5dc3a2ae1dcb67d149c850ecbe52c6a72931cb93bc5d355c3a28cd56', 'ab9ed0a153d548f39d3efc57f6e56d09', 'Bertrand', 'Maxime', '6 Rue du Ranelagh, 75016 Paris', '0613456722', 'maxime.bertrand@email.com', 16, NULL, 20, FALSE, 18),
+(27, 'camillemorin', '8aebd2406a63f79a21bd16532f144e9e5cd4f8537ab6c73dbfda3fdf5e97bc21', 'ea40a32f7e2b44f4b85a84140e0a907e', 'Morin', 'Camille', '9 Rue Francis de Croisset, 75018 Paris', '0609988776', 'camille.morin@email.com', NULL, 14, 9, FALSE, 22),
+(28, 'hugojoly', 'bcb693c7f0bb1d259f0d4ebcf93367e64c9f36c2f56e4c52aa2488a3dfd80438', 'c31f2aeb24e8475db0916de19b7c3f10', 'Joly', 'Hugo', '19 Rue Corvisart, 75013 Paris', '0691234567', 'hugo.joly@email.com', 17, NULL, 2, FALSE, 9),
+(29, 'nathalieforest', 'd0f4c36549ea878fc1ef36f95aa16d44b7089d0bfbebd0e879adf8e2c2939470', 'd7a1d9e9d51e404a961ab137f0a3c6b3', 'Forest', 'Nathalie', '14 Rue Crespin du Gast, 75011 Paris', '0632145678', 'nathalie.forest@email.com', NULL, 15, 34, TRUE, 2),
+(30, 'alainrenard', '01750f4b8d81c5fd38d0835d176373ad645acb8b9272c98c7b1c594cdfc7d274', 'bd10d84534c2455ba0bd058a6e3b211c', 'Renard', 'Alain', '12 Rue Claude Tillier, 75012 Paris', '0678432123', 'alain.renard@email.com', 18, NULL, 26, FALSE, 5);
+
+INSERT INTO Recette (IdRecette, Nom) VALUES
+(1, 'Choucroute garnie'),
+(2, 'Schnitzel'),
+(3, 'Empanadas'),
+(4, 'Asado'),
+(5, 'Feijoada'),
+(6, 'Moqueca'),
+(7, 'Canard laqué'),
+(8, 'Nouilles sautées'),
+(9, 'Paella'),
+(10, 'Tortilla espagnole'),
+(11, 'Injera'),
+(12, 'Doro wat'),
+(13, 'Moussaka'),
+(14, 'Souvlaki'),
+(15, 'Butter chicken'),
+(16, 'Palak paneer'),
+(17, 'Pizza Margherita'),
+(18, 'Lasagnes'),
+(19, 'Sushi saumon'),
+(20, 'Ramen'),
+(21, 'Taboulé'),
+(22, 'Kebbé'),
+(23, 'Tajine poulet citron'),
+(24, 'Couscous'),
+(25, 'Tacos'),
+(26, 'Enchiladas'),
+(27, 'Bortsch'),
+(28, 'Pelmeni'),
+(29, 'Veau aux olives'),
+(30, 'Soupe corse'),
+(31, 'Fondue suisse'),
+(32, 'Rösti'),
+(33, 'Pad thaï'),
+(34, 'Curry vert'),
+(35, 'Kebab'),
+(36, 'Lahmacun'),
+(37, 'Burger classique'),
+(38, 'Mac and cheese'),
+(39, 'Phở'),
+(40, 'Bánh mì'),
+(41, 'Mafé'),
+(42, 'Yassa poulet');
+
+INSERT INTO Plat (IdPlat, Nom, Prix, IdCuisinier, Type, Personnes, DateFabrication, DatePeremption, Regime, IdRecette, CheminAccesPhoto, Nationalite, Proteines) VALUES
+(1, 'Choucroute garnie', 13.49, 5, 'Plat Principal', 5, '2025-05-01', '2025-05-03', 'Vegan', 1, 'Choucroutegarnie', 'Allemande', 19.4),
+(2, 'Schnitzel', 15.66, 6, 'Plat Principal', 4, '2025-05-01', '2025-05-03', 'Végétarien', 2, 'Schnitzel', 'Allemande', 26.5),
+(3, 'Empanadas', 14.32, 7, 'Plat Principal', 4, '2025-05-01', '2025-05-03', 'Sans gluten', 3, 'Empanadas', 'Argentine', 10.9),
+(4, 'Asado', 15.79, 8, 'Plat Principal', 4, '2025-05-01', '2025-05-03', 'Classique', 4, 'Asado', 'Argentine', 15.9),
+(5, 'Feijoada', 15.35, 9, 'Plat Principal', 5, '2025-05-01', '2025-05-03', 'Végétarien', 5, 'Feijoada', 'Brésilienne', 14.5),
+(6, 'Moqueca', 17.11, 10, 'Plat Principal', 6, '2025-05-01', '2025-05-03', 'Halal', 6, 'Moqueca', 'Brésilienne', 16.0),
+(7, 'Canard laqué', 15.5, 11, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Végétarien', 7, 'Canardlaque', 'Chinoise', 15.6),
+(8, 'Nouilles sautées', 15.94, 12, 'Plat Principal', 5, '2025-05-01', '2025-05-03', 'Halal', 8, 'Nouillessautees', 'Chinoise', 20.7),
+(9, 'Paella', 17.63, 13, 'Plat Principal', 4, '2025-05-01', '2025-05-03', 'Sans gluten', 9, 'Paella', 'Espagnole', 16.8),
+(10, 'Tortilla espagnole', 16.75, 14, 'Entrée', 3, '2025-05-01', '2025-05-03', 'Sans gluten', 10, 'Tortillaespagnole', 'Espagnole', 11.7),
+(11, 'Injera', 16.02, 15, 'Plat Principal', 6, '2025-05-01', '2025-05-03', 'Végétarien', 11, 'Injera', 'Éthiopienne', 10.3),
+(12, 'Doro wat', 13.85, 16, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Végétarien', 12, 'Dorowat', 'Éthiopienne', 27.1),
+(13, 'Moussaka', 14.92, 17, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Halal', 13, 'Moussaka', 'Grecque', 12.8),
+(14, 'Souvlaki', 13.77, 18, 'Plat Principal', 2, '2025-05-01', '2025-05-03', 'Sans gluten', 14, 'Souvlaki', 'Grecque', 23.9),
+(15, 'Butter chicken', 17.01, 19, 'Plat Principal', 6, '2025-05-01', '2025-05-03', 'Halal', 15, 'Butterchicken', 'Indienne', 20.5),
+(16, 'Palak paneer', 13.20, 20, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Végétarien', 16, 'Palakpaneer', 'Indienne', 18.6),
+(17, 'Pizza Margherita', 11.50, 21, 'Plat Principal', 2, '2025-05-01', '2025-05-03', 'Végétarien', 17, 'PizzaMargherita', 'Italienne', 19.7),
+(18, 'Lasagnes', 13.80, 22, 'Plat Principal', 4, '2025-05-01', '2025-05-03', 'Classique', 18, 'Lasagnes', 'Italienne', 23.1),
+(19, 'Sushi saumon', 15.90, 23, 'Plat Principal', 6, '2025-05-01', '2025-05-03', 'Sans gluten', 19, 'Sushisaumon', 'Japonaise', 24.5),
+(20, 'Ramen', 14.30, 24, 'Plat Principal', 2, '2025-05-01', '2025-05-03', 'Classique', 20, 'Ramen', 'Japonaise', 19.2),
+(21, 'Taboulé', 12.00, 25, 'Entrée', 3, '2025-05-01', '2025-05-03', 'Vegan', 21, 'Taboule', 'Libanaise', 10.5),
+(22, 'Kebbé', 13.90, 26, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Halal', 22, 'Kebbe', 'Libanaise', 22.7),
+(23, 'Tajine poulet citron', 16.10, 27, 'Plat Principal', 4, '2025-05-01', '2025-05-03', 'Halal', 23, 'Tajinepouletcitron', 'Marocaine', 20.4),
+(24, 'Couscous', 14.40, 28, 'Plat Principal', 4, '2025-05-01', '2025-05-03', 'Halal', 24, 'Couscous', 'Marocaine', 19.8),
+(25, 'Tacos', 13.20, 29, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Halal', 25, 'Tacos', 'Mexicaine', 21.0),
+(26, 'Enchiladas', 14.80, 30, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Classique', 26, 'Enchiladas', 'Mexicaine', 24.5),
+(27, 'Bortsch', 11.90, 31, 'Entrée', 4, '2025-05-01', '2025-05-03', 'Vegan', 27, 'Bortsch', 'Russe', 9.0),
+(28, 'Pelmeni', 13.70, 32, 'Plat Principal', 4, '2025-05-01', '2025-05-03', 'Classique', 28, 'Pelmeni', 'Russe', 18.4),
+(29, 'Veau aux olives', 16.30, 33, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Classique', 29, 'Veauxauxolives', 'Sud-Corée', 23.6),
+(30, 'Soupe corse', 12.70, 34, 'Entrée', 3, '2025-05-01', '2025-05-03', 'Végétarien', 30, 'Soupecorse', 'Sud-Corée', 11.3),
+(31, 'Fondue suisse', 15.60, 35, 'Plat Principal', 4, '2025-05-01', '2025-05-03', 'Végétarien', 31, 'Fonduesuisse', 'Suisse', 20.0),
+(32, 'Rösti', 13.10, 36, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Végétarien', 32, 'Rosti', 'Suisse', 14.4),
+(33, 'Pad thaï', 14.50, 37, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Sans gluten', 33, 'Padthai', 'Thaïlandaise', 21.1),
+(34, 'Curry vert', 15.30, 38, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Vegan', 34, 'Curryvert', 'Thaïlandaise', 16.9),
+(35, 'Kebab', 12.90, 39, 'Plat Principal', 2, '2025-05-01', '2025-05-03', 'Halal', 35, 'Kebab', 'Turque', 22.0),
+(36, 'Lahmacun', 13.50, 40, 'Plat Principal', 2, '2025-05-01', '2025-05-03', 'Halal', 36, 'Lahmacun', 'Turque', 20.3),
+(37, 'Burger classique', 14.00, 41, 'Plat Principal', 2, '2025-05-01', '2025-05-03', 'Classique', 37, 'Burgerclassique', 'USA', 25.0),
+(38, 'Mac and cheese', 13.40, 42, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Végétarien', 38, 'Macandcheese', 'USA', 18.0),
+(39, 'Phở', 13.80, 43, 'Plat Principal', 2, '2025-05-01', '2025-05-03', 'Sans gluten', 39, 'Pho', 'Vietnamienne', 17.5),
+(40, 'Bánh mì', 12.60, 44, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Classique', 40, 'Banhmi', 'Vietnamienne', 20.2),
+(41, 'Mafé', 14.90, 45, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Halal', 41, 'Mafe', 'Sénégalaise', 23.8),
+(42, 'Yassa poulet', 15.20, 46, 'Plat Principal', 3, '2025-05-01', '2025-05-03', 'Halal', 42, 'Yassapoulet', 'Sénégalaise', 22.6),
+(43, 'Crème brûlée', 7.20, 47, 'Dessert', 2, '2025-05-01', '2025-05-03', 'Végétarien', 43, 'Cremebrulee', 'Default', 6.4),
+(44, 'Tarte aux pommes', 6.90, 48, 'Dessert', 2, '2025-05-01', '2025-05-03', 'Végétarien', 44, 'Tarteauxpommes', 'Default', 4.8),
+(45, 'Moelleux au chocolat', 7.50, 49, 'Dessert', 2, '2025-05-01', '2025-05-03', 'Végétarien', 45, 'Moelleuxauchocolat', 'Default', 5.9);
+
+INSERT INTO Ingredient (IdIngredient, Nom, Prix) VALUES
+(1, 'Poulet', 3.50),
+(2, 'Bœuf', 4.20),
+(3, 'Riz', 1.00),
+(4, 'Pâtes', 1.20),
+(5, 'Tomates', 0.80),
+(6, 'Oignons', 0.60),
+(7, 'Ail', 0.40),
+(8, 'Carottes', 0.70),
+(9, 'Pommes de terre', 0.90),
+(10, 'Poivrons', 1.00),
+(11, 'Champignons', 1.30),
+(12, 'Fromage', 2.00),
+(13, 'Crème fraîche', 1.50),
+(14, 'Beurre', 1.40),
+(15, 'Œufs', 2.00),
+(16, 'Lait', 1.10),
+(17, 'Pain', 0.80),
+(18, 'Saumon', 3.80),
+(19, 'Thon', 2.50),
+(20, 'Crevettes', 4.00),
+(21, 'Épinards', 0.90),
+(22, 'Pois chiches', 1.10),
+(23, 'Lentilles', 0.95),
+(24, 'Haricots rouges', 1.20),
+(25, 'Chou', 0.75),
+(26, 'Coriandre', 0.50),
+(27, 'Persil', 0.40),
+(28, 'Cumin', 0.60),
+(29, 'Paprika', 0.70),
+(30, 'Cannelle', 0.80),
+(31, 'Curry', 0.90),
+(32, 'Gingembre', 0.85),
+(33, 'Sel', 0.10),
+(34, 'Poivre', 0.15),
+(35, 'Citron', 0.60),
+(36, 'Yaourt', 1.00),
+(37, 'Farine', 0.95),
+(38, 'Sucre', 0.90),
+(39, 'Chocolat noir', 2.20),
+(40, 'Vanille', 1.80),
+(41, 'Noix', 2.50),
+(42, 'Miel', 2.30),
+(43, 'Huile d’olive', 1.70),
+(44, 'Vinaigre balsamique', 1.50),
+(45, 'Mozzarella', 2.10),
+(46, 'Basilic', 0.60),
+(47, 'Câpres', 1.20),
+(48, 'Saucisse', 2.40),
+(49, 'Agneau', 4.50),
+(50, 'Aubergine', 1.00);
+
+INSERT INTO ListeIngredients (IdIngredient, IdRecette, Quantite) VALUES
+(1, 15, 2), -- Butter chicken : Poulet
+(31, 15, 1), -- Curry
+(5, 15, 3), -- Tomates
+(6, 15, 2), -- Oignons
+
+(2, 4, 2), -- Asado : Bœuf
+(6, 4, 2), -- Oignons
+(43, 4, 1), -- Huile d'olive
+(28, 4, 1), -- Cumin
+
+(3, 39, 1), -- Pho : Riz
+(1, 39, 2), -- Poulet
+(6, 39, 2), -- Oignons
+(32, 39, 1), -- Gingembre
+
+(12, 17, 2), -- Pizza Margherita : Fromage
+(5, 17, 2), -- Tomates
+(45, 17, 1), -- Mozzarella
+(46, 17, 1), -- Basilic
+
+(50, 13, 2), -- Moussaka : Aubergine
+(2, 13, 1), -- Bœuf
+(12, 13, 1), -- Fromage
+(13, 13, 1), -- Crème fraîche
+
+(18, 19, 2), -- Sushi saumon : Saumon
+(3, 19, 1), -- Riz
+(35, 19, 1), -- Citron
+(33, 19, 1), -- Sel
+
+(20, 6, 2), -- Moqueca : Crevettes
+(10, 6, 1), -- Poivrons
+(5, 6, 2), -- Tomates
+(32, 6, 1), -- Gingembre
+
+(1, 42, 2), -- Yassa poulet
+(35, 42, 2), -- Citron
+(6, 42, 2), -- Oignons
+(43, 42, 1); -- Huile d'olive
+INSERT INTO Commande (IdClient, DateCommande, Statut) VALUES
+(2, '2025-04-28 10:12:00', 'En attente'),
+(5, '2025-04-27 14:30:00', 'Validée'),
+(10, '2025-04-26 18:45:00', 'Livrée'),
+(15, '2025-04-25 12:10:00', 'Annulée'),
+(8, '2025-04-29 09:00:00', 'Validée'),
+(25, '2025-04-24 17:50:00', 'Livrée'),
+(3, '2025-04-30 13:15:00', 'En attente'),
+(12, '2025-04-23 20:00:00', 'Annulée'),
+(6, '2025-04-22 11:30:00', 'Validée'),
+(18, '2025-05-01 15:45:00', 'En attente'),
+(13, '2025-04-21 08:20:00', 'Livrée'),
+(9, '2025-05-01 16:30:00', 'Validée'),
+(22, '2025-04-30 19:15:00', 'Annulée'),
+(19, '2025-04-28 10:00:00', 'En attente'),
+(4, '2025-04-27 12:20:00', 'Livrée'),
+(7, '2025-05-02 09:45:00', 'En attente'),
+(11, '2025-04-30 10:25:00', 'Validée'),
+(14, '2025-04-29 16:15:00', 'Livrée'),
+(1, '2025-05-01 11:40:00', 'Annulée'),
+(16, '2025-05-01 13:00:00', 'Validée'),
+(21, '2025-05-01 15:00:00', 'Livrée'),
+(20, '2025-05-02 08:30:00', 'En attente'),
+(23, '2025-05-01 17:20:00', 'Validée'),
+(24, '2025-05-02 10:00:00', 'Annulée'),
+(26, '2025-04-30 09:50:00', 'En attente'),
+(27, '2025-04-30 13:10:00', 'Livrée'),
+(28, '2025-04-29 14:25:00', 'Validée'),
+(29, '2025-04-28 19:40:00', 'En attente'),
+(30, '2025-04-27 21:00:00', 'Livrée'),
+(31, '2025-04-26 15:30:00', 'Validée');
+INSERT INTO LigneDeCommande (IdCommande, IdPlat, Quantite, DateLivraison, LieuLivraison) VALUES
+(1, 5, 2, '2025-05-03', '81 Rue du Charolais, 75012 Paris'),
+(2, 14, 1, '2025-05-02', '44 Rue Vieille du Temple, 75004 Paris'),
+(3, 8, 3, '2025-05-01', '122 Rue du Théâtre, 75015 Paris'),
+(4, 1, 1, '2025-05-04', '82 Rue de la Pompe, 75016 Paris'),
+(5, 23, 2, '2025-05-02', '44 Rue de Ponthieu, 75008 Paris'),
+(6, 35, 1, '2025-05-03', '5 Rue du Bac, 75007 Paris'),
+(7, 41, 1, '2025-05-04', '33 Rue Godot de Mauroy, 75009 Paris'),
+(8, 11, 2, '2025-05-03', '88 Rue Ordener, 75018 Paris'),
+(9, 17, 2, '2025-05-02', '18 Rue Louis Blanc, 75010 Paris'),
+(10, 7, 1, '2025-05-05', '101 Rue des Couronnes, 75020 Paris'),
+(11, 13, 3, '2025-05-01', '81 Rue du Charolais, 75012 Paris'),
+(12, 30, 2, '2025-05-03', '44 Rue Vieille du Temple, 75004 Paris'),
+(13, 40, 1, '2025-05-03', '122 Rue du Théâtre, 75015 Paris'),
+(14, 9, 2, '2025-05-02', '82 Rue de la Pompe, 75016 Paris'),
+(15, 21, 1, '2025-05-04', '44 Rue de Ponthieu, 75008 Paris'),
+(16, 2, 1, '2025-05-05', '5 Rue du Bac, 75007 Paris'),
+(17, 4, 2, '2025-05-06', '33 Rue Godot de Mauroy, 75009 Paris'),
+(18, 6, 3, '2025-05-06', '88 Rue Ordener, 75018 Paris'),
+(19, 10, 1, '2025-05-06', '18 Rue Louis Blanc, 75010 Paris'),
+(20, 15, 1, '2025-05-07', '101 Rue des Couronnes, 75020 Paris'),
+(21, 18, 2, '2025-05-07', '81 Rue du Charolais, 75012 Paris'),
+(22, 20, 2, '2025-05-07', '44 Rue Vieille du Temple, 75004 Paris'),
+(23, 24, 1, '2025-05-08', '122 Rue du Théâtre, 75015 Paris'),
+(24, 26, 1, '2025-05-08', '82 Rue de la Pompe, 75016 Paris'),
+(25, 28, 1, '2025-05-08', '44 Rue de Ponthieu, 75008 Paris'),
+(26, 32, 1, '2025-05-09', '5 Rue du Bac, 75007 Paris'),
+(27, 34, 2, '2025-05-09', '33 Rue Godot de Mauroy, 75009 Paris'),
+(28, 36, 3, '2025-05-09', '88 Rue Ordener, 75018 Paris'),
+(29, 38, 2, '2025-05-10', '18 Rue Louis Blanc, 75010 Paris'),
+(30, 42, 1, '2025-05-10', '101 Rue des Couronnes, 75020 Paris');
+
+INSERT INTO Livraison (IdLigneCommande, IdLivreur, IdStationDepart, IdStationArrivee, Statut) VALUES
+(1, 14, 5, 16, 'Livrée'),
+(2, 19, 11, 3, 'En cours'),
+(3, 7, 22, 7, 'Livrée'),
+(4, 23, 17, 13, 'En attente'),
+(5, 1, 6, 12, 'En cours'),
+(6, 16, 9, 28, 'Livrée'),
+(7, 8, 1, 30, 'Livrée'),
+(8, 18, 13, 19, 'En cours'),
+(9, 20, 25, 10, 'Livrée'),
+(10, 21, 27, 11, 'En attente'),
+(11, 24, 15, 26, 'En cours'),
+(12, 12, 34, 6, 'Livrée'),
+(13, 6, 9, 4, 'Livrée'),
+(14, 10, 18, 20, 'En attente'),
+(15, 22, 2, 8, 'Livrée'),
+(16, 5, 16, 9, 'Livrée'),
+(17, 11, 24, 21, 'En attente'),
+(18, 13, 19, 17, 'En cours'),
+(19, 15, 30, 14, 'Livrée'),
+(20, 3, 7, 23, 'Livrée'),
+(21, 9, 10, 29, 'En attente'),
+(22, 2, 26, 5, 'En cours'),
+(23, 17, 3, 25, 'Livrée'),
+(24, 4, 31, 22, 'Livrée'),
+(25, 25, 8, 18, 'En attente'),
+(26, 26, 20, 15, 'En cours'),
+(27, 27, 12, 32, 'Livrée'),
+(28, 28, 28, 2, 'En cours'),
+(29, 29, 10, 24, 'Livrée'),
+(30, 30, 13, 27, 'En attente'),
+(31, 14, 6, 15, 'En cours'),
+(32, 7, 9, 11, 'Livrée'),
+(33, 20, 10, 14, 'Livrée'),
+(34, 18, 3, 6, 'En attente'),
+(35, 13, 19, 25, 'Livrée'),
+(36, 12, 16, 27, 'En cours'),
+(37, 8, 30, 4, 'Livrée'),
+(38, 5, 1, 20, 'Livrée'),
+(39, 11, 22, 17, 'En attente'),
+(40, 2, 12, 28, 'En cours');
+INSERT INTO Ligne (IdLigne, Nom) VALUES
+(1, 'Ligne 1'),
+(2, 'Ligne 2'),
+(3, 'Ligne 3'),
+(4, 'Ligne 3bis'),
+(5, 'Ligne 4'),
+(6, 'Ligne 5'),
+(7, 'Ligne 6'),
+(8, 'Ligne 7'),
+(9, 'Ligne 7bis'),
+(10, 'Ligne 8'),
+(11, 'Ligne 9'),
+(12, 'Ligne 10'),
+(13, 'Ligne 11'),
+(14, 'Ligne 12'),
+(15, 'Ligne 13'),
+(16, 'Ligne 14');
+INSERT INTO Correspondance (IdStation, IdLigne) VALUES
+(1, 1),  -- Châtelet - Ligne 1
+(1, 4),  -- Châtelet - Ligne 3bis
+(1, 5),  -- Châtelet - Ligne 4
+(1, 14), -- Châtelet - Ligne 14
+(2, 1),  -- Gare de Lyon - Ligne 1
+(2, 14), -- Gare de Lyon - Ligne 14
+(3, 1),  -- Bastille - Ligne 1
+(3, 5),  -- Bastille - Ligne 4
+(4, 1),  -- Nation - Ligne 1
+(4, 2),  -- Nation - Ligne 2
+(4, 6),  -- Nation - Ligne 5
+(5, 13), -- Montparnasse-Bienvenüe - Ligne 12
+(5, 15), -- Montparnasse-Bienvenüe - Ligne 13
+(6, 4),  -- Porte de Clignancourt - Ligne 3bis
+(7, 6),  -- République - Ligne 5
+(7, 13), -- République - Ligne 11
+(8, 1),  -- Opéra - Ligne 1
+(8, 2),  -- Opéra - Ligne 2
+(9, 5),  -- Place d’Italie - Ligne 4
+(10, 9), -- Trocadéro - Ligne 9
+(11, 3), -- Saint-Lazare - Ligne 3
+(11, 14),-- Saint-Lazare - Ligne 14
+(12, 8), -- La Motte-Picquet – Grenelle - Ligne 7
+(13, 6), -- Denfert-Rochereau - Ligne 5
+(14, 6), -- Alésia - Ligne 5
+(15, 6), -- Porte d’Orléans - Ligne 5
+(16, 2), -- Porte de Vincennes - Ligne 2
+(17, 3), -- Porte de Bagnolet - Ligne 3
+(18, 3), -- Gambetta - Ligne 3
+(19, 3), -- Ménilmontant - Ligne 3
+(20, 3), -- Père Lachaise - Ligne 3
+(20, 6), -- Père Lachaise - Ligne 5
+(21, 6), -- Faidherbe – Chaligny - Ligne 5
+(22, 6), -- Voltaire - Ligne 5
+(23, 6), -- Richard-Lenoir - Ligne 5
+(24, 6), -- Oberkampf - Ligne 5
+(25, 6), -- Strasbourg – Saint-Denis - Ligne 5
+(26, 6), -- Bonne Nouvelle - Ligne 5
+(27, 6), -- Grands Boulevards - Ligne 5
+(28, 6), -- Richelieu – Drouot - Ligne 5
+(29, 6), -- Cadet - Ligne 5
+(30, 6); -- Poissonnière - Ligne 5
+INSERT INTO Transaction (IdCommande, Montant, Reussie, DateTransaction) VALUES
+(1, 29.80, TRUE, '2025-05-01 10:15:00'),
+(2, 15.60, TRUE, '2025-05-01 11:30:00'),
+(3, 42.70, FALSE, '2025-05-01 12:45:00'),
+(4, 13.90, TRUE, '2025-05-01 14:10:00'),
+(5, 58.20, TRUE, '2025-05-01 15:25:00'),
+(6, 19.90, TRUE, '2025-05-01 16:40:00'),
+(7, 35.60, FALSE, '2025-05-01 17:55:00'),
+(8, 25.40, TRUE, '2025-05-01 19:10:00'),
+(9, 47.10, TRUE, '2025-05-01 20:25:00'),
+(10, 39.80, TRUE, '2025-05-01 21:40:00'),
+(11, 24.90, TRUE, '2025-05-02 09:05:00'),
+(12, 18.50, TRUE, '2025-05-02 09:30:00'),
+(13, 40.70, FALSE, '2025-05-02 10:10:00'),
+(14, 33.60, TRUE, '2025-05-02 10:50:00'),
+(15, 27.90, TRUE, '2025-05-02 11:15:00'),
+(16, 22.40, TRUE, '2025-05-02 11:40:00'),
+(17, 19.80, FALSE, '2025-05-02 12:00:00'),
+(18, 49.50, TRUE, '2025-05-02 12:30:00'),
+(19, 28.60, TRUE, '2025-05-02 13:05:00'),
+(20, 34.70, TRUE, '2025-05-02 13:30:00'),
+(21, 36.20, TRUE, '2025-05-02 14:00:00'),
+(22, 26.90, TRUE, '2025-05-02 14:25:00'),
+(23, 17.80, TRUE, '2025-05-02 14:45:00'),
+(24, 31.60, FALSE, '2025-05-02 15:10:00'),
+(25, 38.10, TRUE, '2025-05-02 15:30:00'),
+(26, 21.70, TRUE, '2025-05-02 16:00:00'),
+(27, 30.00, FALSE, '2025-05-02 16:20:00'),
+(28, 33.30, TRUE, '2025-05-02 16:45:00'),
+(29, 44.80, TRUE, '2025-05-02 17:10:00'),
+(30, 23.40, TRUE, '2025-05-02 17:30:00'),
+(31, 16.90, TRUE, '2025-05-02 17:50:00'),
+(32, 27.30, TRUE, '2025-05-02 18:10:00'),
+(33, 35.60, TRUE, '2025-05-02 18:30:00'),
+(34, 42.00, FALSE, '2025-05-02 18:50:00'),
+(35, 39.90, TRUE, '2025-05-02 19:10:00'),
+(36, 28.70, TRUE, '2025-05-02 19:30:00'),
+(37, 34.80, TRUE, '2025-05-02 19:50:00'),
+(38, 46.30, FALSE, '2025-05-02 20:10:00'),
+(39, 31.20, TRUE, '2025-05-02 20:30:00'),
+(40, 22.50, TRUE, '2025-05-02 20:50:00');
+
+INSERT INTO CategorieAmbiance (IdCategorie, Nom) VALUES
+(1, 'Romantique'),
+(2, 'Familiale'),
+(3, 'Festive'),
+(4, 'Soleil'),
+(5, 'Chic'),
+(6, 'Cosy'),
+(7, 'Traditionnelle'),
+(8, 'Exotique'),
+(9, 'Montagnarde'),
+(10, 'Épicée');
+
+INSERT INTO PlatCategorieAmbiance (IdPlat, IdCategorie) VALUES
+(1, 7),  
+(2, 7),  
+(3, 4),  
+(4, 4),  
+(5, 4),  
+(6, 6),  
+(7, 5),  
+(8, 5),  
+(9, 4),  
+(10, 4), 
+(11, 3), 
+(12, 3), 
+(13, 1), 
+(14, 1), 
+(15, 5), 
+(16, 4), 
+(17, 1), 
+(18, 1), 
+(19, 8), 
+(20, 5),
+(21, 4), 
+(22, 4), 
+(23, 4), 
+(24, 4), 
+(25, 4), 
+(26, 4), 
+(27, 7), 
+(28, 7), 
+(29, 7), 
+(30, 2), 
+(31, 2), 
+(32, 2), 
+(33, 4), 
+(34, 4), 
+(35, 4), 
+(36, 4), 
+(37, 1), 
+(38, 1), 
+(39, 4), 
+(40, 4), 
+(41, 10), 
+(42, 4),
+(43, 2), 
+(44, 3), 
+(45, 6), 
+(31, 9), 
+(34, 10); 
+
+
+INSERT INTO NotationCuisinier (IdCuisinier, Note) VALUES
+(1, 5),
+(2, 4),
+(3, 5),
+(4, 3),
+(5, 4),
+(6, 5),
+(7, 4),
+(8, 5),
+(9, 3),
+(10, 5),
+(11, 4),
+(12, 4),
+(13, 5),
+(14, 3),
+(15, 5),
+(16, 4),
+(17, 4),
+(18, 3),
+(19, 5),
+(20, 5),
+(21, 4),
+(22, 4),
+(23, 5),
+(24, 3),
+(25, 5);
+
+INSERT INTO Musique (Titre, Nationalite) VALUES
+('allemande', 'Allemande'),
+('argentine', 'Argentine'),
+('bresilienne', 'Brésilienne'),
+('chinoise', 'Chinoise'),
+('default', 'Default'),
+('espagnole', 'Espagnole'),
+('ethiopienne', 'Éthiopienne'),
+('francaise', 'Française'),
+('grecque', 'Grecque'),
+('indienne', 'Indienne'),
+('italienne', 'Italienne'),
+('japonaise', 'Japonaise'),
+('libanaise', 'Libanaise'),
+('marocaine', 'Marocaine'),
+('mexicaine', 'Mexicaine'),
+('russe', 'Russe'),
+('sudcoreenne', 'Sud-coréenne'),
+('suisse', 'Suisse'),
+('thailandaise', 'Thaïlandaise'),
+('turque', 'Turque'),
+('usa', 'USA'),
+('vietnamienne', 'Vietnamienne');
+
+SET FOREIGN_KEY_CHECKS = 1;
